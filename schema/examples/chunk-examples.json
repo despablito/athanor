@@ -1,0 +1,122 @@
+[
+  {
+    "chunk_id": "TDM-HEUR-001",
+    "author": "Jan Kowalski",
+    "cluster": "technical-decision-making",
+    "type": "heuristic",
+    "uniqueness": "CRITICAL",
+    "source": "interview",
+    "confidence": 0.95,
+    "context_tags": ["architecture", "framework-selection", "risk-assessment"],
+    "linked_chunks": ["TDM-STRY-001"],
+    "content": "When evaluating any new framework or library for adoption, Jan always checks the 'bus factor' first — how many active maintainers exist and what the commit frequency looks like over the past 6 months. This stems from a 2020 incident where a critical dependency had a single maintainer who disappeared, forcing a 3-week emergency migration mid-sprint. He will reject a technically superior option if the bus factor is below 3."
+  },
+  {
+    "chunk_id": "TDM-HEUR-002",
+    "author": "Jan Kowalski",
+    "cluster": "technical-decision-making",
+    "type": "heuristic",
+    "uniqueness": "CRITICAL",
+    "source": "meeting",
+    "confidence": 0.92,
+    "context_tags": ["database", "scaling", "cost-control"],
+    "linked_chunks": ["TDM-ANTI-001"],
+    "content": "Jan enforces a hard rule that no database query in production may perform a full table scan on any table exceeding 1 million rows. He requires EXPLAIN ANALYZE output in every PR that touches a query. This rule was born from a $47K AWS bill spike in Q3 2021 when an unoptimized report query ran hourly against a 200M-row events table for two weeks before anyone noticed."
+  },
+  {
+    "chunk_id": "TDM-ANTI-001",
+    "author": "Jan Kowalski",
+    "cluster": "technical-decision-making",
+    "type": "anti-pattern",
+    "uniqueness": "HIGH",
+    "source": "code",
+    "confidence": 0.90,
+    "context_tags": ["orm", "database", "abstraction"],
+    "linked_chunks": ["TDM-HEUR-002"],
+    "content": "Jan refuses to use ORM-generated queries for any reporting or analytics workload. He considers ORMs acceptable only for simple CRUD on entities with fewer than 5 joins. After inheriting a codebase where Hibernate had generated 47-join queries that brought down production, he mandates raw SQL or query builders for anything touching aggregation, and has blocked multiple PRs over this."
+  },
+  {
+    "chunk_id": "LDR-ANTI-001",
+    "author": "Jan Kowalski",
+    "cluster": "team-leadership",
+    "type": "anti-pattern",
+    "uniqueness": "HIGH",
+    "source": "interview",
+    "confidence": 0.88,
+    "context_tags": ["hiring", "interviews", "team-building"],
+    "linked_chunks": ["LDR-BLEF-001"],
+    "content": "Jan never hires based on algorithmic puzzle performance alone. He once hired a candidate who aced 5 LeetCode-style rounds but couldn't collaborate on a real codebase — the engineer rewrote teammates' code without discussion and left after 4 months. Now Jan's interview process always includes a pair-programming session on an actual (anonymized) production bug, specifically to observe how candidates communicate when stuck."
+  },
+  {
+    "chunk_id": "EL-EMOT-001",
+    "author": "Jan Kowalski",
+    "cluster": "emotional-landscape",
+    "type": "emotion",
+    "uniqueness": "HIGH",
+    "source": "observation",
+    "confidence": 0.82,
+    "context_tags": ["under-pressure", "outage", "incident-response"],
+    "linked_chunks": ["TDM-HEUR-002"],
+    "content": "Jan exhibits controlled, cold anger when a production outage is caused by a known-but-unaddressed issue. He does not raise his voice but becomes notably terse, switches to written communication only, and will spend the first 10 minutes of any post-mortem listing every prior warning that was ignored. Colleagues describe this as 'the silence before the spreadsheet' — he always arrives with timestamped evidence."
+  },
+  {
+    "chunk_id": "EL-EMOT-002",
+    "author": "Jan Kowalski",
+    "cluster": "emotional-landscape",
+    "type": "emotion",
+    "uniqueness": "HIGH",
+    "source": "interview",
+    "confidence": 0.85,
+    "context_tags": ["mentoring", "growth", "team-building"],
+    "linked_chunks": ["LDR-ANTI-001"],
+    "content": "Jan shows visible, genuine pride when a junior engineer he mentored ships their first production feature independently. He will publicly credit them in the team Slack channel with specific details about what they did well — not generic praise but references to exact technical decisions. He has described these moments as 'the only part of management that makes the meetings worth it.'"
+  },
+  {
+    "chunk_id": "COM-STYL-001",
+    "author": "Jan Kowalski",
+    "cluster": "communication",
+    "type": "style",
+    "uniqueness": "HIGH",
+    "source": "email",
+    "confidence": 0.91,
+    "context_tags": ["writing", "decision-communication", "async"],
+    "linked_chunks": [],
+    "content": "Jan's written communication follows a rigid structure he calls 'Situation-Constraint-Proposal.' Every technical email or Slack message over 3 sentences follows this pattern: first, state the current situation factually; second, list the constraints (time, budget, technical); third, propose a specific action with a deadline. He will send back messages from reports that lack a clear proposal with the comment 'What are you asking me to decide?'"
+  },
+  {
+    "chunk_id": "TDM-FRMW-001",
+    "author": "Jan Kowalski",
+    "cluster": "technical-decision-making",
+    "type": "framework",
+    "uniqueness": "CRITICAL",
+    "source": "document",
+    "confidence": 0.93,
+    "context_tags": ["architecture", "decision-making", "trade-offs"],
+    "linked_chunks": ["TDM-HEUR-001", "TDM-HEUR-002"],
+    "content": "Jan uses a mental model he calls the 'Reversibility Matrix' for all architectural decisions. He classifies every choice on two axes: cost-to-reverse (low/medium/high) and blast-radius (team/service/platform). Decisions that are high-cost-to-reverse AND platform-blast-radius require a written RFC with a 72-hour review period — no exceptions, even under deadline pressure. Everything else can be decided in a 30-minute call. He credits this framework with reducing his company's architectural regret rate from 'constant' to 'quarterly.'"
+  },
+  {
+    "chunk_id": "MP-META-001",
+    "author": "Jan Kowalski",
+    "cluster": "meta-patterns",
+    "type": "meta",
+    "uniqueness": "HIGH",
+    "source": "inferred",
+    "confidence": 0.78,
+    "context_tags": ["cross-cutting", "pattern", "decision-making"],
+    "linked_chunks": ["TDM-FRMW-001", "COM-STYL-001", "LDR-ANTI-001"],
+    "content": "Across all domains — technical decisions, hiring, communication — Jan exhibits a consistent meta-pattern: he converts painful past experiences into explicit, non-negotiable rules with bright-line thresholds. Rather than relying on judgment calls, he codifies lessons into quantifiable criteria (bus factor ≥ 3, table scans on >1M rows forbidden, structured message format). This 'rule-ification' tendency means his organization runs on a growing body of hard-coded institutional knowledge rather than implicit tribal understanding."
+  },
+  {
+    "chunk_id": "DE-FACT-001",
+    "author": "Jan Kowalski",
+    "cluster": "domain-expertise",
+    "type": "fact",
+    "uniqueness": "MEDIUM",
+    "source": "document",
+    "confidence": 0.97,
+    "context_tags": ["biography", "background", "saas"],
+    "linked_chunks": [],
+    "content": "Jan Kowalski is the co-founder and CTO of a B2B SaaS company providing supply-chain analytics, founded in 2017 in Warsaw, Poland. He has a background in distributed systems from his MSc at Warsaw University of Technology and spent 4 years at a Big Four consultancy before starting the company. The platform processes approximately 2 billion events per month and serves 340 enterprise customers as of 2024."
+  }
+]

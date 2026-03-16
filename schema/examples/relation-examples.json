@@ -1,0 +1,92 @@
+[
+  {
+    "source": "TDM-HEUR-001",
+    "target": "TDM-FRMW-001",
+    "type": "INSTANTIATES",
+    "description": "The bus-factor heuristic is a concrete application of Jan's Reversibility Matrix — checking maintainer count is his way of assessing cost-to-reverse for dependency choices."
+  },
+  {
+    "source": "TDM-HEUR-002",
+    "target": "TDM-FRMW-001",
+    "type": "INSTANTIATES",
+    "description": "The full-table-scan ban instantiates the Reversibility Matrix: unoptimized queries on large tables are high-blast-radius and hard to detect, warranting a hard rule."
+  },
+  {
+    "source": "TDM-ANTI-001",
+    "target": "TDM-HEUR-002",
+    "type": "ENABLES",
+    "description": "Rejecting ORM-generated queries for analytics enables the EXPLAIN ANALYZE requirement — raw SQL makes query plans inspectable and enforceable."
+  },
+  {
+    "source": "COM-STYL-001",
+    "target": "TDM-FRMW-001",
+    "type": "ENABLES",
+    "description": "The Situation-Constraint-Proposal communication style enables effective use of the Reversibility Matrix by ensuring decisions arrive with constraints pre-classified."
+  },
+  {
+    "source": "TDM-HEUR-001",
+    "target": "DE-FACT-001",
+    "type": "LEARNED_FROM",
+    "description": "The bus-factor heuristic was learned through Jan's operational experience scaling the SaaS platform, specifically the 2020 dependency incident."
+  },
+  {
+    "source": "TDM-HEUR-002",
+    "target": "DE-FACT-001",
+    "type": "LEARNED_FROM",
+    "description": "The table-scan ban was learned from the $47K billing incident while operating the platform's 2-billion-event-per-month infrastructure."
+  },
+  {
+    "source": "LDR-ANTI-001",
+    "target": "EL-EMOT-002",
+    "type": "LEARNED_FROM",
+    "description": "The anti-pattern of hiring on puzzles alone was learned from a failed hire, and the lesson reinforced Jan's emphasis on collaborative growth (which brings him pride)."
+  },
+  {
+    "source": "EL-EMOT-001",
+    "target": "COM-STYL-001",
+    "type": "EXPRESSED_THROUGH",
+    "description": "Jan's cold anger during outages is expressed through his communication style — he switches to written-only mode and arrives with timestamped, structured evidence."
+  },
+  {
+    "source": "EL-EMOT-002",
+    "target": "COM-STYL-001",
+    "type": "EXPRESSED_THROUGH",
+    "description": "Jan's pride in mentored engineers is expressed through his communication style — specific, detailed public credit in Slack rather than generic praise."
+  },
+  {
+    "source": "TDM-ANTI-001",
+    "target": "TDM-HEUR-001",
+    "type": "CONTRASTS_WITH",
+    "description": "The ORM anti-pattern (reject abstraction for complex queries) contrasts with the bus-factor heuristic (prefer well-maintained dependencies) — Jan values external dependencies for simple work but rejects them for critical paths."
+  },
+  {
+    "source": "EL-EMOT-001",
+    "target": "EL-EMOT-002",
+    "type": "CONTRASTS_WITH",
+    "description": "Jan's cold anger at preventable failures contrasts with his warm pride in growth — revealing that his emotional range in professional contexts is tied to whether institutional knowledge was respected or advanced."
+  },
+  {
+    "source": "MP-META-001",
+    "target": "LDR-ANTI-001",
+    "type": "CONTRASTS_WITH",
+    "description": "The meta-pattern of codifying everything into rules contrasts subtly with the hiring anti-pattern — Jan resists purely quantitative hiring signals despite favoring quantitative rules elsewhere."
+  },
+  {
+    "source": "TDM-ANTI-001",
+    "target": "DE-FACT-001",
+    "type": "HARDCODED_EXCEPTION",
+    "description": "Despite running a modern SaaS stack, Jan makes a hardcoded exception to standard ORM usage — the platform's scale (2B events/month) makes ORM-generated analytics queries categorically unacceptable."
+  },
+  {
+    "source": "TDM-FRMW-001",
+    "target": "TDM-HEUR-002",
+    "type": "HARDCODED_EXCEPTION",
+    "description": "The Reversibility Matrix normally allows quick decisions for low-blast-radius changes, but the table-scan ban is a hardcoded exception — it applies unconditionally regardless of the Matrix classification because the $47K incident proved that 'low-blast-radius' query changes can have platform-level cost impact."
+  },
+  {
+    "source": "MP-META-001",
+    "target": "TDM-FRMW-001",
+    "type": "INSTANTIATES",
+    "description": "The meta-pattern of converting pain into rules is itself an instantiation of the Reversibility Matrix thinking — Jan treats institutional knowledge loss as a high-cost-to-reverse, platform-blast-radius problem."
+  }
+]

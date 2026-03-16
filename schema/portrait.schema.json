@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://athanor.dev/schema/portrait.schema.json",
+  "title": "Athanor Portrait",
+  "description": "The complete, versioned assembly of all Chunks, Relations, and metadata for a single subject.",
+  "type": "object",
+  "required": [
+    "version",
+    "subject",
+    "created_at",
+    "chunks",
+    "relations",
+    "metadata"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.]+)?$",
+      "description": "Semantic version of the protocol used to generate this portrait."
+    },
+    "subject": {
+      "type": "object",
+      "required": ["name", "id"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The subject's display name."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A unique identifier for the subject."
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this portrait was generated."
+    },
+    "chunks": {
+      "type": "array",
+      "items": {
+        "$ref": "chunk.schema.json"
+      },
+      "description": "All chunks in the portrait."
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "$ref": "relation.schema.json"
+      },
+      "description": "All relations between chunks in the portrait."
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "completeness_score",
+        "chunk_count",
+        "relation_count",
+        "cluster_coverage"
+      ],
+      "properties": {
+        "completeness_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Estimated coverage of the subject's identity."
+        },
+        "chunk_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of chunks in the portrait."
+        },
+        "relation_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of relations in the portrait."
+        },
+        "cluster_coverage": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Map of cluster names to the number of chunks in each cluster."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

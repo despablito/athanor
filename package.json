@@ -10,7 +10,9 @@
     "clean": "turbo run clean"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "devDependencies": {
     "turbo": "^2.4.0",
