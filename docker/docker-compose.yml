@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: apache/age:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-athanor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-athanor}
+      POSTGRES_DB: ${POSTGRES_DB:-athanor}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  clone-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.clone-api
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-athanor}:${POSTGRES_PASSWORD:-athanor}@postgres:5432/${POSTGRES_DB:-athanor}
+      OLLAMA_URL: http://ollama:11434
+    depends_on:
+      - postgres
+      - ollama
+    profiles:
+      - full
+
+  explorer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.explorer
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://clone-api:3001
+    depends_on:
+      - clone-api
+    profiles:
+      - full
+
+volumes:
+  pgdata:
+  ollama_data:
