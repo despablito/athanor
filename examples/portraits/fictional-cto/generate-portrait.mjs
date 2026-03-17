@@ -312,6 +312,131 @@ const mpChunks = [
   ),
 ];
 
+// ─── Cluster: incident-response (IR) — 6 chunks ───────────────────────────────
+
+const irChunks = [
+  chunk("IR", "incident-response", "heuristic", "HEUR", "CRITICAL", "meeting", 0.93,
+    ["outage", "severity", "classification"],
+    "Jan classifies incidents using a custom severity scale tied to business impact, not technical symptoms. P1 means revenue-impacting for multiple customers, P2 means a single enterprise customer affected, P3 means internal tooling down, P4 means degraded but functional. He insists that the on-call engineer classify severity within 5 minutes of the first alert and escalate any P1 to him personally, even at 3 AM. He has never once complained about being woken up for a legitimate P1."
+  ),
+  chunk("IR", "incident-response", "ritual", "RITL", "CRITICAL", "observation", 0.91,
+    ["post-mortem", "blameless", "process"],
+    "Jan's post-mortem process follows an invariable ritual: the incident is documented within 48 hours, the post-mortem meeting happens within 5 business days, and every post-mortem must produce at least one 'systemic fix' — a change to process, tooling, or architecture that prevents the class of incident, not just the specific instance. He reviews every post-mortem personally and will reject any that list 'be more careful' as an action item."
+  ),
+  chunk("IR", "incident-response", "anti-pattern", "ANTI", "HIGH", "interview", 0.89,
+    ["rollback", "hotfix", "deployment"],
+    "Jan forbids deploying forward (hotfixing) as a first response to production incidents. His standing order is: roll back first, investigate second, fix third. He made this rule absolute after a 2021 incident where a hasty hotfix to fix a payment processing bug introduced a data corruption issue that took 3 days to remediate. The only exception is when the rollback itself would cause data loss, which must be documented in real-time."
+  ),
+  chunk("IR", "incident-response", "skill", "SKIL", "HIGH", "observation", 0.87,
+    ["debugging", "triage", "pattern-recognition"],
+    "Jan has an exceptional ability to triage production incidents by correlating seemingly unrelated symptoms. During a 2023 outage that presented as 'slow API responses,' he noticed a 2% increase in garbage collection pauses on a seemingly unrelated service, traced it to a memory leak caused by a connection pool misconfiguration introduced 3 weeks earlier, and identified the exact PR. His debugging approach is systematic: he draws a timeline of all changes in the past 2 weeks and overlays it with the anomaly onset."
+  ),
+  chunk("IR", "incident-response", "framework", "FRMW", "HIGH", "document", 0.88,
+    ["alerting", "signal-noise", "monitoring"],
+    "Jan designed the company's alerting philosophy around what he calls the 'Alert Credibility Index': every alert must have a minimum 80% true-positive rate over a rolling 30-day window. Alerts that fall below this threshold are automatically silenced and flagged for review. His reasoning: 'Every false alert erodes on-call trust by 5%. After 20 false alerts, your engineers stop responding to real ones. Alert fatigue kills more systems than actual bugs.'"
+  ),
+  chunk("IR", "incident-response", "story", "STRY", "MEDIUM", "interview", 0.84,
+    ["cascading-failure", "resilience", "learning"],
+    "Jan's most-referenced incident story is 'The Cascade of 2022': a routine database migration caused a 5-second lock that triggered a connection pool exhaustion, which cascaded through 4 downstream services, which overwhelmed the message queue, which caused the alerting system itself to fail. The team didn't know about the outage for 23 minutes because the monitoring was also down. This incident led Jan to implement an independent 'watchdog' monitoring system that runs on completely separate infrastructure."
+  ),
+];
+
+// ─── Cluster: code-review (CR) — 5 chunks ─────────────────────────────────────
+
+const crChunks = [
+  chunk("CR", "code-review", "heuristic", "HEUR", "CRITICAL", "code", 0.92,
+    ["pr-size", "review-quality", "process"],
+    "Jan enforces a maximum PR size of 400 lines of changed code (excluding generated files and tests). PRs exceeding this limit are automatically flagged by CI and require a written justification. His data shows that review defect-detection rate drops by 50% above 400 lines. He tells engineers: 'If your PR is too big to review in 30 minutes, it's too big to understand in an incident at 3 AM.'"
+  ),
+  chunk("CR", "code-review", "heuristic", "HEUR", "HIGH", "meeting", 0.88,
+    ["review-focus", "what-to-review", "priorities"],
+    "Jan teaches code reviewers to focus on three things in order: (1) correctness of the data model, (2) error handling at system boundaries, (3) naming and readability. He explicitly deprioritizes style and formatting, which he considers 'solved by linters.' He has a phrase: 'I'd rather ship ugly code that handles errors correctly than beautiful code that swallows exceptions.'"
+  ),
+  chunk("CR", "code-review", "anti-pattern", "ANTI", "HIGH", "code", 0.90,
+    ["rubber-stamping", "approval", "accountability"],
+    "Jan monitors code review approval times and flags any review completed in under 10 minutes on a PR with more than 100 lines as a potential rubber stamp. He addresses this privately with the reviewer, not punitively, but with a direct conversation: 'Either this PR was trivial enough to not need review, or it wasn't reviewed properly. Which is it?' He tracks repeat offenders and has removed review privileges from two senior engineers who consistently rubber-stamped."
+  ),
+  chunk("CR", "code-review", "preference", "PREF", "MEDIUM", "chat", 0.85,
+    ["review-comments", "tone", "collaboration"],
+    "Jan insists that all code review comments must be phrased as questions or suggestions, never commands. Instead of 'Change this to use a map,' reviewers must write 'Have you considered using a map here? It might improve readability because...' He considers imperative review comments a form of technical authority abuse and has modeled this behavior consistently for 5 years. The team's review culture is notably non-adversarial as a result."
+  ),
+  chunk("CR", "code-review", "belief", "BLEF", "MEDIUM", "interview", 0.83,
+    ["code-review", "learning", "knowledge-sharing"],
+    "Jan considers code review the single most effective knowledge-sharing mechanism in a software organization — more effective than documentation, pair programming, or tech talks. His reasoning: reviews expose every engineer to decisions they wouldn't otherwise see, create a searchable record of technical rationale, and normalize constructive disagreement. He estimates that 30% of his engineers' technical growth comes directly from reviewing others' code."
+  ),
+];
+
+// ─── Cluster: vendor-management (VM) — 4 chunks ───────────────────────────────
+
+const vmChunks = [
+  chunk("VM", "vendor-management", "heuristic", "HEUR", "CRITICAL", "meeting", 0.90,
+    ["vendor-selection", "lock-in", "risk"],
+    "Jan evaluates every SaaS vendor against what he calls the 'Exit Cost Test': before signing any contract, the team must prototype a migration to an alternative provider and document the estimated effort. If the exit cost exceeds 2 engineering-months, Jan either negotiates contractual protections (data portability clauses, API stability guarantees) or builds an abstraction layer before integrating. He has walked away from 3 vendor deals over excessive lock-in."
+  ),
+  chunk("VM", "vendor-management", "anti-pattern", "ANTI", "HIGH", "email", 0.87,
+    ["vendor-lock-in", "cloud", "multi-cloud"],
+    "Despite his lock-in aversion, Jan explicitly rejects multi-cloud strategies for his company's size. He considers multi-cloud 'a large company's luxury that small companies pay for with complexity.' Instead, he uses cloud-agnostic open-source tools (Kubernetes, PostgreSQL, Kafka) on a single cloud provider (AWS), accepting provider lock-in at the infrastructure layer while maintaining portability at the application layer."
+  ),
+  chunk("VM", "vendor-management", "story", "STRY", "HIGH", "interview", 0.85,
+    ["vendor-failure", "contingency", "resilience"],
+    "In 2023, a critical third-party geocoding API that Jan's platform depended on was acquired and its pricing increased 400% with 30 days notice. Because Jan's team had built an abstraction layer during initial integration (per his Exit Cost Test), they migrated to an open-source alternative in 8 days. Jan now uses this as his primary story when engineers push back on the overhead of vendor abstraction layers: 'The abstraction layer isn't overhead — it's insurance.'"
+  ),
+  chunk("VM", "vendor-management", "preference", "PREF", "MEDIUM", "meeting", 0.82,
+    ["open-source", "build-vs-buy", "cost"],
+    "Jan's default position on build-vs-buy is 'buy first, build only if the vendor can't meet a specific, documented requirement.' He considers the urge to build in-house a form of 'engineering vanity' and requires any build decision to include a total cost of ownership comparison covering 3 years of maintenance. However, for anything in the critical data path (ingestion, processing, storage), he reverses this default and prefers building or using open-source."
+  ),
+];
+
+// ─── Cluster: hiring-process (HP) — 5 chunks ──────────────────────────────────
+
+const hpChunks = [
+  chunk("HP", "hiring-process", "ritual", "RITL", "CRITICAL", "observation", 0.91,
+    ["hiring", "interview-design", "structured"],
+    "Jan's interview process is a precisely structured 4-stage pipeline: (1) async take-home exercise simulating a real work task (time-boxed to 3 hours), (2) technical deep-dive on the take-home with the hiring manager, (3) pair-programming session on a production bug with a team member, (4) values alignment conversation with Jan himself. Each stage has a written rubric with specific pass/fail criteria. He reviews every hiring decision and has veto power that he exercises roughly once per quarter."
+  ),
+  chunk("HP", "hiring-process", "heuristic", "HEUR", "HIGH", "interview", 0.89,
+    ["red-flags", "candidates", "evaluation"],
+    "Jan maintains a list of 'soft red flags' that don't disqualify candidates but trigger deeper investigation: (1) can't name a mistake they made in their last role, (2) describe every past team as dysfunctional, (3) have never maintained a system they built for more than 6 months, (4) can't explain a concept they listed on their resume in simple terms. He considers flag #4 the most reliable: 'If you can't explain it simply, you memorized it from a blog post.'"
+  ),
+  chunk("HP", "hiring-process", "belief", "BLEF", "HIGH", "interview", 0.88,
+    ["diversity", "team-composition", "hiring"],
+    "Jan believes that cognitive diversity — not just demographic diversity — is the most undervalued hiring criterion. He actively seeks engineers with non-traditional backgrounds: former teachers, musicians, military veterans, career-changers. His best-performing team lead is a former logistics manager who learned to code at 35. Jan's reasoning: 'Homogeneous teams converge on solutions too quickly. I want someone who thinks about the problem differently, not just someone who writes code differently.'"
+  ),
+  chunk("HP", "hiring-process", "anti-pattern", "ANTI", "MEDIUM", "meeting", 0.85,
+    ["counter-offers", "retention", "negotiation"],
+    "Jan never makes counter-offers to engineers who have accepted an external position. His policy is firm: 'If you needed an outside offer to get a raise, I failed as your manager.' He considers counter-offers a temporary patch that doesn't address the underlying dissatisfaction, and his data shows that 70% of counter-offered employees leave within 12 months anyway. Instead, he invests in proactive retention through regular market-rate adjustments and career development conversations."
+  ),
+  chunk("HP", "hiring-process", "preference", "PREF", "MEDIUM", "chat", 0.83,
+    ["referrals", "sourcing", "network"],
+    "Jan caps referral hires at 40% of total hires per quarter to prevent the team from becoming an echo chamber of shared backgrounds and perspectives. He has seen teams where 80% of engineers came from the same 2 companies and observed that they replicated the same architectural patterns and blind spots. His 40% cap forces the recruiting team to source from diverse channels and ensures the team regularly encounters unfamiliar approaches."
+  ),
+];
+
+// ─── Cluster: product-strategy (PS) — 5 chunks ────────────────────────────────
+
+const psChunks = [
+  chunk("PS", "product-strategy", "framework", "FRMW", "CRITICAL", "document", 0.91,
+    ["prioritization", "roadmap", "impact"],
+    "Jan uses a modified RICE framework for feature prioritization but replaces 'Confidence' with 'Reversibility' — how easily the feature can be rolled back or changed after launch. Features that are high-impact but hard to reverse receive extra scrutiny and require a rollback plan before development begins. He has found that this modification catches 'one-way door' features that standard RICE misses because it doesn't account for architectural commitment."
+  ),
+  chunk("PS", "product-strategy", "heuristic", "HEUR", "HIGH", "meeting", 0.88,
+    ["mvp", "scope", "delivery"],
+    "Jan's MVP rule: the first version of any feature must be deliverable by a single engineer in 2 weeks or less. If it can't be scoped that small, the feature is too complex and needs to be decomposed further. He considers 2 weeks the maximum time between feedback loops — anything longer means the team is building on assumptions rather than data. He has killed features mid-development when the team couldn't demo working software after 2 weeks."
+  ),
+  chunk("PS", "product-strategy", "belief", "BLEF", "HIGH", "interview", 0.87,
+    ["customer-proximity", "engineering", "product"],
+    "Jan insists that every engineer spend at least one day per quarter sitting with a customer (virtually or in-person) watching them use the product. He considers this non-negotiable because 'engineers who never see their users build features for imaginary people.' His most impactful product decisions — including the freshness SLA feature that prevented churn of their largest customer — originated from engineers who witnessed customer pain firsthand."
+  ),
+  chunk("PS", "product-strategy", "anti-pattern", "ANTI", "MEDIUM", "meeting", 0.84,
+    ["feature-factory", "velocity", "value"],
+    "Jan explicitly rejects 'feature velocity' as a product health metric. He has removed it from dashboards and refuses to discuss 'features shipped per sprint' in board meetings. His alternative metric is 'Feature Adoption Rate': the percentage of users who use a new feature within 30 days of launch. He argues that shipping 10 features nobody uses is worse than shipping 2 features everyone loves: 'Velocity without adoption is just organized waste.'"
+  ),
+  chunk("PS", "product-strategy", "rant", "RANT", "MEDIUM", "chat", 0.86,
+    ["roadmaps", "planning", "honesty"],
+    "Jan has a passionate stance on roadmaps: 'A roadmap is not a promise. A roadmap is a snapshot of current priorities that will change when we learn new things. Anyone who treats a 12-month roadmap as a contract has never built software. I show our roadmap to customers with a giant watermark that says WILL CHANGE. If your sales team is selling features from the roadmap as commitments, you don't have a roadmap problem — you have a sales culture problem.'"
+  ),
+];
+
 // ─── Export for next stages ────────────────────────────────────────────────────
 
 const allChunks = [
@@ -322,6 +447,11 @@ const allChunks = [
   ...deChunks,
   ...elChunks,
   ...mpChunks,
+  ...irChunks,
+  ...crChunks,
+  ...vmChunks,
+  ...hpChunks,
+  ...psChunks,
   // More clusters will be added in subsequent commits
 ];
 
