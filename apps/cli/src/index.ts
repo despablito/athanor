@@ -9,3 +9,4 @@ export { extractCommand } from "./commands/extract.js";
 export { metaGenerateCommand } from "./commands/meta-generate.js";
 export { clonePromptCommand } from "./commands/clone-prompt.js";
 export { embedCommand } from "./commands/embed.js";
+export { exploreCommand } from "./commands/explore.js";

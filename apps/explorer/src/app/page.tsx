@@ -1,7 +1,12 @@
+"use client";
+
+import { PortraitProvider } from "@/lib/portrait-context";
+import PortraitDashboard from "@/components/PortraitDashboard";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">Athanor Explorer</h1>
-    </main>
+    <PortraitProvider>
+      <PortraitDashboard />
+    </PortraitProvider>
   );
 }

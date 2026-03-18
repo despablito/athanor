@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Athanor Explorer",
-  description: "Explore and visualize code transformations",
+  description: "Visualize and explore identity portraits",
 };
 
 export default function RootLayout({
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="dark">
+      <body className="overflow-hidden">{children}</body>
     </html>
   );
 }

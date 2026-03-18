@@ -10,6 +10,7 @@ import { extractCommand } from "../commands/extract.js";
 import { metaGenerateCommand } from "../commands/meta-generate.js";
 import { clonePromptCommand } from "../commands/clone-prompt.js";
 import { embedCommand } from "../commands/embed.js";
+import { exploreCommand } from "../commands/explore.js";
 
 const program = new Command();
 
@@ -28,5 +29,6 @@ program.addCommand(extractCommand);
 program.addCommand(metaGenerateCommand);
 program.addCommand(clonePromptCommand);
 program.addCommand(embedCommand);
+program.addCommand(exploreCommand);
 
 program.parse();
