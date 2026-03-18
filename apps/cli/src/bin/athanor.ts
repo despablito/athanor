@@ -12,6 +12,7 @@ import { clonePromptCommand } from "../commands/clone-prompt.js";
 import { embedCommand } from "../commands/embed.js";
 import { exploreCommand } from "../commands/explore.js";
 import { serveCommand } from "../commands/serve.js";
+import { mcpCommand } from "../commands/mcp.js";
 
 const program = new Command();
 
@@ -32,5 +33,6 @@ program.addCommand(clonePromptCommand);
 program.addCommand(embedCommand);
 program.addCommand(exploreCommand);
 program.addCommand(serveCommand);
+program.addCommand(mcpCommand);
 
 program.parse();

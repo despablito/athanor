@@ -1,26 +1,25 @@
 {
-  "name": "@athanor/cli",
+  "name": "@athanor/mcp-server",
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "main": "./dist/index.js",
   "bin": {
-    "athanor": "./dist/bin/athanor.js"
+    "athanor-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
     "lint": "eslint src/",
-    "dev": "tsx src/bin/athanor.ts",
+    "dev": "tsx src/index.ts",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
     "@athanor/clone-api": "workspace:*",
     "@athanor/core": "workspace:*",
     "@athanor/extractor": "workspace:*",
-    "@athanor/mcp-server": "workspace:*",
-    "chalk": "^5.4.0",
-    "commander": "^13.0.0",
-    "ora": "^8.0.0"
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

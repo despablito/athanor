@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "athanor": {
+      "command": "npx",
+      "args": ["athanor-mcp", "--portrait", "./portrait.json"],
+      "env": {
+        "LLM_PROVIDER": "anthropic",
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  }
+}
