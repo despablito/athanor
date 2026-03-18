@@ -4,9 +4,9 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import ora from "ora";
 import chalk from "chalk";
-import { validateChunk, validateRelation, type PortraitJSON, type Chunk, type Relation } from "@athanor/core";
+import { validateChunk, validateRelation, type Chunk, type Relation } from "@athanor/core";
 import { loadPortraitJSON, savePortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
-import { ok, warn, fail, errorBox, successBox, warnBox } from "../lib/ui.js";
+import { errorBox, successBox, warnBox } from "../lib/ui.js";
 
 type ImportType = "transcript" | "document" | "json";
 type ImportPhase = "taxonomy" | "cases" | "antipatterns" | "legacy";

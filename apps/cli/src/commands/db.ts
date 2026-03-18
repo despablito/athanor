@@ -1,9 +1,9 @@
 import { Command } from "commander";
-import { writeFile } from "node:fs/promises";
+
 import { resolve } from "node:path";
 import ora from "ora";
 import chalk from "chalk";
-import { GraphStore, Portrait, asChunkId, type PortraitJSON, type Chunk, type Relation } from "@athanor/core";
+import { GraphStore, type PortraitJSON, type Chunk, type Relation } from "@athanor/core";
 import { loadPortraitJSON, jsonToPortrait, resolvePortraitPath, savePortraitJSON } from "../lib/portrait-io.js";
 import { errorBox, successBox } from "../lib/ui.js";
 

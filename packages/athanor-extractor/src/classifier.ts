@@ -55,7 +55,7 @@ function buildPortraitContext(portrait: PortraitJSON): string {
     byCluster.get(chunk.cluster)!.push(chunk);
   }
 
-  for (const [cluster, chunks] of byCluster) {
+  for (const [, chunks] of byCluster) {
     for (const chunk of chunks.slice(0, 2)) {
       lines.push(`  [${chunk.chunk_id}] ${chunk.type}/${chunk.uniqueness}: ${chunk.content.slice(0, 120)}...`);
     }

@@ -2,3 +2,4 @@ packages:
   - "packages/*"
   - "apps/*"
   - "integrations/*"
+  - "docs-site"

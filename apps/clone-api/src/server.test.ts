@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { createApp, type AppContext } from "./server.js";
+import { createApp } from "./server.js";
 import { PortraitStore } from "./portrait-store.js";
 import { CloneEngine } from "./clone.js";
 import type { PortraitJSON, Chunk, Relation } from "@athanor/core";
@@ -72,7 +72,7 @@ beforeAll(() => {
   });
 
   // Override the engine's internal LLM with mock
-  (engine as any).llm = new MockLLMProvider();
+  (engine as unknown as { llm: LLMProvider }).llm = new MockLLMProvider();
 
   app = createApp({
     store,

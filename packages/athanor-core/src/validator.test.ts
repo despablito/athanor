@@ -131,7 +131,7 @@ describe("validateRelation", () => {
   });
 
   it("accepts relation without description", () => {
-    const { description: _, ...rel } = exampleRelations[0];
+    const { description: _desc, ...rel } = exampleRelations[0];
     const result = validateRelation(rel);
     expect(result.valid).toBe(true);
   });
@@ -166,7 +166,7 @@ describe("validatePortrait", () => {
   });
 
   it("rejects missing version", () => {
-    const { version: _, ...rest } = makePortrait();
+    const { version: _version, ...rest } = makePortrait();
     const result = validatePortrait(rest);
     expect(result.valid).toBe(false);
   });

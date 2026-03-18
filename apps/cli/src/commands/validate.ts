@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import ora from "ora";
 import chalk from "chalk";
-import { validatePortrait, RECOMMENDED_CLUSTERS, type PortraitJSON } from "@athanor/core";
+import { validatePortrait, RECOMMENDED_CLUSTERS } from "@athanor/core";
 import { loadPortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
 import { ok, warn, fail, heading, errorBox } from "../lib/ui.js";
 

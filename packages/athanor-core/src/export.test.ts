@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Portrait } from "./portrait.js";
 import { toJSON, toCypher, toMarkdown, toObsidian } from "./export.js";
-import type { ChunkInput } from "./types.js";
+
 
 function buildTestPortrait(): Portrait {
   const p = new Portrait({ name: "Jan Kowalski", id: "jan-001" });

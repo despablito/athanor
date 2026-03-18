@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { detectRelations } from "./linker.js";
 import { MockLLMProvider } from "./provider.test.js";
-import type { PortraitJSON } from "@athanor/core";
+import type { PortraitJSON, ChunkId } from "@athanor/core";
 
 function makePortrait(overrides: Partial<PortraitJSON> = {}): PortraitJSON {
   return {
@@ -10,7 +10,7 @@ function makePortrait(overrides: Partial<PortraitJSON> = {}): PortraitJSON {
     created_at: new Date().toISOString(),
     chunks: [
       {
-        chunk_id: "TDM-HEUR-001" as any,
+        chunk_id: "TDM-HEUR-001" as ChunkId,
         author: "Jan",
         cluster: "technical-decision-making",
         type: "heuristic",
@@ -22,7 +22,7 @@ function makePortrait(overrides: Partial<PortraitJSON> = {}): PortraitJSON {
         content: "Jan always checks the bus factor when evaluating new frameworks.",
       },
       {
-        chunk_id: "TDM-STRY-001" as any,
+        chunk_id: "TDM-STRY-001" as ChunkId,
         author: "Jan",
         cluster: "technical-decision-making",
         type: "story",
@@ -34,7 +34,7 @@ function makePortrait(overrides: Partial<PortraitJSON> = {}): PortraitJSON {
         content: "In 2020, a critical dependency had a single maintainer who disappeared.",
       },
       {
-        chunk_id: "LDR-BLEF-001" as any,
+        chunk_id: "LDR-BLEF-001" as ChunkId,
         author: "Jan",
         cluster: "team-leadership",
         type: "belief",
@@ -129,8 +129,8 @@ describe("detectRelations", () => {
     const portrait = makePortrait({
       relations: [
         {
-          source: "TDM-HEUR-001" as any,
-          target: "TDM-STRY-001" as any,
+          source: "TDM-HEUR-001" as ChunkId,
+          target: "TDM-STRY-001" as ChunkId,
           type: "LEARNED_FROM",
           description: "Already exists",
         },

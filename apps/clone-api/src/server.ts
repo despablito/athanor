@@ -4,7 +4,7 @@ import { logger } from "hono/logger";
 import { PortraitStore } from "./portrait-store.js";
 import { CloneEngine, type ChatRequest } from "./clone.js";
 import type { CloneApiConfig } from "./config.js";
-import { Portrait } from "@athanor/core";
+
 
 export interface AppContext {
   store: PortraitStore;
@@ -84,7 +84,6 @@ export function createApp(ctx: AppContext): Hono {
     }
 
     // Compute stats from the portrait data
-    const p = new Portrait({ name: portrait.subject.name, id: portrait.subject.id });
     // We need to compute stats manually since Portrait auto-generates IDs
     const types: Record<string, number> = {};
     const uniqueness: Record<string, number> = {};

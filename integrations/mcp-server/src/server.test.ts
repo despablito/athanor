@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { createMcpServer } from "./server.js";
 import type { McpServerConfig } from "./config.js";
 

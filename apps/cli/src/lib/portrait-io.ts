@@ -3,11 +3,8 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   Portrait,
-  validatePortrait,
   asChunkId,
   type PortraitJSON,
-  type Chunk,
-  type RelationInput,
 } from "@athanor/core";
 
 export async function loadPortraitJSON(path: string): Promise<PortraitJSON> {

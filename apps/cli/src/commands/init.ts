@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 import ora from "ora";
 import chalk from "chalk";
-import { ok, errorBox, successBox } from "../lib/ui.js";
+import { errorBox, successBox } from "../lib/ui.js";
 
 export const initCommand = new Command("init")
   .description("Create a new portrait directory with skeleton portrait.json")

@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import chalk from "chalk";
-import type { PortraitJSON, Chunk, Relation } from "@athanor/core";
+import type { PortraitJSON } from "@athanor/core";
 import { loadPortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
 import { heading, dim, errorBox } from "../lib/ui.js";
 
@@ -219,7 +219,7 @@ function printLearningChains(portrait: PortraitJSON): void {
   }
 
   // Handle chains with no clear root (cycles or isolated pairs)
-  for (const [target, sources] of adj) {
+  for (const target of adj.keys()) {
     if (!visited.has(target)) {
       printChain(target, 0);
       console.log("");

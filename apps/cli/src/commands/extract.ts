@@ -7,7 +7,7 @@ import chalk from "chalk";
 import { Extractor } from "@athanor/extractor";
 import type { PortraitJSON, Chunk } from "@athanor/core";
 import { loadPortraitJSON, savePortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
-import { ok, warn, errorBox, successBox, warnBox } from "../lib/ui.js";
+import { errorBox, successBox, warnBox } from "../lib/ui.js";
 
 interface ExtractOpts {
   provider: "ollama" | "anthropic" | "openai";

@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { resolve } from "node:path";
 import { existsSync } from "node:fs";
 import chalk from "chalk";
-import { errorBox, successBox, info } from "../lib/ui.js";
+import { errorBox, info } from "../lib/ui.js";
 
 interface ServeOpts {
   port: string;

@@ -5,6 +5,18 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["**/dist/", "**/node_modules/", "**/.next/", "**/.turbo/"],
+    ignores: ["**/dist/", "**/node_modules/", "**/.next/", "**/.turbo/", "**/docs-site/"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
   },
 );

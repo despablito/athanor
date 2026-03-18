@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { Extractor } from "./index.js";
 import type { LLMProvider } from "./provider.js";
-import type { PortraitJSON } from "@athanor/core";
+import type { PortraitJSON, ChunkId } from "@athanor/core";
 
 /**
  * A mock provider that returns different responses based on the system prompt content.
@@ -9,6 +8,7 @@ import type { PortraitJSON } from "@athanor/core";
  */
 class PipelineMockProvider implements LLMProvider {
   async complete(system: string, user: string): Promise<string> {
+    void user;
     // Chunking prompt
     if (system.includes("Chunk Extraction")) {
       return JSON.stringify([
@@ -176,7 +176,7 @@ describe("Extractor pipeline (mocked)", () => {
       subject: { name: "Test", id: "test" },
       created_at: new Date().toISOString(),
       chunks: Array.from({ length: 10 }, (_, i) => ({
-        chunk_id: `TST-HEUR-${String(i + 1).padStart(3, "0")}` as any,
+        chunk_id: `TST-HEUR-${String(i + 1).padStart(3, "0")}` as ChunkId,
         author: "Test",
         cluster: i < 5 ? "technical-decision-making" : "team-leadership",
         type: "heuristic" as const,
@@ -214,7 +214,7 @@ describe("Extractor pipeline (mocked)", () => {
       created_at: new Date().toISOString(),
       chunks: [
         {
-          chunk_id: "TDM-HEUR-001" as any,
+          chunk_id: "TDM-HEUR-001" as ChunkId,
           author: "Test Subject",
           cluster: "technical-decision-making",
           type: "heuristic",
@@ -253,7 +253,7 @@ describe("Extractor pipeline (mocked)", () => {
       created_at: new Date().toISOString(),
       chunks: [
         {
-          chunk_id: "TDM-HEUR-001" as any,
+          chunk_id: "TDM-HEUR-001" as ChunkId,
           author: "Test",
           cluster: "tdm",
           type: "heuristic",
@@ -265,7 +265,7 @@ describe("Extractor pipeline (mocked)", () => {
           content: "Test chunk content for embedding generation purposes.",
         },
         {
-          chunk_id: "TDM-HEUR-002" as any,
+          chunk_id: "TDM-HEUR-002" as ChunkId,
           author: "Test",
           cluster: "tdm",
           type: "heuristic",

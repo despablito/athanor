@@ -1,5 +1,5 @@
 import type { Portrait } from "./portrait.js";
-import type { Chunk, PortraitJSON, Relation } from "./types.js";
+import type { Chunk } from "./types.js";
 import { CHUNK_TYPE_CODES } from "./types.js";
 
 export function toJSON(portrait: Portrait): string {

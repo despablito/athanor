@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Portrait } from "./portrait.js";
-import type { ChunkInput, RelationInput, ChunkId } from "./types.js";
+import type { ChunkInput } from "./types.js";
 import { asChunkId } from "./types.js";
 
 function makeChunkInput(overrides: Partial<ChunkInput> = {}): ChunkInput {

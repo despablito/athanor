@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { vectorSearch, graphExpand, rerank, assembleContext } from "./rag.js";
+import { vectorSearch, graphExpand, rerank, assembleContext, type ScoredChunk } from "./rag.js";
 import { PortraitStore } from "./portrait-store.js";
 import type { PortraitJSON, Chunk, Relation } from "@athanor/core";
 
@@ -297,7 +297,7 @@ describe("full RAG pipeline integration", () => {
 
     // The bus factor chunk should be among the top results
     const busFactorChunk = result.chunks.find(
-      (sc: any) => sc.chunk.chunk_id === "TDM-HEUR-001",
+      (sc: ScoredChunk) => sc.chunk.chunk_id === "TDM-HEUR-001",
     );
     expect(busFactorChunk).toBeDefined();
   });
