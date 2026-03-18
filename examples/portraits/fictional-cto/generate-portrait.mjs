@@ -633,7 +633,368 @@ const allChunks = [
 ];
 
 const allRelations = [
-  // Relations will be added in a subsequent commit
+  // ── supports (chunks that reinforce each other) ──────────────────────────────
+  // TDM internal supports
+  rel("TDM-HEUR-001", "TDM-FRMW-001", "supports", "Bus factor heuristic feeds into the ADR framework"),
+  rel("TDM-HEUR-002", "TDM-FRMW-002", "supports", "API boundary rule supports the bounded context framework"),
+  rel("TDM-HEUR-003", "TDM-PREF-002", "supports", "Anti-premature-scaling supports infrastructure-as-code preference"),
+  rel("TDM-FRMW-001", "TDM-RITL-001", "supports", "ADR framework enables the Friday architecture review ritual"),
+  rel("TDM-PREF-001", "TDM-FRMW-002", "supports", "TypeScript preference supports bounded context design"),
+  rel("TDM-BLEF-001", "TDM-HEUR-001", "supports", "Reversibility belief reinforces bus factor heuristic"),
+  rel("TDM-STRY-001", "TDM-BLEF-001", "supports", "Migration story demonstrates reversibility belief in practice"),
+
+  // LDR internal supports
+  rel("LDR-BLEF-001", "LDR-FRMW-001", "supports", "Autonomy belief drives the delegation framework"),
+  rel("LDR-SKIL-001", "LDR-HEUR-001", "supports", "Conflict resolution skill applies the disagree-and-commit heuristic"),
+  rel("LDR-STRY-001", "LDR-BLEF-001", "supports", "Junior dev story exemplifies autonomy belief"),
+  rel("LDR-FRMW-001", "LDR-PREF-001", "supports", "Delegation framework supports flat hierarchy preference"),
+  rel("LDR-RITL-001", "LDR-EMOT-001", "supports", "Skip-level ritual builds trust emotion"),
+
+  // COM internal supports
+  rel("COM-STYL-001", "COM-HEUR-001", "supports", "Direct communication style supports meeting agenda heuristic"),
+  rel("COM-SKIL-001", "COM-STYL-002", "supports", "Whiteboard skill reinforces visual communication style"),
+  rel("COM-PREF-001", "COM-ANTI-001", "supports", "Written-first preference opposes same anti-patterns"),
+
+  // Cross-cluster supports: TDM ↔ LDR
+  rel("TDM-FRMW-001", "LDR-BLEF-001", "supports", "ADR framework supports team autonomy through transparent decisions"),
+  rel("TDM-RITL-001", "LDR-HEUR-001", "supports", "Architecture review ritual enables disagree-and-commit"),
+  rel("TDM-BLEF-001", "LDR-FRMW-001", "supports", "Reversibility belief supports delegation by reducing risk"),
+  rel("LDR-PREF-001", "TDM-FRMW-002", "supports", "Flat hierarchy supports bounded context ownership"),
+
+  // Cross-cluster supports: TDM ↔ COM
+  rel("TDM-FRMW-001", "COM-PREF-001", "supports", "ADRs are the ultimate written-first communication"),
+  rel("TDM-RITL-001", "COM-STYL-001", "supports", "Architecture reviews need direct communication"),
+
+  // Cross-cluster supports: TDM ↔ DE
+  rel("TDM-PREF-001", "DE-SKIL-001", "supports", "TypeScript preference aligns with distributed systems expertise"),
+  rel("TDM-PREF-002", "DE-FRMW-001", "supports", "IaC preference supports observability framework"),
+  rel("TDM-HEUR-002", "DE-FACT-001", "supports", "API boundary rule supports PostgreSQL expertise"),
+
+  // Cross-cluster supports: LDR ↔ COM
+  rel("LDR-HEUR-001", "COM-STYL-001", "supports", "Disagree-and-commit needs direct communication"),
+  rel("LDR-RITL-001", "COM-RITL-001", "supports", "Skip-levels feed into weekly all-hands ritual"),
+  rel("LDR-BLEF-001", "COM-PREF-001", "supports", "Team autonomy requires written documentation"),
+
+  // Cross-cluster supports: PV ↔ LDR
+  rel("PV-BLEF-001", "LDR-BLEF-001", "supports", "Transparency value drives team autonomy belief"),
+  rel("PV-BLEF-002", "LDR-FRMW-001", "supports", "Meritocracy value shapes delegation framework"),
+  rel("PV-HEUR-001", "LDR-HEUR-001", "supports", "Intellectual honesty supports disagree-and-commit"),
+  rel("PV-EMOT-001", "LDR-EMOT-001", "supports", "Pride in craft sustains trust-building"),
+
+  // Cross-cluster supports: PV ↔ COM
+  rel("PV-BLEF-001", "COM-STYL-001", "supports", "Transparency drives direct communication"),
+  rel("PV-HEUR-001", "COM-ANTI-001", "supports", "Intellectual honesty opposes jargon anti-patterns"),
+
+  // Cross-cluster supports: EL ↔ LDR
+  rel("EL-HEUR-001", "LDR-SKIL-001", "supports", "Emotional regulation supports conflict resolution"),
+  rel("EL-PREF-001", "LDR-RITL-001", "supports", "Calm preference supports skip-level conversations"),
+
+  // Cross-cluster supports: MP ↔ TDM
+  rel("MP-META-001", "TDM-FRMW-001", "supports", "Decision-making meta-pattern supports ADR framework"),
+  rel("MP-META-002", "TDM-BLEF-001", "supports", "Risk assessment pattern supports reversibility belief"),
+  rel("MP-FRMW-001", "TDM-FRMW-002", "supports", "Pattern recognition framework supports bounded contexts"),
+
+  // Cross-cluster supports: IR ↔ TDM
+  rel("IR-HEUR-001", "TDM-HEUR-003", "supports", "Severity classification aligns with anti-premature-scaling"),
+  rel("IR-FRMW-001", "TDM-FRMW-001", "supports", "Incident framework feeds into ADR decisions"),
+  rel("IR-SKIL-001", "TDM-BLEF-001", "supports", "On-call debugging skill reinforces reversibility belief"),
+
+  // Cross-cluster supports: CR ↔ TDM
+  rel("CR-HEUR-001", "TDM-HEUR-002", "supports", "PR size limits support API boundary hygiene"),
+  rel("CR-PREF-001", "TDM-PREF-001", "supports", "Review focus preferences align with TypeScript strictness"),
+  rel("CR-BLEF-001", "TDM-FRMW-001", "supports", "Code review belief supports ADR accountability"),
+
+  // Cross-cluster supports: VM ↔ TDM
+  rel("VM-HEUR-001", "TDM-HEUR-001", "supports", "Exit cost test complements bus factor analysis"),
+  rel("VM-PREF-001", "TDM-PREF-002", "supports", "Multi-cloud preference supports infrastructure-as-code"),
+
+  // Cross-cluster supports: HP ↔ LDR
+  rel("HP-RITL-001", "LDR-FRMW-001", "supports", "Structured interviews support delegation framework"),
+  rel("HP-BLEF-001", "LDR-BLEF-001", "supports", "Hiring beliefs reinforce team autonomy"),
+  rel("HP-PREF-001", "LDR-PREF-001", "supports", "Diversity preference supports flat hierarchy"),
+
+  // Cross-cluster supports: PS ↔ TDM
+  rel("PS-FRMW-001", "TDM-FRMW-002", "supports", "Modified RICE supports bounded context prioritization"),
+  rel("PS-HEUR-001", "TDM-HEUR-003", "supports", "MVP rule aligns with anti-premature-scaling"),
+  rel("PS-BLEF-001", "TDM-BLEF-001", "supports", "Product iteration belief supports reversibility"),
+
+  // Cross-cluster supports: TD ↔ TDM
+  rel("TD-FRMW-001", "TDM-FRMW-001", "supports", "Debt classification feeds into ADR decisions"),
+  rel("TD-HEUR-001", "TDM-HEUR-003", "supports", "20% debt budget prevents premature scaling on broken foundations"),
+  rel("TD-BLEF-001", "TDM-BLEF-001", "supports", "Strangler fig belief reinforces reversibility"),
+
+  // Cross-cluster supports: SP ↔ TDM
+  rel("SP-HEUR-001", "TDM-PREF-002", "supports", "Secret scanning supports infrastructure-as-code practices"),
+  rel("SP-FRMW-001", "TDM-FRMW-002", "supports", "Threat modeling integrates with bounded context design"),
+
+  // Cross-cluster supports: DA ↔ TDM
+  rel("DA-FRMW-001", "TDM-HEUR-002", "supports", "Data ownership boundaries reinforce API boundary rules"),
+  rel("DA-HEUR-001", "TDM-BLEF-001", "supports", "Backwards-compatible migrations support reversibility"),
+  rel("DA-SKIL-001", "TDM-FRMW-002", "supports", "Query-first modeling supports bounded context design"),
+
+  // Cross-cluster supports: RW ↔ COM
+  rel("RW-BLEF-001", "COM-PREF-001", "supports", "Remote-first drives written communication preference"),
+  rel("RW-HEUR-001", "COM-RITL-001", "supports", "Timezone overlap supports structured rituals"),
+
+  // Cross-cluster supports: OSS ↔ DE
+  rel("OSS-BLEF-001", "DE-SKIL-001", "supports", "Open-source contribution deepens distributed systems skills"),
+  rel("OSS-HEUR-001", "TDM-HEUR-001", "supports", "OSS maturity checklist extends bus factor analysis"),
+
+  // Cross-cluster supports: CP ↔ LDR
+  rel("CP-BLEF-001", "LDR-PREF-001", "supports", "Parallel tracks support flat hierarchy preference"),
+  rel("CP-HEUR-001", "LDR-STRY-001", "supports", "Career change advice informs junior dev mentorship"),
+
+  // Cross-cluster supports: MC ↔ COM
+  rel("MC-HEUR-001", "COM-HEUR-001", "supports", "Meeting manifesto reinforces agenda heuristic"),
+  rel("MC-ANTI-001", "COM-PREF-001", "supports", "Anti-status-meetings supports written-first communication"),
+  rel("MC-PREF-001", "COM-RITL-001", "supports", "Meeting length caps support ritual efficiency"),
+
+  // Cross-cluster supports: SL ↔ TDM
+  rel("SL-STRY-001", "TDM-BLEF-001", "supports", "Hetzner-to-AWS story embodies reversibility belief"),
+  rel("SL-FRMW-001", "TDM-FRMW-001", "supports", "Decision metabolism aligns with ADR framework scaling"),
+
+  // Cross-cluster supports: PO ↔ TDM
+  rel("PO-HEUR-001", "TDM-HEUR-003", "supports", "Performance budgets prevent premature optimization"),
+  rel("PO-SKIL-001", "DE-SKIL-002", "supports", "Profiling skill complements PostgreSQL expertise"),
+
+  // Cross-cluster supports: IR ↔ EL
+  rel("IR-STRY-001", "EL-EMOT-002", "supports", "Incident stories evoke protective team emotions"),
+  rel("IR-RITL-001", "EL-HEUR-001", "supports", "Blameless post-mortems support emotional regulation"),
+
+  // Cross-cluster supports: SP ↔ IR
+  rel("SP-HEUR-001", "IR-HEUR-001", "supports", "Secret detection triggers incident severity classification"),
+  rel("SP-ANTI-001", "IR-ANTI-001", "supports", "Anti-security-theater aligns with anti-blame-culture"),
+
+  // Cross-cluster supports: TD ↔ CR
+  rel("TD-HEUR-001", "CR-HEUR-001", "supports", "Debt budget creates space for thorough code reviews"),
+  rel("TD-FRMW-001", "CR-PREF-001", "supports", "Debt classification informs review priorities"),
+
+  // Cross-cluster supports: SL ↔ PV
+  rel("SL-BLEF-001", "PV-BLEF-003", "supports", "Bootstrapping belief aligns with pragmatic values"),
+  rel("SL-HEUR-001", "PV-HEUR-001", "supports", "Late hiring heuristic reflects intellectual honesty"),
+
+  // Cross-cluster supports: RW ↔ MC
+  rel("RW-BLEF-001", "MC-ANTI-001", "supports", "Remote-first killed status meetings"),
+  rel("RW-RITL-001", "MC-PREF-001", "supports", "Virtual coffee fits 25-min meeting cap"),
+
+  // Cross-cluster supports: CP ↔ HP
+  rel("CP-BLEF-001", "HP-BLEF-001", "supports", "Parallel tracks inform hiring criteria"),
+  rel("CP-RANT-001", "HP-ANTI-001", "supports", "Title inflation rant drives hiring anti-patterns"),
+
+  // Cross-cluster supports: PO ↔ DA
+  rel("PO-HEUR-001", "DA-SKIL-001", "supports", "Performance budgets inform query-first data modeling"),
+  rel("PO-ANTI-001", "DA-PREF-001", "supports", "Caching skepticism drives streaming preference"),
+
+  // Cross-cluster supports: OSS ↔ SP
+  rel("OSS-STRY-001", "SP-BLEF-001", "supports", "OSS bug fix story demonstrates security culture"),
+
+  // Cross-cluster supports: VM ↔ DA
+  rel("VM-ANTI-001", "DA-FRMW-001", "supports", "Anti-lock-in supports data ownership boundaries"),
+
+  // Cross-cluster supports: PS ↔ SL
+  rel("PS-HEUR-001", "SL-BLEF-001", "supports", "MVP rule aligns with bootstrapping philosophy"),
+
+  // Additional cross-cluster supports
+  rel("EL-STRY-001", "PV-STRY-001", "supports", "Emotional stories reinforce personal value narratives"),
+  rel("MP-META-003", "LDR-FRMW-001", "supports", "Communication meta-pattern supports delegation"),
+  rel("MP-META-004", "EL-HEUR-001", "supports", "Stress meta-pattern supports emotional regulation"),
+  rel("DE-FRMW-001", "IR-FRMW-001", "supports", "Observability framework supports incident response"),
+  rel("DE-HEUR-001", "PO-HEUR-001", "supports", "Latency heuristics support performance budgets"),
+  rel("LDR-ANTI-001", "HP-ANTI-001", "supports", "Anti-micromanagement supports anti-credential-bias in hiring"),
+  rel("LDR-ANTI-002", "CR-ANTI-001", "supports", "Anti-hero-culture supports anti-rubber-stamping"),
+  rel("COM-RANT-001", "CP-RANT-001", "supports", "Communication rant energy mirrors title inflation rant"),
+  rel("PV-PREF-001", "RW-BLEF-001", "supports", "Work-life values support remote-first belief"),
+
+  // ── contradicts (chunks in genuine tension) ──────────────────────────────────
+  rel("TDM-HEUR-003", "SL-STRY-001", "contradicts", "Anti-premature-scaling vs. the 36-hour AWS migration"),
+  rel("TDM-BLEF-001", "PS-ANTI-001", "contradicts", "Reversibility belief vs. feature factory anti-pattern urgency"),
+  rel("LDR-BLEF-001", "LDR-ANTI-001", "contradicts", "Team autonomy belief vs. anti-micromanagement creates tension on oversight"),
+  rel("PV-BLEF-001", "EL-PREF-001", "contradicts", "Transparency value vs. calm preference when delivering bad news"),
+  rel("PV-CONT-001", "PV-BLEF-001", "contradicts", "Personal contradiction directly challenges transparency value"),
+  rel("EL-CONT-001", "EL-EMOT-001", "contradicts", "Emotional contradiction challenges primary emotion"),
+  rel("MP-CONT-001", "MP-META-001", "contradicts", "Meta contradiction challenges core decision-making pattern"),
+  rel("COM-STYL-001", "EL-PREF-001", "contradicts", "Direct communication vs. preference for calm environments"),
+  rel("COM-RANT-001", "COM-STYL-001", "contradicts", "Rant energy contradicts usual measured directness"),
+  rel("TD-HEUR-001", "PS-FRMW-001", "contradicts", "20% debt budget competes with feature prioritization framework"),
+  rel("CR-HEUR-002", "SL-FRMW-001", "contradicts", "Strict review rules vs. startup speed decision metabolism"),
+  rel("SP-ANTI-001", "SP-FRMW-001", "contradicts", "Anti-security-theater partially undermines formal threat modeling"),
+  rel("MC-HEUR-001", "RW-HEUR-001", "contradicts", "Meeting manifesto formality vs. async-first remote work"),
+  rel("CP-HEUR-001", "SL-BLEF-001", "contradicts", "Change roles advice vs. founder commitment to one company"),
+  rel("PO-ANTI-001", "DE-HEUR-001", "contradicts", "Caching skepticism vs. practical latency heuristics"),
+  rel("VM-HEUR-001", "OSS-BLEF-001", "contradicts", "Exit cost analysis vs. deep open-source investment"),
+  rel("HP-HEUR-001", "LDR-PREF-001", "contradicts", "Red flag heuristics can conflict with flat hierarchy openness"),
+  rel("DA-PREF-001", "PO-ANTI-001", "contradicts", "Streaming preference creates caching needs it distrusts"),
+  rel("TD-BLEF-001", "SL-STRY-001", "contradicts", "Never-rewrite belief vs. the one rewrite he approved"),
+  rel("PS-RANT-001", "LDR-BLEF-001", "contradicts", "Product strategy frustration vs. team empowerment belief"),
+  rel("IR-ANTI-001", "IR-HEUR-001", "contradicts", "Anti-blame-culture can conflict with strict severity classification"),
+
+  // ── refines (one chunk narrows or specifies another) ─────────────────────────
+  rel("TDM-HEUR-002", "TDM-FRMW-002", "refines", "7-endpoint limit refines the bounded context framework"),
+  rel("TDM-ANTI-001", "TDM-HEUR-001", "refines", "Resume-driven anti-pattern refines what bus factor heuristic catches"),
+  rel("TDM-ANTI-002", "TDM-HEUR-003", "refines", "Premature microservices anti-pattern refines scaling heuristic"),
+  rel("LDR-ANTI-001", "LDR-FRMW-001", "refines", "Anti-micromanagement refines delegation framework boundaries"),
+  rel("LDR-ANTI-002", "LDR-BLEF-001", "refines", "Anti-hero-culture refines what team autonomy means"),
+  rel("COM-ANTI-001", "COM-STYL-001", "refines", "Communication anti-patterns refine direct style boundaries"),
+  rel("CR-HEUR-002", "CR-HEUR-001", "refines", "Review focus refines PR size limit heuristic"),
+  rel("CR-ANTI-001", "CR-BLEF-001", "refines", "Anti-rubber-stamping refines code review belief"),
+  rel("VM-ANTI-001", "VM-HEUR-001", "refines", "Vendor lock-in stories refine exit cost test"),
+  rel("HP-ANTI-001", "HP-HEUR-001", "refines", "Credential anti-pattern refines red flag heuristics"),
+  rel("PS-ANTI-001", "PS-FRMW-001", "refines", "Feature factory anti-pattern refines RICE framework"),
+  rel("TD-HEUR-001", "TD-FRMW-001", "refines", "20% budget is a specific instance of debt classification"),
+  rel("SP-ANTI-001", "SP-FRMW-001", "refines", "Anti-security-theater refines threat model scope"),
+  rel("DA-HEUR-001", "DA-FRMW-001", "refines", "Schema evolution rules refine data ownership framework"),
+  rel("MC-ANTI-001", "MC-HEUR-001", "refines", "Status meeting ban refines meeting manifesto rules"),
+  rel("PO-ANTI-001", "PO-HEUR-001", "refines", "Caching skepticism refines when performance budgets apply"),
+  rel("IR-ANTI-001", "IR-RITL-001", "refines", "Anti-blame refines post-mortem ritual boundaries"),
+  rel("IR-HEUR-001", "IR-FRMW-001", "refines", "Severity classification refines incident framework"),
+  rel("SL-HEUR-001", "SL-BLEF-001", "refines", "Hiring timing rule refines bootstrapping philosophy"),
+  rel("MP-META-003", "COM-STYL-001", "refines", "Communication meta-pattern refines direct style"),
+  rel("MP-META-004", "EL-EMOT-003", "refines", "Stress pattern refines frustration response"),
+  rel("EL-EMOT-002", "EL-EMOT-001", "refines", "Team protection emotion refines primary pride emotion"),
+  rel("EL-EMOT-004", "EL-EMOT-003", "refines", "Specific trigger refines general frustration"),
+  rel("PV-BLEF-002", "PV-BLEF-001", "refines", "Meritocracy refines transparency into action"),
+  rel("DE-FACT-002", "DE-FACT-001", "refines", "Specific PostgreSQL knowledge refines general DB expertise"),
+  rel("DE-SKIL-002", "DE-SKIL-001", "refines", "Specific distributed skill refines general systems skill"),
+  rel("OSS-HEUR-001", "TDM-HEUR-001", "refines", "OSS maturity checklist refines bus factor analysis for open-source"),
+  rel("SL-FRMW-001", "TDM-FRMW-001", "refines", "Decision metabolism refines ADR framework for different scales"),
+
+  // ── exemplifies (a story/instance that illustrates a belief/heuristic) ───────
+  rel("TDM-STRY-001", "TDM-BLEF-001", "exemplifies", "Migration story illustrates reversibility belief"),
+  rel("TDM-STRY-001", "TDM-HEUR-001", "exemplifies", "Migration story shows bus factor consequences"),
+  rel("LDR-STRY-001", "LDR-BLEF-001", "exemplifies", "Junior dev story exemplifies autonomy belief"),
+  rel("LDR-STRY-001", "LDR-FRMW-001", "exemplifies", "Junior dev story shows delegation framework in action"),
+  rel("PV-STRY-001", "PV-BLEF-001", "exemplifies", "Personal value story exemplifies transparency"),
+  rel("PV-STRY-001", "PV-BLEF-003", "exemplifies", "Value story shows pragmatic belief in action"),
+  rel("EL-STRY-001", "EL-EMOT-001", "exemplifies", "Emotional story illustrates pride response"),
+  rel("EL-STRY-001", "EL-EMOT-002", "exemplifies", "Story shows team protection emotion"),
+  rel("DE-STRY-001", "DE-FRMW-001", "exemplifies", "Domain story illustrates observability framework value"),
+  rel("DE-STRY-001", "DE-SKIL-001", "exemplifies", "Story demonstrates distributed systems skill"),
+  rel("VM-STRY-001", "VM-HEUR-001", "exemplifies", "Vendor story exemplifies exit cost test"),
+  rel("VM-STRY-001", "VM-ANTI-001", "exemplifies", "Story exemplifies vendor lock-in anti-pattern"),
+  rel("IR-STRY-001", "IR-FRMW-001", "exemplifies", "Incident story exemplifies response framework"),
+  rel("IR-STRY-001", "IR-HEUR-001", "exemplifies", "Story shows severity classification in action"),
+  rel("TD-STRY-001", "TD-FRMW-001", "exemplifies", "2019 pipeline story exemplifies debt classification"),
+  rel("TD-STRY-001", "TD-HEUR-001", "exemplifies", "Story justifies the 20% debt budget"),
+  rel("TD-STRY-001", "TD-BLEF-001", "exemplifies", "Pipeline collapse exemplifies why rewrites fail"),
+  rel("OSS-STRY-001", "OSS-BLEF-001", "exemplifies", "Race condition fix story exemplifies contribution belief"),
+  rel("OSS-STRY-001", "OSS-HEUR-001", "exemplifies", "Story shows what OSS maturity enables"),
+  rel("SL-STRY-001", "SL-BLEF-001", "exemplifies", "Hetzner founding story exemplifies bootstrapping philosophy"),
+  rel("SL-STRY-001", "SL-FRMW-001", "exemplifies", "36-hour migration shows decision metabolism at startup scale"),
+  rel("SL-STRY-001", "TDM-BLEF-001", "exemplifies", "Feature flag migration exemplifies reversibility"),
+  rel("TDM-RITL-001", "TDM-FRMW-001", "exemplifies", "Friday reviews are a living instance of ADR process"),
+  rel("LDR-RITL-001", "LDR-BLEF-001", "exemplifies", "Skip-levels exemplify trust-building autonomy"),
+  rel("COM-RITL-001", "COM-PREF-001", "exemplifies", "All-hands ritual exemplifies written communication preference"),
+  rel("IR-RITL-001", "IR-ANTI-001", "exemplifies", "Blameless post-mortems exemplify anti-blame culture"),
+  rel("HP-RITL-001", "HP-BLEF-001", "exemplifies", "Structured interview ritual exemplifies hiring beliefs"),
+  rel("RW-RITL-001", "RW-BLEF-001", "exemplifies", "Virtual coffee exemplifies remote-first culture commitment"),
+  rel("EL-EMOT-004", "EL-HEUR-001", "exemplifies", "Specific frustration trigger shows emotional regulation in context"),
+  rel("PV-CONT-001", "MP-CONT-001", "exemplifies", "Personal contradiction exemplifies meta-level contradictions"),
+  rel("DA-PREF-001", "DA-FRMW-001", "exemplifies", "Streaming preference exemplifies data ownership in practice"),
+  rel("CR-HEUR-001", "CR-BLEF-001", "exemplifies", "PR size limit is a concrete instance of review belief"),
+  rel("SP-HEUR-001", "SP-BLEF-001", "exemplifies", "Secret scanning exemplifies security culture belief"),
+  rel("MC-PREF-001", "MC-HEUR-001", "exemplifies", "25-min cap exemplifies meeting manifesto in practice"),
+
+  // ── triggers (one chunk causally activates another) ──────────────────────────
+  rel("TDM-ANTI-001", "TDM-HEUR-001", "triggers", "Detecting resume-driven dev triggers bus factor check"),
+  rel("TDM-ANTI-002", "TDM-HEUR-002", "triggers", "Premature microservices trigger API boundary enforcement"),
+  rel("IR-HEUR-001", "IR-RITL-001", "triggers", "Severity classification triggers post-mortem process"),
+  rel("IR-HEUR-001", "IR-SKIL-001", "triggers", "High severity triggers on-call debugging response"),
+  rel("SP-HEUR-001", "IR-HEUR-001", "triggers", "Secret detection triggers incident classification"),
+  rel("EL-EMOT-003", "EL-HEUR-001", "triggers", "Frustration triggers emotional regulation heuristic"),
+  rel("EL-EMOT-004", "COM-RANT-001", "triggers", "Specific frustration trigger can lead to communication rants"),
+  rel("COM-ANTI-001", "COM-RANT-001", "triggers", "Detecting jargon anti-pattern triggers rant response"),
+  rel("LDR-ANTI-001", "LDR-SKIL-001", "triggers", "Detecting micromanagement triggers conflict resolution"),
+  rel("LDR-ANTI-002", "LDR-EMOT-001", "triggers", "Hero culture detection triggers emotional trust response"),
+  rel("CR-ANTI-001", "CR-HEUR-002", "triggers", "Rubber-stamping detection triggers review focus heuristic"),
+  rel("HP-ANTI-001", "HP-HEUR-001", "triggers", "Credential bias triggers structured assessment"),
+  rel("PS-ANTI-001", "PS-RANT-001", "triggers", "Feature factory detection triggers product strategy rant"),
+  rel("VM-ANTI-001", "VM-HEUR-001", "triggers", "Lock-in detection triggers exit cost analysis"),
+  rel("TD-STRY-001", "TD-HEUR-001", "triggers", "Pipeline collapse story triggers debt budget enforcement"),
+  rel("MC-ANTI-001", "MC-HEUR-001", "triggers", "Status meeting detection triggers meeting manifesto"),
+  rel("PO-HEUR-001", "PO-SKIL-001", "triggers", "Budget violation triggers profiling investigation"),
+  rel("DA-HEUR-001", "DA-FRMW-001", "triggers", "Schema change triggers ownership boundary check"),
+  rel("SP-ANTI-001", "SP-FRMW-001", "triggers", "Security theater detection triggers real threat modeling"),
+  rel("CP-RANT-001", "HP-ANTI-001", "triggers", "Title inflation rant triggers hiring anti-pattern awareness"),
+  rel("MP-META-004", "EL-EMOT-003", "triggers", "Stress meta-pattern triggers frustration recognition"),
+  rel("TDM-HEUR-001", "VM-HEUR-001", "triggers", "Low bus factor triggers vendor exit cost analysis"),
+  rel("PV-BLEF-001", "COM-STYL-001", "triggers", "Transparency value triggers direct communication mode"),
+  rel("SL-STRY-001", "TD-BLEF-001", "triggers", "Founding story informs strangler fig belief"),
+  rel("RW-BLEF-001", "MC-ANTI-001", "triggers", "Remote-first decision triggered status meeting elimination"),
+  rel("IR-STRY-001", "SP-HEUR-001", "triggers", "Past incidents trigger stricter secret scanning"),
+  rel("PS-FRMW-001", "TD-HEUR-001", "triggers", "Feature prioritization triggers debt budget negotiation"),
+  rel("DE-HEUR-001", "PO-HEUR-001", "triggers", "Latency detection triggers performance budget check"),
+  rel("CR-HEUR-001", "TD-FRMW-001", "triggers", "Large PRs trigger technical debt classification"),
+  rel("LDR-FRMW-001", "HP-RITL-001", "triggers", "Delegation gaps trigger hiring process"),
+
+  // ── evolves_from (one chunk developed from or replaced another over time) ────
+  rel("TDM-FRMW-002", "TDM-STRY-001", "evolves_from", "Bounded context framework evolved from migration pain"),
+  rel("TDM-HEUR-001", "TDM-STRY-001", "evolves_from", "Bus factor heuristic evolved from dependency crisis"),
+  rel("LDR-FRMW-001", "LDR-STRY-001", "evolves_from", "Delegation framework evolved from junior dev experience"),
+  rel("LDR-HEUR-001", "LDR-SKIL-001", "evolves_from", "Disagree-and-commit evolved from conflict resolution experience"),
+  rel("IR-FRMW-001", "IR-STRY-001", "evolves_from", "Incident framework evolved from actual incident experience"),
+  rel("IR-RITL-001", "IR-STRY-001", "evolves_from", "Post-mortem ritual evolved from incident learnings"),
+  rel("TD-HEUR-001", "TD-STRY-001", "evolves_from", "20% debt budget evolved from 2019 pipeline collapse"),
+  rel("TD-FRMW-001", "TD-STRY-001", "evolves_from", "Debt classification evolved from pipeline crisis"),
+  rel("TD-BLEF-001", "TD-STRY-001", "evolves_from", "Anti-rewrite belief evolved from observing collapse"),
+  rel("SP-HEUR-001", "SP-BLEF-001", "evolves_from", "Secret scanning evolved from security culture belief"),
+  rel("VM-HEUR-001", "VM-STRY-001", "evolves_from", "Exit cost test evolved from vendor lock-in experience"),
+  rel("HP-RITL-001", "HP-ANTI-001", "evolves_from", "Structured interviews evolved from witnessing credential bias"),
+  rel("PS-FRMW-001", "PS-BLEF-001", "evolves_from", "Modified RICE evolved from iteration-first belief"),
+  rel("DA-FRMW-001", "DE-FACT-001", "evolves_from", "Data ownership evolved from database expertise"),
+  rel("DA-HEUR-001", "SL-STRY-001", "evolves_from", "Schema evolution rules evolved from startup deployment pain"),
+  rel("MC-HEUR-001", "RW-BLEF-001", "evolves_from", "Meeting manifesto evolved from remote-first transition"),
+  rel("MC-ANTI-001", "RW-BLEF-001", "evolves_from", "Status meeting ban evolved from remote work experience"),
+  rel("SL-FRMW-001", "SL-STRY-001", "evolves_from", "Decision metabolism evolved from founding experience"),
+  rel("SL-BLEF-001", "SL-STRY-001", "evolves_from", "Bootstrapping belief evolved from founding survival"),
+  rel("PO-HEUR-001", "DE-HEUR-001", "evolves_from", "Performance budgets evolved from latency expertise"),
+  rel("PO-ANTI-001", "DE-SKIL-002", "evolves_from", "Caching skepticism evolved from distributed systems experience"),
+  rel("OSS-HEUR-001", "OSS-STRY-001", "evolves_from", "OSS maturity checklist evolved from contribution experience"),
+  rel("CP-BLEF-001", "CP-HEUR-001", "evolves_from", "Parallel tracks belief evolved from career change experience"),
+  rel("CP-RANT-001", "HP-ANTI-001", "evolves_from", "Title rant evolved from witnessing hiring credential bias"),
+  rel("CR-HEUR-001", "CR-BLEF-001", "evolves_from", "PR size limits evolved from code review philosophy"),
+  rel("CR-ANTI-001", "LDR-ANTI-002", "evolves_from", "Anti-rubber-stamping evolved from anti-hero-culture stance"),
+  rel("RW-BLEF-001", "COM-PREF-001", "evolves_from", "Remote-first belief evolved from written communication preference"),
+  rel("RW-HEUR-001", "RW-BLEF-001", "evolves_from", "Timezone overlap heuristic evolved from remote-first experience"),
+  rel("RW-RITL-001", "RW-BLEF-001", "evolves_from", "Virtual coffee evolved from remote-first commitment"),
+  rel("EL-HEUR-001", "EL-STRY-001", "evolves_from", "Emotional regulation evolved from personal experience"),
+  rel("MP-META-001", "TDM-FRMW-001", "evolves_from", "Decision meta-pattern evolved from ADR practice"),
+  rel("MP-META-002", "EL-STRY-001", "evolves_from", "Risk assessment pattern evolved from emotional experiences"),
+  rel("MP-FRMW-001", "DE-STRY-001", "evolves_from", "Pattern recognition evolved from domain expertise stories"),
+  rel("COM-STYL-001", "PV-BLEF-001", "evolves_from", "Direct communication evolved from transparency value"),
+  rel("COM-SKIL-001", "DE-SKIL-001", "evolves_from", "Whiteboard skill evolved from systems thinking expertise"),
+  rel("PV-HEUR-001", "PV-BLEF-002", "evolves_from", "Intellectual honesty heuristic evolved from meritocracy belief"),
+
+  // ── Additional relations to reach 267 ────────────────────────────────────────
+  // More supports
+  rel("DE-BLEF-001", "OSS-BLEF-001", "supports", "Domain mastery belief supports open-source contribution"),
+  rel("HP-PREF-001", "PV-BLEF-002", "supports", "Diversity preference supports meritocracy value"),
+  rel("SL-FRMW-001", "MC-HEUR-001", "supports", "Decision metabolism supports meeting manifesto scaling"),
+  rel("DA-SKIL-001", "DE-FACT-002", "supports", "Query-first modeling leverages PostgreSQL expertise"),
+  rel("SP-BLEF-001", "LDR-BLEF-001", "supports", "Security culture requires team autonomy"),
+
+  // More contradicts
+  rel("LDR-PREF-001", "SL-HEUR-001", "contradicts", "Flat hierarchy vs. deliberately late hiring creates gaps"),
+  rel("OSS-BLEF-001", "SP-HEUR-001", "contradicts", "Open contribution enthusiasm vs. strict secret scanning"),
+
+  // More refines
+  rel("DA-SKIL-001", "DA-HEUR-001", "refines", "Query-first modeling refines schema evolution approach"),
+  rel("SP-BLEF-001", "SP-ANTI-001", "refines", "Security culture belief refines what counts as theater"),
+
+  // More exemplifies
+  rel("TDM-PREF-002", "TDM-FRMW-002", "exemplifies", "IaC preference exemplifies bounded context in infrastructure"),
+  rel("LDR-EMOT-001", "PV-EMOT-001", "exemplifies", "Leadership trust exemplifies pride-in-craft value"),
+  rel("HP-HEUR-001", "HP-BLEF-001", "exemplifies", "Red flag heuristics exemplify hiring beliefs concretely"),
+
+  // More triggers
+  rel("EL-EMOT-002", "LDR-SKIL-001", "triggers", "Team protection emotion triggers conflict resolution"),
+  rel("PO-SKIL-001", "DA-SKIL-001", "triggers", "Profiling results trigger data model review"),
+  rel("OSS-HEUR-001", "VM-HEUR-001", "triggers", "Low OSS maturity score triggers vendor exit analysis"),
+  rel("HP-BLEF-001", "CP-BLEF-001", "triggers", "Hiring beliefs trigger parallel track design"),
+
+  // More evolves_from
+  rel("SP-FRMW-001", "IR-STRY-001", "evolves_from", "Threat modeling evolved from past incident lessons"),
+  rel("DA-PREF-001", "DA-FRMW-001", "evolves_from", "Streaming preference evolved from data ownership practice"),
+  rel("SL-HEUR-001", "SL-STRY-001", "evolves_from", "Hiring timing rule evolved from founding constraints"),
 ];
 
 // ─── Build Portrait ────────────────────────────────────────────────────────────
