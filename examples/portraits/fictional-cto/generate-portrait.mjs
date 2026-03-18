@@ -437,6 +437,175 @@ const psChunks = [
   ),
 ];
 
+// ─── Cluster: technical-debt (TD) — 4 chunks ──────────────────────────────────
+
+const tdChunks = [
+  chunk("TD", "technical-debt", "framework", "FRMW", "CRITICAL", "document", 0.91,
+    ["debt-classification", "prioritization", "strategy"],
+    "Jan classifies technical debt into three categories using a financial metaphor: 'credit card debt' (quick hacks that accrue daily interest — must be paid within the sprint), 'mortgage debt' (deliberate architectural compromises with known payoff schedules — tracked quarterly), and 'student loan debt' (foundational choices that enabled growth but now constrain it — addressed in annual planning). Each category has a different remediation strategy and budget allocation. He refuses to let credit card debt carry over between sprints."
+  ),
+  chunk("TD", "technical-debt", "heuristic", "HEUR", "HIGH", "meeting", 0.88,
+    ["debt-budget", "allocation", "maintenance"],
+    "Jan allocates exactly 20% of each sprint's capacity to technical debt reduction — not as a stretch goal but as a hard reservation. If a product manager tries to reclaim this capacity for feature work, Jan requires them to sign a 'Debt Deferral Notice' that documents the deferred item, its estimated interest rate (velocity drag per sprint), and a committed payback date. He has found that the formality of the notice deters all but the most urgent requests."
+  ),
+  chunk("TD", "technical-debt", "story", "STRY", "HIGH", "interview", 0.86,
+    ["debt-crisis", "refactoring", "recovery"],
+    "Jan's cautionary tale about technical debt comes from 2019: the team spent 6 months building features on top of a 'temporary' data pipeline that was supposed to be replaced after 3 months. When the pipeline finally collapsed under load, the replacement took 4 months instead of the original 3 because every new feature had created additional coupling. He calculates the total cost at $380K in engineering time and uses this as his primary argument for the 20% debt budget."
+  ),
+  chunk("TD", "technical-debt", "belief", "BLEF", "MEDIUM", "interview", 0.84,
+    ["refactoring", "rewriting", "pragmatism"],
+    "Jan is deeply skeptical of 'big bang' rewrites and believes that almost every system can be incrementally migrated using the strangler fig pattern. He has approved exactly one ground-up rewrite in 7 years (the event pipeline after the 2019 collapse) and considers it the exception that proves the rule. His standard response to rewrite proposals: 'Show me the migration plan where both systems run in parallel. If you can't, you don't understand the problem well enough to rewrite it.'"
+  ),
+];
+
+// ─── Cluster: security-practices (SP) — 4 chunks ──────────────────────────────
+
+const spChunks = [
+  chunk("SP", "security-practices", "heuristic", "HEUR", "CRITICAL", "code", 0.92,
+    ["secrets-management", "credentials", "security"],
+    "Jan enforces a zero-tolerance policy for secrets in code repositories. The CI pipeline runs automated secret scanning on every commit, and any detection triggers an immediate forced rotation of the compromised credential, a P2 incident report, and a team-wide security review. He implemented this after discovering that a database password committed to a private repo in 2020 was still valid 8 months later because no one had rotated it."
+  ),
+  chunk("SP", "security-practices", "framework", "FRMW", "HIGH", "document", 0.89,
+    ["threat-modeling", "security-review", "process"],
+    "Jan requires a lightweight threat model for any feature that handles user data, financial transactions, or authentication flows. His threat model template has exactly 4 questions: (1) What data flows through this feature? (2) Who should not have access to this data? (3) What happens if this feature fails open? (4) What's the blast radius of a compromise? He considers this 'security minimum viable process' — lightweight enough to not slow development but thorough enough to catch the top risks."
+  ),
+  chunk("SP", "security-practices", "anti-pattern", "ANTI", "HIGH", "meeting", 0.87,
+    ["security-theater", "compliance", "pragmatism"],
+    "Jan vocally opposes what he calls 'security theater' — compliance activities that create a false sense of security without reducing actual risk. He has eliminated three quarterly security reports that no one read, replaced annual penetration testing with continuous automated scanning, and refuses to implement IP whitelisting for internal tools because 'it makes people think the network is a security boundary when it hasn't been for a decade.'"
+  ),
+  chunk("SP", "security-practices", "belief", "BLEF", "MEDIUM", "interview", 0.85,
+    ["security-culture", "shared-responsibility", "education"],
+    "Jan believes that security is a shared responsibility, not a team responsibility. He requires every engineer to complete a security training module during onboarding that he personally designed, covering the OWASP top 10 with examples from the company's own codebase. He also runs quarterly 'bug bounty' events where engineers try to break each other's features. The winning team gets to choose the next team offsite activity."
+  ),
+];
+
+// ─── Cluster: data-architecture (DA) — 4 chunks ───────────────────────────────
+
+const daChunks = [
+  chunk("DA", "data-architecture", "framework", "FRMW", "CRITICAL", "document", 0.90,
+    ["data-ownership", "boundaries", "governance"],
+    "Jan enforces strict data ownership boundaries: every table in the database must have exactly one owning service, and no other service may write to it directly. Cross-service data access is mediated through APIs or event streams. He considers shared databases the number one cause of accidental coupling in microservice architectures and has spent significant political capital enforcing this boundary, including rewriting a billing integration that bypassed it."
+  ),
+  chunk("DA", "data-architecture", "heuristic", "HEUR", "HIGH", "code", 0.88,
+    ["schema-evolution", "migrations", "backwards-compatibility"],
+    "Jan requires all database schema changes to be backwards-compatible with the previous application version. This means: no dropping columns without a 2-release deprecation cycle, no renaming columns (add new, migrate, drop old), and no NOT NULL constraints on existing columns without a default value. His reasoning: 'We do rolling deployments. At any moment, two versions of the application are running. If your migration breaks the old version, your deployment is a ticking time bomb.'"
+  ),
+  chunk("DA", "data-architecture", "preference", "PREF", "MEDIUM", "meeting", 0.85,
+    ["data-pipeline", "batch-vs-stream", "architecture"],
+    "Jan's default position on data pipelines is 'stream first, batch only for historical backfills.' He has migrated three batch ETL processes to streaming equivalents since 2021, reducing data latency from hours to seconds. His reasoning is both technical and organizational: 'Batch processing creates invisible deadlines. Stream processing makes problems visible immediately. I'd rather deal with 100 small issues in real-time than one catastrophic batch failure at 3 AM.'"
+  ),
+  chunk("DA", "data-architecture", "skill", "SKIL", "HIGH", "code", 0.87,
+    ["data-modeling", "normalization", "schema-design"],
+    "Jan approaches data modeling with an unusual philosophy: he designs schemas for queryability first and normalization second. He uses a technique he calls 'query-first modeling' where the team writes the 10 most important queries before designing any tables. This sometimes results in deliberate denormalization that academic database design would reject, but Jan argues that 'a normalized schema that requires 12 joins for your most common query is a theoretical victory and a practical defeat.'"
+  ),
+];
+
+// ─── Cluster: remote-work (RW) — 3 chunks ─────────────────────────────────────
+
+const rwChunks = [
+  chunk("RW", "remote-work", "belief", "BLEF", "HIGH", "interview", 0.87,
+    ["remote-first", "distributed-teams", "culture"],
+    "Jan transitioned his company to remote-first in 2020 and considers it irreversible. He believes that remote work forces better communication habits — everything must be written down, decisions must be documented, and asynchronous communication becomes the default. He has observed that his team's documentation quality improved 300% after going remote because 'you can't rely on hallway conversations to transmit institutional knowledge anymore.'"
+  ),
+  chunk("RW", "remote-work", "heuristic", "HEUR", "MEDIUM", "observation", 0.83,
+    ["timezone", "overlap", "collaboration"],
+    "Jan requires a minimum 4-hour timezone overlap for all team members and structures the overlapping window specifically for synchronous collaboration: code reviews, pair programming, and decision meetings. All other work — coding, documentation, research — happens asynchronously. He considers the 4-hour overlap the 'Goldilocks zone': enough for real-time collaboration without forcing anyone to work outside reasonable hours."
+  ),
+  chunk("RW", "remote-work", "ritual", "RITL", "MEDIUM", "observation", 0.80,
+    ["virtual-social", "team-bonding", "culture"],
+    "Jan hosts a weekly 'Virtual Coffee Roulette' that randomly pairs two engineers for a 15-minute non-work conversation. Participation is optional but strongly encouraged. He also flies the entire team to Warsaw twice a year for a week-long offsite focused 70% on social bonding and 30% on strategic planning. He considers these in-person gatherings essential for building the trust that makes remote collaboration work the rest of the year."
+  ),
+];
+
+// ─── Cluster: open-source (OSS) — 3 chunks ────────────────────────────────────
+
+const ossChunks = [
+  chunk("OSS", "open-source", "belief", "BLEF", "HIGH", "interview", 0.86,
+    ["open-source", "contribution", "community"],
+    "Jan believes that companies that use open source have a moral and practical obligation to contribute back. His company dedicates 5% of engineering time to upstream contributions — fixing bugs, improving documentation, and occasionally contributing features to the open-source tools they depend on. He has found that this investment pays for itself: 'Our engineers become experts in the tools we depend on, and the maintainers know us by name when we report issues.'"
+  ),
+  chunk("OSS", "open-source", "heuristic", "HEUR", "MEDIUM", "meeting", 0.84,
+    ["open-source", "evaluation", "maturity"],
+    "Jan evaluates open-source projects using a 5-point maturity checklist: (1) active maintainer team of 3+, (2) automated CI with test coverage above 70%, (3) documented release process with semantic versioning, (4) responsive issue triage (median first response under 7 days), (5) at least one corporate sponsor or a sustainable funding model. Projects that score below 3/5 are classified as 'experimental' and forbidden in production without a written exception approved by Jan."
+  ),
+  chunk("OSS", "open-source", "story", "STRY", "MEDIUM", "interview", 0.82,
+    ["open-source", "contribution", "reputation"],
+    "Jan's proudest open-source moment was when an engineer on his team discovered and fixed a subtle race condition in a widely-used message queue library. The fix prevented data loss for thousands of users worldwide. The maintainer personally thanked them, and three enterprise customers mentioned the fix during sales calls as evidence of the company's technical depth. Jan uses this story to justify the 5% open-source time allocation: 'One bug fix earned us more credibility than a year of marketing.'"
+  ),
+];
+
+// ─── Cluster: career-philosophy (CP) — 3 chunks ───────────────────────────────
+
+const cpChunks = [
+  chunk("CP", "career-philosophy", "belief", "BLEF", "CRITICAL", "interview", 0.90,
+    ["career", "management", "individual-contributor"],
+    "Jan believes that the management track and the IC track should be truly parallel in compensation, prestige, and influence — not just on paper. He has structured his organization so that a Staff Engineer has the same compensation band, reports to the same VP, and attends the same strategic meetings as an Engineering Manager. He considers organizations where management is the only path to seniority to be 'systematically selecting against their best engineers.'"
+  ),
+  chunk("CP", "career-philosophy", "heuristic", "HEUR", "HIGH", "interview", 0.87,
+    ["career-change", "growth", "stagnation"],
+    "Jan advises engineers to change roles or companies every 3-5 years, even if they're happy. His reasoning: 'Comfort is the enemy of growth. After 3 years, you've mastered your environment and you're optimizing locally. The discomfort of a new context forces global optimization.' He practices what he preaches — before founding his company, he deliberately moved from consulting to a startup to a mid-size company to experience different organizational scales."
+  ),
+  chunk("CP", "career-philosophy", "rant", "RANT", "HIGH", "chat", 0.88,
+    ["titles", "industry", "inflation"],
+    `Jan has a well-known rant about title inflation in the tech industry: 'When everyone is a Senior Engineer after 2 years, the title means nothing. When every team lead is a Director, the org chart is a fiction. I've interviewed "Principal Engineers" who couldn't design a system that handles 100 concurrent users. Titles should describe demonstrated impact, not tenure. My company has exactly 4 engineering levels and I will fight title inflation until I retire or lose this fight, whichever comes first.'`
+  ),
+];
+
+// ─── Cluster: meeting-culture (MC) — 3 chunks ─────────────────────────────────
+
+const mcChunks = [
+  chunk("MC", "meeting-culture", "heuristic", "HEUR", "HIGH", "observation", 0.88,
+    ["meetings", "efficiency", "rules"],
+    "Jan enforces three meeting rules that he calls 'The Meeting Manifesto': (1) every meeting must have a written agenda shared 24 hours in advance, (2) every meeting must end with written action items and owners, (3) any meeting without a decision to make is an email. He has walked out of meetings that violate rule #1 and cancelled recurring meetings that consistently fail to produce decisions. His teams estimate this has recovered 6 hours per person per week."
+  ),
+  chunk("MC", "meeting-culture", "anti-pattern", "ANTI", "MEDIUM", "meeting", 0.85,
+    ["status-meetings", "updates", "async"],
+    "Jan considers status update meetings the single greatest waste of engineering time. He has replaced all status meetings with a Slack bot that collects async updates and compiles a daily digest. The bot asks three questions: what did you ship, what are you working on, what's blocking you. If nothing is blocking, the update takes 30 seconds. He estimates this change saved his 40-person engineering team 160 person-hours per month — the equivalent of one full-time engineer."
+  ),
+  chunk("MC", "meeting-culture", "preference", "PREF", "MEDIUM", "observation", 0.83,
+    ["meeting-length", "timeboxing", "focus"],
+    "Jan caps all meetings at 25 minutes (not 30) or 50 minutes (not 60), following the principle that meetings should never consume a full calendar block. The 5-minute buffer between meetings is sacred — it's for context-switching, bio breaks, and the mental reset that prevents 'meeting zombie syndrome.' He has configured the company's Google Calendar to default to these durations and considers the standard 30/60 minute meeting 'a relic of the pre-digital era.'"
+  ),
+];
+
+// ─── Cluster: startup-lessons (SL) — 4 chunks ─────────────────────────────────
+
+const slChunks = [
+  chunk("SL", "startup-lessons", "story", "STRY", "CRITICAL", "interview", 0.92,
+    ["founding", "early-days", "survival"],
+    "Jan's founding story shapes much of his current philosophy: in the first year, he and his co-founder built the entire platform on a single PostgreSQL instance running on a $40/month Hetzner server. When they landed their first enterprise customer, they had 48 hours to migrate to AWS. Jan did the migration solo in a 36-hour coding session, with zero downtime, by replicating writes to both databases and switching reads with a feature flag. He still considers this his greatest technical achievement and references it when engineers over-plan: 'Ship on Hetzner, scale on AWS.'"
+  ),
+  chunk("SL", "startup-lessons", "belief", "BLEF", "HIGH", "interview", 0.89,
+    ["fundraising", "bootstrapping", "independence"],
+    "Jan bootstrapped the company for 2 years before taking VC funding, and he considers those bootstrapped years the most important period of the company's life. Without investor pressure, the team could iterate slowly, make mistakes cheaply, and develop genuine product-market fit. He advises other technical founders: 'Take money when you need to scale, not when you need to find product-market fit. Investor money makes you fast, not smart.'"
+  ),
+  chunk("SL", "startup-lessons", "heuristic", "HEUR", "HIGH", "meeting", 0.87,
+    ["hiring-timing", "scaling", "growth"],
+    "Jan's rule for startup hiring: never hire for a role until the pain of not having that role is felt by at least 3 people on the team. He has seen early-stage startups hire VPs of Engineering with 3 engineers, DevOps teams with 5 developers, and product managers before having a product. His counter-position: 'Every hire at a startup should feel slightly late. If it doesn't feel uncomfortable without this person, you're hiring ahead of your needs.'"
+  ),
+  chunk("SL", "startup-lessons", "framework", "FRMW", "HIGH", "document", 0.86,
+    ["decision-speed", "startup-vs-enterprise", "context"],
+    "Jan uses a framework he calls 'Decision Metabolism' to calibrate the company's decision-making speed as it scales. In the early days (under 10 people), decisions were made verbally in minutes. At 40 people, he introduced lightweight RFCs. At 100+ people, formal ADRs became necessary. He considers adjusting decision-making overhead to company size a critical leadership skill: 'The process that saved you at 100 people will strangle you at 20. The speed that worked at 10 will create chaos at 100.'"
+  ),
+];
+
+// ─── Cluster: performance-optimization (PO) — 3 chunks ────────────────────────
+
+const poChunks = [
+  chunk("PO", "performance-optimization", "heuristic", "HEUR", "CRITICAL", "code", 0.91,
+    ["latency", "sla", "monitoring"],
+    "Jan defines performance budgets for every API endpoint at the design phase, not after deployment. Each endpoint gets a p50, p95, and p99 latency target based on its user-facing criticality. Dashboard queries are allowed up to 2 seconds p99, but transaction endpoints must stay under 200ms p99. He bakes these targets into CI: if a load test shows a regression beyond the budget, the PR is automatically blocked until the regression is addressed."
+  ),
+  chunk("PO", "performance-optimization", "skill", "SKIL", "HIGH", "code", 0.89,
+    ["profiling", "optimization", "jvm"],
+    "Jan is exceptionally proficient at using profiling tools to identify performance bottlenecks. He can navigate flame graphs intuitively and has trained his team to use async-profiler for JVM services and clinic.js for Node.js. His optimization philosophy is ruthlessly empirical: 'Never optimize without a profile. Never profile without a hypothesis. Never hypothesize without a user complaint. Optimization without evidence is superstition.'"
+  ),
+  chunk("PO", "performance-optimization", "anti-pattern", "ANTI", "MEDIUM", "meeting", 0.86,
+    ["caching", "complexity", "tradeoffs"],
+    "Jan considers caching a 'necessary evil' rather than a performance strategy. He mandates that every cache must have: (1) explicit TTL with justification, (2) cache invalidation strategy documented before implementation, (3) monitoring on hit rate and staleness. He has rejected caching proposals where the invalidation logic was more complex than the original computation, arguing: 'You haven't solved a performance problem — you've traded it for a correctness problem that's harder to debug at 3 AM.'"
+  ),
+];
+
 // ─── Export for next stages ────────────────────────────────────────────────────
 
 const allChunks = [
@@ -452,7 +621,15 @@ const allChunks = [
   ...vmChunks,
   ...hpChunks,
   ...psChunks,
-  // More clusters will be added in subsequent commits
+  ...tdChunks,
+  ...spChunks,
+  ...daChunks,
+  ...rwChunks,
+  ...ossChunks,
+  ...cpChunks,
+  ...mcChunks,
+  ...slChunks,
+  ...poChunks,
 ];
 
 const allRelations = [
