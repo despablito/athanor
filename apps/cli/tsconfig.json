@@ -8,6 +8,7 @@
   "references": [
     { "path": "../../packages/athanor-core" },
     { "path": "../../packages/athanor-extractor" },
+    { "path": "../../packages/athanor-interviewer" },
     { "path": "../clone-api" },
     { "path": "../../integrations/mcp-server" }
   ]

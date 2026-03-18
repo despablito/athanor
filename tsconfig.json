@@ -16,6 +16,7 @@
     "paths": {
       "@athanor/core": ["./packages/athanor-core/src"],
       "@athanor/extractor": ["./packages/athanor-extractor/src"],
+      "@athanor/interviewer": ["./packages/athanor-interviewer/src"],
       "@athanor/clone-api": ["./apps/clone-api/src"],
       "@athanor/mcp-server": ["./integrations/mcp-server/src"]
     }
