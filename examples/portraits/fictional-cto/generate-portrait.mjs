@@ -33,8 +33,18 @@ function chunk(clusterPrefix, cluster, type, typeCode, uniqueness, source, confi
   };
 }
 
+const RELATION_TYPE_MAP = {
+  supports: "ENABLES",
+  contradicts: "CONTRASTS_WITH",
+  refines: "HARDCODED_EXCEPTION",
+  exemplifies: "INSTANTIATES",
+  triggers: "EXPRESSED_THROUGH",
+  evolves_from: "LEARNED_FROM",
+};
+
 function rel(source, target, type, description) {
-  return { source, target, type, ...(description ? { description } : {}) };
+  const schemaType = RELATION_TYPE_MAP[type] || type;
+  return { source, target, type: schemaType, ...(description ? { description } : {}) };
 }
 
 // ─── Cluster: technical-decision-making (TDM) — 12 chunks ─────────────────────

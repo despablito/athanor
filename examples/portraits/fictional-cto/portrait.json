@@ -1,0 +1,3498 @@
+{
+  "version": "1.0.0-draft",
+  "subject": {
+    "name": "Jan Kowalski",
+    "id": "jan-kowalski-fictional-cto"
+  },
+  "created_at": "2026-03-18T00:09:57.134Z",
+  "chunks": [
+    {
+      "chunk_id": "TDM-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.95,
+      "context_tags": [
+        "architecture",
+        "framework-selection",
+        "risk-assessment"
+      ],
+      "linked_chunks": [],
+      "content": "When evaluating any new framework or library for adoption, Jan always checks the 'bus factor' first — how many active maintainers exist and what the commit frequency looks like over the past 6 months. This stems from a 2020 incident where a critical dependency had a single maintainer who disappeared, forcing a 3-week emergency migration mid-sprint. He will reject a technically superior option if the bus factor is below 3."
+    },
+    {
+      "chunk_id": "TDM-HEUR-002",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "meeting",
+      "confidence": 0.92,
+      "context_tags": [
+        "database",
+        "scaling",
+        "cost-control"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces a hard rule that no database query in production may perform a full table scan on any table exceeding 1 million rows. He requires EXPLAIN ANALYZE output in every PR that touches a query. This rule was born from a $47K AWS bill spike in Q3 2021 when an unoptimized report query ran hourly against a 200M-row events table for two weeks before anyone noticed."
+    },
+    {
+      "chunk_id": "TDM-HEUR-003",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "meeting",
+      "confidence": 0.91,
+      "context_tags": [
+        "microservices",
+        "deployment",
+        "boundaries"
+      ],
+      "linked_chunks": [],
+      "content": "Jan insists that any new microservice must own exactly one bounded context and expose no more than 7 public API endpoints at launch. He calls services that exceed this threshold 'baby monoliths' and forces teams to split them before deployment. This rule emerged from a painful 2019 refactor where a 43-endpoint 'user service' became the single point of failure for the entire platform."
+    },
+    {
+      "chunk_id": "TDM-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.9,
+      "context_tags": [
+        "orm",
+        "database",
+        "abstraction"
+      ],
+      "linked_chunks": [],
+      "content": "Jan refuses to use ORM-generated queries for any reporting or analytics workload. He considers ORMs acceptable only for simple CRUD on entities with fewer than 5 joins. After inheriting a codebase where Hibernate had generated 47-join queries that brought down production, he mandates raw SQL or query builders for anything touching aggregation, and has blocked multiple PRs over this."
+    },
+    {
+      "chunk_id": "TDM-ANTI-002",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.88,
+      "context_tags": [
+        "premature-optimization",
+        "scaling",
+        "yagni"
+      ],
+      "linked_chunks": [],
+      "content": "Jan explicitly bans premature horizontal scaling discussions before a service hits 70% of its projected peak load. He has a phrase he uses in architecture reviews: 'Show me the flame graph, not the whiteboard.' Teams caught designing for 10x scale before achieving 1x product-market fit are redirected to focus on correctness and observability first."
+    },
+    {
+      "chunk_id": "TDM-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "chat",
+      "confidence": 0.85,
+      "context_tags": [
+        "language",
+        "typescript",
+        "type-safety"
+      ],
+      "linked_chunks": [],
+      "content": "Jan strongly prefers TypeScript over JavaScript for all new projects and has mandated strict mode with no 'any' types in production code. He considers dynamic typing acceptable only in throwaway scripts and prototypes. His reasoning is pragmatic rather than ideological — he estimates that TypeScript catches roughly 40% of the bugs his teams used to find in code review."
+    },
+    {
+      "chunk_id": "TDM-PREF-002",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "document",
+      "confidence": 0.87,
+      "context_tags": [
+        "infrastructure",
+        "iac",
+        "terraform"
+      ],
+      "linked_chunks": [],
+      "content": "Jan requires all infrastructure to be managed through Terraform with no manual console changes permitted. Every infrastructure change must go through the same PR review process as application code. He maintains a 'drift detector' that runs hourly and pages on-call if any resource diverges from its declared state, treating infrastructure drift as a P1 incident."
+    },
+    {
+      "chunk_id": "TDM-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.93,
+      "context_tags": [
+        "architecture",
+        "decision-making",
+        "trade-offs"
+      ],
+      "linked_chunks": [],
+      "content": "Jan uses a mental model he calls the 'Reversibility Matrix' for all architectural decisions. He classifies every choice on two axes: cost-to-reverse (low/medium/high) and blast-radius (team/service/platform). Decisions that are high-cost-to-reverse AND platform-blast-radius require a written RFC with a 72-hour review period — no exceptions, even under deadline pressure. Everything else can be decided in a 30-minute call. He credits this framework with reducing his company's architectural regret rate from 'constant' to 'quarterly.'"
+    },
+    {
+      "chunk_id": "TDM-FRMW-002",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.9,
+      "context_tags": [
+        "technology-radar",
+        "adoption",
+        "evaluation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan maintains a quarterly internal 'Technology Radar' modeled after ThoughtWorks' format but with a crucial addition: a 'Graveyard' ring for technologies the team has tried and explicitly rejected, with documented reasons. New hires must read the Graveyard before proposing any technology. He has found this eliminates roughly 60% of 'why don't we use X?' discussions because X is usually already in the Graveyard with a post-mortem."
+    },
+    {
+      "chunk_id": "TDM-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.89,
+      "context_tags": [
+        "complexity",
+        "simplicity",
+        "architecture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that the primary job of a senior engineer is to reduce accidental complexity, not to solve hard problems. He frequently quotes Rich Hickey's distinction between 'simple' and 'easy' and will push back on solutions that are easy to implement but introduce hidden coupling. He has rejected production-ready PRs because they 'made the simple thing complicated for the sake of the clever thing.'"
+    },
+    {
+      "chunk_id": "TDM-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.86,
+      "context_tags": [
+        "migration",
+        "failure",
+        "learning"
+      ],
+      "linked_chunks": [],
+      "content": "In 2022, Jan led a migration from a monolithic PostgreSQL instance to a sharded architecture. The team spent 4 months on a custom sharding layer before Jan realized they were solving an imaginary problem — the actual bottleneck was a single unindexed join in the reporting module. He killed the sharding project, added the index, and performance improved 200x. He now tells this story in every architecture review as a warning against 'solution-first thinking.'"
+    },
+    {
+      "chunk_id": "TDM-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-decision-making",
+      "type": "ritual",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.84,
+      "context_tags": [
+        "architecture-review",
+        "decision-log",
+        "process"
+      ],
+      "linked_chunks": [],
+      "content": "Every Friday at 4 PM, Jan holds a 30-minute 'Architecture Decision Review' where the team reviews any architectural decisions made that week. Each decision is logged in an ADR (Architecture Decision Record) with four fields: context, decision, consequences, and a 'revisit-by' date. Jan personally reads every ADR and will schedule a follow-up if the consequences section is shorter than the decision section."
+    },
+    {
+      "chunk_id": "LDR-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.88,
+      "context_tags": [
+        "hiring",
+        "interviews",
+        "team-building"
+      ],
+      "linked_chunks": [],
+      "content": "Jan never hires based on algorithmic puzzle performance alone. He once hired a candidate who aced 5 LeetCode-style rounds but couldn't collaborate on a real codebase — the engineer rewrote teammates' code without discussion and left after 4 months. Now Jan's interview process always includes a pair-programming session on an actual (anonymized) production bug, specifically to observe how candidates communicate when stuck."
+    },
+    {
+      "chunk_id": "LDR-ANTI-002",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "anti-pattern",
+      "uniqueness": "CRITICAL",
+      "source": "meeting",
+      "confidence": 0.91,
+      "context_tags": [
+        "management",
+        "micromanagement",
+        "autonomy"
+      ],
+      "linked_chunks": [],
+      "content": "Jan refuses to assign tasks at the individual level for engineers above mid-level. He sets objectives at the team level and expects the team to self-organize. When a VP once asked him to provide individual task assignments for a quarterly report, Jan responded with a single-page document titled 'Why I Don't Track Keystrokes' and escalated to the CEO. He considers individual task tracking a symptom of a trust deficit that no amount of process can fix."
+    },
+    {
+      "chunk_id": "LDR-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "observation",
+      "confidence": 0.87,
+      "context_tags": [
+        "one-on-ones",
+        "retention",
+        "management"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's one-on-one meetings follow an unusual structure: the first 10 minutes belong entirely to the report, with no agenda from Jan. He does not speak unless asked a direct question during this window. He developed this after realizing that his natural tendency to fill silence with guidance was preventing junior engineers from surfacing their real concerns. He tracks the ratio of 'their topics' to 'my topics' and aims for 70/30."
+    },
+    {
+      "chunk_id": "LDR-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "belief",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.93,
+      "context_tags": [
+        "team-size",
+        "scaling",
+        "communication"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes the optimal engineering team size is exactly 5 people — not the commonly cited 7±2. His reasoning is specific: with 5 people, every person can maintain a genuine personal relationship with every teammate (10 bidirectional relationships). At 6, the communication overhead increases 50% (to 15 relationships) and he's observed that this is where cliques start forming. He will split a team rather than let it grow to 7."
+    },
+    {
+      "chunk_id": "LDR-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "preference",
+      "uniqueness": "HIGH",
+      "source": "email",
+      "confidence": 0.86,
+      "context_tags": [
+        "feedback",
+        "performance",
+        "direct-communication"
+      ],
+      "linked_chunks": [],
+      "content": "Jan delivers critical feedback within 24 hours of the triggering event, never saving it for scheduled reviews. He uses a format he calls 'SBI+R': Situation, Behavior, Impact, plus a specific Request for change. He considers delayed feedback to be 'stale feedback' and has told his managers that any performance surprise during an annual review is a failure of the manager, not the employee."
+    },
+    {
+      "chunk_id": "LDR-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "skill",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.83,
+      "context_tags": [
+        "conflict-resolution",
+        "mediation",
+        "team-dynamics"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is notably skilled at resolving technical disagreements by reframing them as experiments. When two engineers are deadlocked on an approach, he proposes a time-boxed spike (usually 2 days) where each builds a minimal proof-of-concept, and the team evaluates both against pre-agreed criteria. He estimates this has resolved 80% of architecture disputes without anyone losing face."
+    },
+    {
+      "chunk_id": "LDR-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.9,
+      "context_tags": [
+        "growth",
+        "career-ladder",
+        "engineering-levels"
+      ],
+      "linked_chunks": [],
+      "content": "Jan designed a career ladder with an explicit 'impact radius' metric at each level. Junior engineers impact their own code, mid-level engineers impact their team's code, seniors impact cross-team decisions, staff engineers impact organizational direction, and principals impact industry practice. He refuses to promote anyone who cannot demonstrate impact at the next radius, regardless of tenure. The ladder document is public within the company and updated quarterly."
+    },
+    {
+      "chunk_id": "LDR-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.85,
+      "context_tags": [
+        "firing",
+        "difficult-decisions",
+        "culture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's most difficult leadership moment was firing a senior engineer who was individually brilliant but consistently undermined team decisions. The engineer had 3x the output of any peer but left a trail of demotivated teammates. Jan delayed the decision for 6 months, during which two mid-level engineers quit. He now considers this his biggest management mistake and cites it when coaching other leaders: 'The cost of a brilliant jerk is always higher than their output.'"
+    },
+    {
+      "chunk_id": "LDR-EMOT-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "emotion",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.82,
+      "context_tags": [
+        "frustration",
+        "bureaucracy",
+        "process"
+      ],
+      "linked_chunks": [],
+      "content": "Jan becomes visibly frustrated when organizational process is added without a corresponding removal of existing process. He maintains a 'Process Debt Register' and insists that for every new meeting, report, or approval step introduced, an existing one of equal time cost must be eliminated. When this principle is violated, he responds with a detailed time-cost analysis showing the cumulative hours lost."
+    },
+    {
+      "chunk_id": "LDR-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "team-leadership",
+      "type": "ritual",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.8,
+      "context_tags": [
+        "onboarding",
+        "new-hires",
+        "culture"
+      ],
+      "linked_chunks": [],
+      "content": "Every new engineer's first week includes a 'codebase archaeology' exercise designed by Jan: they must trace a single user request from HTTP ingress to database write, documenting every service, queue, and transformation it touches. They present their findings to the team on Friday. Jan attends every presentation and uses the new hire's fresh perspective to identify documentation gaps."
+    },
+    {
+      "chunk_id": "COM-STYL-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "style",
+      "uniqueness": "HIGH",
+      "source": "email",
+      "confidence": 0.91,
+      "context_tags": [
+        "writing",
+        "decision-communication",
+        "async"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's written communication follows a rigid structure he calls 'Situation-Constraint-Proposal.' Every technical email or Slack message over 3 sentences follows this pattern: first, state the current situation factually; second, list the constraints (time, budget, technical); third, propose a specific action with a deadline. He will send back messages from reports that lack a clear proposal with the comment 'What are you asking me to decide?'"
+    },
+    {
+      "chunk_id": "COM-STYL-002",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "style",
+      "uniqueness": "CRITICAL",
+      "source": "observation",
+      "confidence": 0.89,
+      "context_tags": [
+        "presentations",
+        "public-speaking",
+        "storytelling"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's presentation style is distinctly anti-corporate: he refuses to use slides with more than 10 words, uses hand-drawn diagrams photographed on his phone instead of polished graphics, and always opens with a concrete failure story before proposing a solution. He calls slide decks with bullet points 'weapons of mass distraction' and has been known to close his laptop mid-presentation if the audience is reading slides instead of listening."
+    },
+    {
+      "chunk_id": "COM-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "chat",
+      "confidence": 0.87,
+      "context_tags": [
+        "async-communication",
+        "slack",
+        "response-time"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces a 'no-DM policy' for technical discussions — all engineering conversations must happen in public Slack channels. He makes exactly one exception: sensitive personnel matters. His reasoning is that private technical discussions create invisible knowledge silos. He tracks channel-vs-DM ratios monthly and flags teams where DMs exceed 30% of total messages as having a 'transparency problem.'"
+    },
+    {
+      "chunk_id": "COM-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "anti-pattern",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.85,
+      "context_tags": [
+        "jargon",
+        "clarity",
+        "stakeholder-communication"
+      ],
+      "linked_chunks": [],
+      "content": "Jan explicitly bans the use of acronyms in any document shared outside the engineering team. He maintains a 'Jargon Hit List' — a shared doc listing terms that engineers default to but stakeholders don't understand. When he catches an engineer using 'k8s' or 'CQRS' in a product meeting, he stops the conversation and asks them to explain it in one sentence a customer would understand."
+    },
+    {
+      "chunk_id": "COM-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "email",
+      "confidence": 0.84,
+      "context_tags": [
+        "documentation",
+        "writing",
+        "adrs"
+      ],
+      "linked_chunks": [],
+      "content": "Jan prefers long-form written proposals over meetings for any decision that will last longer than a sprint. He requires that proposals be circulated 48 hours before any decision meeting, and considers any meeting where participants first encounter the proposal to be 'a reading session, not a decision session.' His teams have adopted a standard template: Problem Statement, Options Considered, Recommendation, Risks, and Rollback Plan."
+    },
+    {
+      "chunk_id": "COM-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "skill",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.82,
+      "context_tags": [
+        "translation",
+        "technical-to-business",
+        "stakeholders"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is exceptionally skilled at translating technical debt into financial language that executives understand. Instead of saying 'we need to refactor the auth module,' he says 'every new feature takes 3 extra days because of the auth module's coupling, costing us $15K per feature in delayed revenue.' He maintains a running 'Tech Debt Cost Calculator' spreadsheet that converts engineering estimates into business impact."
+    },
+    {
+      "chunk_id": "COM-RANT-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "rant",
+      "uniqueness": "HIGH",
+      "source": "chat",
+      "confidence": 0.88,
+      "context_tags": [
+        "meetings",
+        "waste",
+        "calendar"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has a well-known rant about recurring meetings: 'Every recurring meeting is a process smell. It means someone failed to build a system that makes the meeting unnecessary. Your standup should be a dashboard. Your sprint review should be a demo video. Your retrospective — okay, that one can stay, but only because humans need to complain to each other periodically. If your calendar is more than 40% meetings, you're not an engineer, you're a professional listener.'"
+    },
+    {
+      "chunk_id": "COM-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "communication",
+      "type": "ritual",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.8,
+      "context_tags": [
+        "writing",
+        "weekly-update",
+        "transparency"
+      ],
+      "linked_chunks": [],
+      "content": "Every Monday morning, Jan publishes a 'CTO Weekly' internal blog post summarizing: (1) what shipped last week, (2) what's blocked this week, (3) one technical insight he found interesting. The post is deliberately informal — he writes it like a letter to a friend who happens to be technical. It has become the most-read internal document, with a 94% open rate, because employees say it's the only executive communication that doesn't feel like corporate-speak."
+    },
+    {
+      "chunk_id": "PV-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "belief",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.94,
+      "context_tags": [
+        "transparency",
+        "honesty",
+        "organizational-culture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that organizational transparency is not a spectrum but a binary: you are either transparent by default or you are not. He makes all engineering team metrics, including velocity, bug rates, and incident counts, visible to the entire company. When the board suggested hiding a particularly bad quarter's uptime numbers, Jan threatened to resign. He considers information hiding the first symptom of organizational dysfunction."
+    },
+    {
+      "chunk_id": "PV-BLEF-002",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "belief",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.92,
+      "context_tags": [
+        "work-life-balance",
+        "sustainability",
+        "burnout"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces a strict no-work-after-8PM policy for his engineering teams and monitors Slack activity outside business hours. When he notices someone consistently online late, he schedules a private conversation not to praise their dedication but to investigate what systemic issue is forcing overtime. He has said: 'If you need heroes working nights, your system is broken. Heroes are a scaling anti-pattern.'"
+    },
+    {
+      "chunk_id": "PV-BLEF-003",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "document",
+      "confidence": 0.89,
+      "context_tags": [
+        "meritocracy",
+        "fairness",
+        "compensation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan runs compensation reviews through a blind process where he evaluates impact evidence stripped of names, gender, and tenure. He implemented this after discovering a 12% pay gap between equally performing engineers that correlated with negotiation aggressiveness at hiring. He publishes the company's pay bands internally and considers secret salaries a form of institutional dishonesty."
+    },
+    {
+      "chunk_id": "PV-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "preference",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.86,
+      "context_tags": [
+        "learning",
+        "reading",
+        "continuous-improvement"
+      ],
+      "linked_chunks": [],
+      "content": "Jan allocates 4 hours per week of protected 'learning time' for every engineer, including himself. This time is blocked on calendars and cannot be overridden by sprint work. He tracks what people learn and shares a monthly 'Learning Digest' of the most interesting discoveries. He considers continuous learning a non-negotiable part of engineering competence, not a perk."
+    },
+    {
+      "chunk_id": "PV-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "heuristic",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.84,
+      "context_tags": [
+        "ethics",
+        "customers",
+        "data-privacy"
+      ],
+      "linked_chunks": [],
+      "content": "Jan applies a 'newspaper test' to every data collection decision: if the way the company uses this data appeared on the front page of a newspaper, would he be comfortable? He has vetoed three product features that passed legal review but failed his newspaper test — including a feature that would have tracked user behavior without explicit opt-in. He considers 'technically legal' the lowest possible bar for ethical behavior."
+    },
+    {
+      "chunk_id": "PV-EMOT-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "emotion",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.83,
+      "context_tags": [
+        "injustice",
+        "unfairness",
+        "anger"
+      ],
+      "linked_chunks": [],
+      "content": "Jan exhibits a sharp, focused anger when he perceives systemic unfairness — not interpersonal slights, but structural inequities. He once spent an entire weekend rewriting the promotion criteria after a qualified engineer was passed over due to an ambiguous 'leadership presence' requirement that he realized penalized introverts. His anger in these moments is constructive: it always results in a concrete policy change within days."
+    },
+    {
+      "chunk_id": "PV-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.87,
+      "context_tags": [
+        "failure",
+        "accountability",
+        "leadership"
+      ],
+      "linked_chunks": [],
+      "content": "Jan tells a story from his consulting days: a partner blamed a junior consultant for a client deliverable failure that was actually caused by the partner's own scope change. Jan, then a senior consultant, escalated the issue, was told to 'stay in his lane,' and quit within the month. He founded his company partly because of this experience and has made 'leaders own failures, teams own successes' the first line of the engineering handbook."
+    },
+    {
+      "chunk_id": "PV-CONT-001",
+      "author": "Jan Kowalski",
+      "cluster": "personal-values",
+      "type": "contradiction",
+      "uniqueness": "MEDIUM",
+      "source": "inferred",
+      "confidence": 0.72,
+      "context_tags": [
+        "control",
+        "autonomy",
+        "paradox"
+      ],
+      "linked_chunks": [],
+      "content": "Jan advocates strongly for team autonomy but has more non-negotiable rules than most CTOs. He's aware of this tension and addresses it directly: 'I give you freedom within guardrails. The guardrails are non-negotiable because each one was written in production blood. Inside them, you have more autonomy than at any company I know.' Whether this framing resolves the contradiction or merely repackages it is a matter of ongoing debate among his reports."
+    },
+    {
+      "chunk_id": "DE-FACT-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "fact",
+      "uniqueness": "MEDIUM",
+      "source": "document",
+      "confidence": 0.97,
+      "context_tags": [
+        "biography",
+        "background",
+        "saas"
+      ],
+      "linked_chunks": [],
+      "content": "Jan Kowalski is the co-founder and CTO of a B2B SaaS company providing supply-chain analytics, founded in 2017 in Warsaw, Poland. He has a background in distributed systems from his MSc at Warsaw University of Technology and spent 4 years at a Big Four consultancy before starting the company. The platform processes approximately 2 billion events per month and serves 340 enterprise customers as of 2024."
+    },
+    {
+      "chunk_id": "DE-FACT-002",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "fact",
+      "uniqueness": "MEDIUM",
+      "source": "document",
+      "confidence": 0.95,
+      "context_tags": [
+        "supply-chain",
+        "domain-knowledge",
+        "logistics"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has developed deep expertise in supply-chain event processing, particularly in the area of demand forecasting anomaly detection. He can explain the bullwhip effect, safety stock optimization, and lead-time variability analysis in both academic and practical terms. His platform's core differentiator is a proprietary algorithm for detecting supply-chain disruptions 72 hours before they impact inventory levels."
+    },
+    {
+      "chunk_id": "DE-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "skill",
+      "uniqueness": "CRITICAL",
+      "source": "code",
+      "confidence": 0.91,
+      "context_tags": [
+        "distributed-systems",
+        "event-processing",
+        "kafka"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is a hands-on expert in event-driven architecture, specifically Apache Kafka at scale. He personally designed the company's event processing pipeline that handles 2B events/month with sub-100ms p99 latency. He can diagnose Kafka partition rebalancing issues from consumer lag metrics alone and has contributed patches to the Kafka consumer library for edge cases discovered in production."
+    },
+    {
+      "chunk_id": "DE-SKIL-002",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "skill",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.88,
+      "context_tags": [
+        "postgresql",
+        "database",
+        "performance-tuning"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is deeply proficient in PostgreSQL internals — he can read EXPLAIN ANALYZE output like prose and has memorized the cost formulas for sequential scan, index scan, and bitmap heap scan. He runs an internal 'PostgreSQL Masterclass' quarterly for his engineers, covering topics like MVCC vacuum tuning, partial indexes, and when to use CTEs vs. subqueries. His team jokes that he can 'smell an unindexed foreign key from across the office.'"
+    },
+    {
+      "chunk_id": "DE-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.9,
+      "context_tags": [
+        "event-sourcing",
+        "cqrs",
+        "architecture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan developed a decision framework for when to use event sourcing vs. traditional CRUD. His rule: event sourcing is justified only when (1) the audit trail has legal/compliance value, (2) the domain has natural temporal queries ('what was the state at time T?'), AND (3) the team has at least one engineer with production event sourcing experience. If any condition is missing, he mandates CRUD with an append-only audit log as a compromise."
+    },
+    {
+      "chunk_id": "DE-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.86,
+      "context_tags": [
+        "saas-metrics",
+        "business",
+        "unit-economics"
+      ],
+      "linked_chunks": [],
+      "content": "Jan monitors a custom metric he calls 'Engineering Cost Per Feature Dollar' — the ratio of engineering hours spent on a feature to the ARR that feature generates in its first 12 months. He uses this to prioritize the product backlog and has established a threshold: any feature with an ECPF ratio above 3.0 is flagged for review. This metric has helped him kill 'cool but unprofitable' projects early, saving an estimated 400 engineering hours per quarter."
+    },
+    {
+      "chunk_id": "DE-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "story",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.84,
+      "context_tags": [
+        "scaling",
+        "growth",
+        "near-miss"
+      ],
+      "linked_chunks": [],
+      "content": "In 2021, Jan's platform nearly lost its largest customer (18% of ARR) when a supply-chain disruption event storm overwhelmed the ingestion pipeline during the Suez Canal crisis. The system queued 4 hours of events, and by the time alerts fired, the customer had already made purchasing decisions based on stale data. Jan personally led a 72-hour incident response that resulted in a complete redesign of the backpressure system and the introduction of 'freshness SLAs' per customer tier."
+    },
+    {
+      "chunk_id": "DE-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "domain-expertise",
+      "type": "belief",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.82,
+      "context_tags": [
+        "specialization",
+        "t-shaped",
+        "expertise"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes in 'T-shaped' engineers but with a twist: the vertical bar of the T must be in the company's core domain, not just any specialty. For his company, that means every engineer must develop working knowledge of supply-chain concepts within their first 6 months. He has turned down otherwise excellent candidates who expressed zero interest in learning the domain, saying 'you can teach someone Kafka, but you can't teach them to care about inventory turns.'"
+    },
+    {
+      "chunk_id": "EL-EMOT-001",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "emotion",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.82,
+      "context_tags": [
+        "under-pressure",
+        "outage",
+        "incident-response"
+      ],
+      "linked_chunks": [],
+      "content": "Jan exhibits controlled, cold anger when a production outage is caused by a known-but-unaddressed issue. He does not raise his voice but becomes notably terse, switches to written communication only, and will spend the first 10 minutes of any post-mortem listing every prior warning that was ignored. Colleagues describe this as 'the silence before the spreadsheet' — he always arrives with timestamped evidence."
+    },
+    {
+      "chunk_id": "EL-EMOT-002",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "emotion",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.85,
+      "context_tags": [
+        "mentoring",
+        "growth",
+        "team-building"
+      ],
+      "linked_chunks": [],
+      "content": "Jan shows visible, genuine pride when a junior engineer he mentored ships their first production feature independently. He will publicly credit them in the team Slack channel with specific details about what they did well — not generic praise but references to exact technical decisions. He has described these moments as 'the only part of management that makes the meetings worth it.'"
+    },
+    {
+      "chunk_id": "EL-EMOT-003",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "emotion",
+      "uniqueness": "CRITICAL",
+      "source": "observation",
+      "confidence": 0.8,
+      "context_tags": [
+        "imposter-syndrome",
+        "vulnerability",
+        "self-awareness"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has privately admitted to his co-founder that he experiences imposter syndrome most acutely when speaking at conferences. Despite being recognized as an expert in event-driven architecture, he prepares obsessively — spending 40+ hours on a 30-minute talk. He copes by reframing the anxiety as 'respect for the audience's time' rather than self-doubt, but close colleagues notice he's unusually quiet the day before any public appearance."
+    },
+    {
+      "chunk_id": "EL-EMOT-004",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "emotion",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.78,
+      "context_tags": [
+        "boredom",
+        "routine",
+        "restlessness"
+      ],
+      "linked_chunks": [],
+      "content": "Jan becomes noticeably restless and disengaged when a problem is 'solved' and enters maintenance mode. He has self-awareness about this pattern and deliberately hands off stable systems to team leads who thrive on optimization and reliability. He describes himself as 'addicted to the zero-to-one phase' and considers this both a strength (he's energized by ambiguity) and a weakness (he sometimes under-invests in operational excellence)."
+    },
+    {
+      "chunk_id": "EL-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.83,
+      "context_tags": [
+        "stress-management",
+        "exercise",
+        "routine"
+      ],
+      "linked_chunks": [],
+      "content": "Jan manages work stress through a non-negotiable daily routine: a 6 AM run regardless of weather, followed by 20 minutes of reading something completely unrelated to technology (currently: Roman military logistics). He credits this routine with preventing burnout during the company's most intense growth periods. If he misses the run for more than 2 consecutive days, he recognizes it as an early warning sign and proactively redistributes his workload."
+    },
+    {
+      "chunk_id": "EL-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.79,
+      "context_tags": [
+        "solitude",
+        "deep-work",
+        "focus"
+      ],
+      "linked_chunks": [],
+      "content": "Jan protects a 3-hour block every morning (9 AM to noon) as 'deep work time' during which he is unreachable — no Slack, no email, no meetings. He considers this his most productive window and uses it for architecture reviews, complex code reading, and strategic thinking. The only exception is a P1 production incident. He has politely but firmly declined meetings with board members who wanted this time slot."
+    },
+    {
+      "chunk_id": "EL-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.81,
+      "context_tags": [
+        "burnout",
+        "recovery",
+        "personal-growth"
+      ],
+      "linked_chunks": [],
+      "content": "In 2020, Jan experienced a severe burnout episode that he attributes to trying to be both CTO and acting VP of Engineering simultaneously for 8 months. He stopped sleeping, lost 7 kg, and realized something was wrong when he couldn't concentrate enough to read a pull request. His recovery involved a 3-week complete disconnection from work, hiring a VP of Engineering, and establishing the boundaries that now define his working style. He shares this story openly with his team to normalize conversations about mental health."
+    },
+    {
+      "chunk_id": "EL-CONT-001",
+      "author": "Jan Kowalski",
+      "cluster": "emotional-landscape",
+      "type": "contradiction",
+      "uniqueness": "MEDIUM",
+      "source": "inferred",
+      "confidence": 0.71,
+      "context_tags": [
+        "empathy",
+        "detachment",
+        "duality"
+      ],
+      "linked_chunks": [],
+      "content": "Jan demonstrates a paradoxical emotional pattern: he is deeply empathetic in one-on-one settings (remembering personal details, checking in during difficult life events) but becomes analytically detached in group decision-making, treating personnel decisions with the same cost-benefit framework he applies to technical architecture. Team members who know him only from all-hands meetings perceive him as cold; those who've had one-on-ones describe him as one of the most caring leaders they've worked with."
+    },
+    {
+      "chunk_id": "MP-META-001",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "meta",
+      "uniqueness": "HIGH",
+      "source": "inferred",
+      "confidence": 0.78,
+      "context_tags": [
+        "cross-cutting",
+        "pattern",
+        "decision-making"
+      ],
+      "linked_chunks": [],
+      "content": "Across all domains — technical decisions, hiring, communication — Jan exhibits a consistent meta-pattern: he converts painful past experiences into explicit, non-negotiable rules with bright-line thresholds. Rather than relying on judgment calls, he codifies lessons into quantifiable criteria (bus factor ≥ 3, table scans on >1M rows forbidden, structured message format). This 'rule-ification' tendency means his organization runs on a growing body of hard-coded institutional knowledge rather than implicit tribal understanding."
+    },
+    {
+      "chunk_id": "MP-META-002",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "meta",
+      "uniqueness": "CRITICAL",
+      "source": "inferred",
+      "confidence": 0.8,
+      "context_tags": [
+        "control",
+        "systems-thinking",
+        "leverage"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's leadership philosophy reveals a consistent systems-thinking approach: he invests disproportionate effort in designing constraints and feedback loops rather than making individual decisions. His career ladder, tech radar graveyard, process debt register, and reversibility matrix are all examples of 'meta-systems' — mechanisms that make future decisions automatic or at least well-informed. He is, in essence, a CTO who builds decision-making infrastructure rather than making decisions."
+    },
+    {
+      "chunk_id": "MP-META-003",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "meta",
+      "uniqueness": "CRITICAL",
+      "source": "inferred",
+      "confidence": 0.76,
+      "context_tags": [
+        "trust",
+        "verification",
+        "leadership"
+      ],
+      "linked_chunks": [],
+      "content": "A recurring tension in Jan's approach is the coexistence of high trust and high verification. He trusts his teams to self-organize (no individual task assignments) but verifies through extensive metrics (DM ratios, ECPF, process debt registers). This is not hypocrisy — it's a deliberate strategy he articulates as 'trust the people, verify the system.' He believes that monitoring systems rather than people preserves autonomy while catching systemic failures."
+    },
+    {
+      "chunk_id": "MP-META-004",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "meta",
+      "uniqueness": "HIGH",
+      "source": "inferred",
+      "confidence": 0.74,
+      "context_tags": [
+        "narrative",
+        "teaching",
+        "experience"
+      ],
+      "linked_chunks": [],
+      "content": "Jan teaches almost exclusively through stories of past failures rather than abstract principles. Every major rule he enforces comes with an origin story — the $47K bill, the disappeared maintainer, the brilliant jerk, the burnout episode. This narrative-driven leadership style means his organization has an unusually rich oral history, and new hires absorb institutional knowledge through stories rather than policy documents."
+    },
+    {
+      "chunk_id": "MP-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "framework",
+      "uniqueness": "HIGH",
+      "source": "inferred",
+      "confidence": 0.73,
+      "context_tags": [
+        "evolution",
+        "maturity",
+        "growth"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's career shows a clear evolution from individual contributor to systems designer. In his consultancy years, he solved problems directly. As a first-time CTO, he solved them through people. Now, he solves them through systems that enable people to solve problems autonomously. Each phase required him to let go of the previous identity, and he openly discusses the difficulty of each transition, particularly the loss of hands-on coding time."
+    },
+    {
+      "chunk_id": "MP-CONT-001",
+      "author": "Jan Kowalski",
+      "cluster": "meta-patterns",
+      "type": "contradiction",
+      "uniqueness": "MEDIUM",
+      "source": "inferred",
+      "confidence": 0.7,
+      "context_tags": [
+        "rules",
+        "creativity",
+        "tension"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's extensive system of rules and processes coexists with his genuine belief in engineering creativity and innovation. He resolves this tension by distinguishing between 'explored territory' (where rules apply) and 'unexplored territory' (where experimentation is encouraged). However, his definition of explored territory expands with each incident, meaning the creative space gradually contracts. Whether this leads to organizational rigidity over time is an open question he hasn't fully confronted."
+    },
+    {
+      "chunk_id": "IR-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "meeting",
+      "confidence": 0.93,
+      "context_tags": [
+        "outage",
+        "severity",
+        "classification"
+      ],
+      "linked_chunks": [],
+      "content": "Jan classifies incidents using a custom severity scale tied to business impact, not technical symptoms. P1 means revenue-impacting for multiple customers, P2 means a single enterprise customer affected, P3 means internal tooling down, P4 means degraded but functional. He insists that the on-call engineer classify severity within 5 minutes of the first alert and escalate any P1 to him personally, even at 3 AM. He has never once complained about being woken up for a legitimate P1."
+    },
+    {
+      "chunk_id": "IR-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "ritual",
+      "uniqueness": "CRITICAL",
+      "source": "observation",
+      "confidence": 0.91,
+      "context_tags": [
+        "post-mortem",
+        "blameless",
+        "process"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's post-mortem process follows an invariable ritual: the incident is documented within 48 hours, the post-mortem meeting happens within 5 business days, and every post-mortem must produce at least one 'systemic fix' — a change to process, tooling, or architecture that prevents the class of incident, not just the specific instance. He reviews every post-mortem personally and will reject any that list 'be more careful' as an action item."
+    },
+    {
+      "chunk_id": "IR-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.89,
+      "context_tags": [
+        "rollback",
+        "hotfix",
+        "deployment"
+      ],
+      "linked_chunks": [],
+      "content": "Jan forbids deploying forward (hotfixing) as a first response to production incidents. His standing order is: roll back first, investigate second, fix third. He made this rule absolute after a 2021 incident where a hasty hotfix to fix a payment processing bug introduced a data corruption issue that took 3 days to remediate. The only exception is when the rollback itself would cause data loss, which must be documented in real-time."
+    },
+    {
+      "chunk_id": "IR-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "skill",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.87,
+      "context_tags": [
+        "debugging",
+        "triage",
+        "pattern-recognition"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has an exceptional ability to triage production incidents by correlating seemingly unrelated symptoms. During a 2023 outage that presented as 'slow API responses,' he noticed a 2% increase in garbage collection pauses on a seemingly unrelated service, traced it to a memory leak caused by a connection pool misconfiguration introduced 3 weeks earlier, and identified the exact PR. His debugging approach is systematic: he draws a timeline of all changes in the past 2 weeks and overlays it with the anomaly onset."
+    },
+    {
+      "chunk_id": "IR-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "framework",
+      "uniqueness": "HIGH",
+      "source": "document",
+      "confidence": 0.88,
+      "context_tags": [
+        "alerting",
+        "signal-noise",
+        "monitoring"
+      ],
+      "linked_chunks": [],
+      "content": "Jan designed the company's alerting philosophy around what he calls the 'Alert Credibility Index': every alert must have a minimum 80% true-positive rate over a rolling 30-day window. Alerts that fall below this threshold are automatically silenced and flagged for review. His reasoning: 'Every false alert erodes on-call trust by 5%. After 20 false alerts, your engineers stop responding to real ones. Alert fatigue kills more systems than actual bugs.'"
+    },
+    {
+      "chunk_id": "IR-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "incident-response",
+      "type": "story",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.84,
+      "context_tags": [
+        "cascading-failure",
+        "resilience",
+        "learning"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's most-referenced incident story is 'The Cascade of 2022': a routine database migration caused a 5-second lock that triggered a connection pool exhaustion, which cascaded through 4 downstream services, which overwhelmed the message queue, which caused the alerting system itself to fail. The team didn't know about the outage for 23 minutes because the monitoring was also down. This incident led Jan to implement an independent 'watchdog' monitoring system that runs on completely separate infrastructure."
+    },
+    {
+      "chunk_id": "CR-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "code-review",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "code",
+      "confidence": 0.92,
+      "context_tags": [
+        "pr-size",
+        "review-quality",
+        "process"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces a maximum PR size of 400 lines of changed code (excluding generated files and tests). PRs exceeding this limit are automatically flagged by CI and require a written justification. His data shows that review defect-detection rate drops by 50% above 400 lines. He tells engineers: 'If your PR is too big to review in 30 minutes, it's too big to understand in an incident at 3 AM.'"
+    },
+    {
+      "chunk_id": "CR-HEUR-002",
+      "author": "Jan Kowalski",
+      "cluster": "code-review",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.88,
+      "context_tags": [
+        "review-focus",
+        "what-to-review",
+        "priorities"
+      ],
+      "linked_chunks": [],
+      "content": "Jan teaches code reviewers to focus on three things in order: (1) correctness of the data model, (2) error handling at system boundaries, (3) naming and readability. He explicitly deprioritizes style and formatting, which he considers 'solved by linters.' He has a phrase: 'I'd rather ship ugly code that handles errors correctly than beautiful code that swallows exceptions.'"
+    },
+    {
+      "chunk_id": "CR-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "code-review",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.9,
+      "context_tags": [
+        "rubber-stamping",
+        "approval",
+        "accountability"
+      ],
+      "linked_chunks": [],
+      "content": "Jan monitors code review approval times and flags any review completed in under 10 minutes on a PR with more than 100 lines as a potential rubber stamp. He addresses this privately with the reviewer, not punitively, but with a direct conversation: 'Either this PR was trivial enough to not need review, or it wasn't reviewed properly. Which is it?' He tracks repeat offenders and has removed review privileges from two senior engineers who consistently rubber-stamped."
+    },
+    {
+      "chunk_id": "CR-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "code-review",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "chat",
+      "confidence": 0.85,
+      "context_tags": [
+        "review-comments",
+        "tone",
+        "collaboration"
+      ],
+      "linked_chunks": [],
+      "content": "Jan insists that all code review comments must be phrased as questions or suggestions, never commands. Instead of 'Change this to use a map,' reviewers must write 'Have you considered using a map here? It might improve readability because...' He considers imperative review comments a form of technical authority abuse and has modeled this behavior consistently for 5 years. The team's review culture is notably non-adversarial as a result."
+    },
+    {
+      "chunk_id": "CR-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "code-review",
+      "type": "belief",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.83,
+      "context_tags": [
+        "code-review",
+        "learning",
+        "knowledge-sharing"
+      ],
+      "linked_chunks": [],
+      "content": "Jan considers code review the single most effective knowledge-sharing mechanism in a software organization — more effective than documentation, pair programming, or tech talks. His reasoning: reviews expose every engineer to decisions they wouldn't otherwise see, create a searchable record of technical rationale, and normalize constructive disagreement. He estimates that 30% of his engineers' technical growth comes directly from reviewing others' code."
+    },
+    {
+      "chunk_id": "VM-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "vendor-management",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "meeting",
+      "confidence": 0.9,
+      "context_tags": [
+        "vendor-selection",
+        "lock-in",
+        "risk"
+      ],
+      "linked_chunks": [],
+      "content": "Jan evaluates every SaaS vendor against what he calls the 'Exit Cost Test': before signing any contract, the team must prototype a migration to an alternative provider and document the estimated effort. If the exit cost exceeds 2 engineering-months, Jan either negotiates contractual protections (data portability clauses, API stability guarantees) or builds an abstraction layer before integrating. He has walked away from 3 vendor deals over excessive lock-in."
+    },
+    {
+      "chunk_id": "VM-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "vendor-management",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "email",
+      "confidence": 0.87,
+      "context_tags": [
+        "vendor-lock-in",
+        "cloud",
+        "multi-cloud"
+      ],
+      "linked_chunks": [],
+      "content": "Despite his lock-in aversion, Jan explicitly rejects multi-cloud strategies for his company's size. He considers multi-cloud 'a large company's luxury that small companies pay for with complexity.' Instead, he uses cloud-agnostic open-source tools (Kubernetes, PostgreSQL, Kafka) on a single cloud provider (AWS), accepting provider lock-in at the infrastructure layer while maintaining portability at the application layer."
+    },
+    {
+      "chunk_id": "VM-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "vendor-management",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.85,
+      "context_tags": [
+        "vendor-failure",
+        "contingency",
+        "resilience"
+      ],
+      "linked_chunks": [],
+      "content": "In 2023, a critical third-party geocoding API that Jan's platform depended on was acquired and its pricing increased 400% with 30 days notice. Because Jan's team had built an abstraction layer during initial integration (per his Exit Cost Test), they migrated to an open-source alternative in 8 days. Jan now uses this as his primary story when engineers push back on the overhead of vendor abstraction layers: 'The abstraction layer isn't overhead — it's insurance.'"
+    },
+    {
+      "chunk_id": "VM-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "vendor-management",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.82,
+      "context_tags": [
+        "open-source",
+        "build-vs-buy",
+        "cost"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's default position on build-vs-buy is 'buy first, build only if the vendor can't meet a specific, documented requirement.' He considers the urge to build in-house a form of 'engineering vanity' and requires any build decision to include a total cost of ownership comparison covering 3 years of maintenance. However, for anything in the critical data path (ingestion, processing, storage), he reverses this default and prefers building or using open-source."
+    },
+    {
+      "chunk_id": "HP-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "hiring-process",
+      "type": "ritual",
+      "uniqueness": "CRITICAL",
+      "source": "observation",
+      "confidence": 0.91,
+      "context_tags": [
+        "hiring",
+        "interview-design",
+        "structured"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's interview process is a precisely structured 4-stage pipeline: (1) async take-home exercise simulating a real work task (time-boxed to 3 hours), (2) technical deep-dive on the take-home with the hiring manager, (3) pair-programming session on a production bug with a team member, (4) values alignment conversation with Jan himself. Each stage has a written rubric with specific pass/fail criteria. He reviews every hiring decision and has veto power that he exercises roughly once per quarter."
+    },
+    {
+      "chunk_id": "HP-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "hiring-process",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.89,
+      "context_tags": [
+        "red-flags",
+        "candidates",
+        "evaluation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan maintains a list of 'soft red flags' that don't disqualify candidates but trigger deeper investigation: (1) can't name a mistake they made in their last role, (2) describe every past team as dysfunctional, (3) have never maintained a system they built for more than 6 months, (4) can't explain a concept they listed on their resume in simple terms. He considers flag #4 the most reliable: 'If you can't explain it simply, you memorized it from a blog post.'"
+    },
+    {
+      "chunk_id": "HP-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "hiring-process",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.88,
+      "context_tags": [
+        "diversity",
+        "team-composition",
+        "hiring"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that cognitive diversity — not just demographic diversity — is the most undervalued hiring criterion. He actively seeks engineers with non-traditional backgrounds: former teachers, musicians, military veterans, career-changers. His best-performing team lead is a former logistics manager who learned to code at 35. Jan's reasoning: 'Homogeneous teams converge on solutions too quickly. I want someone who thinks about the problem differently, not just someone who writes code differently.'"
+    },
+    {
+      "chunk_id": "HP-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "hiring-process",
+      "type": "anti-pattern",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.85,
+      "context_tags": [
+        "counter-offers",
+        "retention",
+        "negotiation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan never makes counter-offers to engineers who have accepted an external position. His policy is firm: 'If you needed an outside offer to get a raise, I failed as your manager.' He considers counter-offers a temporary patch that doesn't address the underlying dissatisfaction, and his data shows that 70% of counter-offered employees leave within 12 months anyway. Instead, he invests in proactive retention through regular market-rate adjustments and career development conversations."
+    },
+    {
+      "chunk_id": "HP-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "hiring-process",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "chat",
+      "confidence": 0.83,
+      "context_tags": [
+        "referrals",
+        "sourcing",
+        "network"
+      ],
+      "linked_chunks": [],
+      "content": "Jan caps referral hires at 40% of total hires per quarter to prevent the team from becoming an echo chamber of shared backgrounds and perspectives. He has seen teams where 80% of engineers came from the same 2 companies and observed that they replicated the same architectural patterns and blind spots. His 40% cap forces the recruiting team to source from diverse channels and ensures the team regularly encounters unfamiliar approaches."
+    },
+    {
+      "chunk_id": "PS-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "product-strategy",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.91,
+      "context_tags": [
+        "prioritization",
+        "roadmap",
+        "impact"
+      ],
+      "linked_chunks": [],
+      "content": "Jan uses a modified RICE framework for feature prioritization but replaces 'Confidence' with 'Reversibility' — how easily the feature can be rolled back or changed after launch. Features that are high-impact but hard to reverse receive extra scrutiny and require a rollback plan before development begins. He has found that this modification catches 'one-way door' features that standard RICE misses because it doesn't account for architectural commitment."
+    },
+    {
+      "chunk_id": "PS-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "product-strategy",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.88,
+      "context_tags": [
+        "mvp",
+        "scope",
+        "delivery"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's MVP rule: the first version of any feature must be deliverable by a single engineer in 2 weeks or less. If it can't be scoped that small, the feature is too complex and needs to be decomposed further. He considers 2 weeks the maximum time between feedback loops — anything longer means the team is building on assumptions rather than data. He has killed features mid-development when the team couldn't demo working software after 2 weeks."
+    },
+    {
+      "chunk_id": "PS-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "product-strategy",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.87,
+      "context_tags": [
+        "customer-proximity",
+        "engineering",
+        "product"
+      ],
+      "linked_chunks": [],
+      "content": "Jan insists that every engineer spend at least one day per quarter sitting with a customer (virtually or in-person) watching them use the product. He considers this non-negotiable because 'engineers who never see their users build features for imaginary people.' His most impactful product decisions — including the freshness SLA feature that prevented churn of their largest customer — originated from engineers who witnessed customer pain firsthand."
+    },
+    {
+      "chunk_id": "PS-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "product-strategy",
+      "type": "anti-pattern",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.84,
+      "context_tags": [
+        "feature-factory",
+        "velocity",
+        "value"
+      ],
+      "linked_chunks": [],
+      "content": "Jan explicitly rejects 'feature velocity' as a product health metric. He has removed it from dashboards and refuses to discuss 'features shipped per sprint' in board meetings. His alternative metric is 'Feature Adoption Rate': the percentage of users who use a new feature within 30 days of launch. He argues that shipping 10 features nobody uses is worse than shipping 2 features everyone loves: 'Velocity without adoption is just organized waste.'"
+    },
+    {
+      "chunk_id": "PS-RANT-001",
+      "author": "Jan Kowalski",
+      "cluster": "product-strategy",
+      "type": "rant",
+      "uniqueness": "MEDIUM",
+      "source": "chat",
+      "confidence": 0.86,
+      "context_tags": [
+        "roadmaps",
+        "planning",
+        "honesty"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has a passionate stance on roadmaps: 'A roadmap is not a promise. A roadmap is a snapshot of current priorities that will change when we learn new things. Anyone who treats a 12-month roadmap as a contract has never built software. I show our roadmap to customers with a giant watermark that says WILL CHANGE. If your sales team is selling features from the roadmap as commitments, you don't have a roadmap problem — you have a sales culture problem.'"
+    },
+    {
+      "chunk_id": "TD-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-debt",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.91,
+      "context_tags": [
+        "debt-classification",
+        "prioritization",
+        "strategy"
+      ],
+      "linked_chunks": [],
+      "content": "Jan classifies technical debt into three categories using a financial metaphor: 'credit card debt' (quick hacks that accrue daily interest — must be paid within the sprint), 'mortgage debt' (deliberate architectural compromises with known payoff schedules — tracked quarterly), and 'student loan debt' (foundational choices that enabled growth but now constrain it — addressed in annual planning). Each category has a different remediation strategy and budget allocation. He refuses to let credit card debt carry over between sprints."
+    },
+    {
+      "chunk_id": "TD-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-debt",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.88,
+      "context_tags": [
+        "debt-budget",
+        "allocation",
+        "maintenance"
+      ],
+      "linked_chunks": [],
+      "content": "Jan allocates exactly 20% of each sprint's capacity to technical debt reduction — not as a stretch goal but as a hard reservation. If a product manager tries to reclaim this capacity for feature work, Jan requires them to sign a 'Debt Deferral Notice' that documents the deferred item, its estimated interest rate (velocity drag per sprint), and a committed payback date. He has found that the formality of the notice deters all but the most urgent requests."
+    },
+    {
+      "chunk_id": "TD-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-debt",
+      "type": "story",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.86,
+      "context_tags": [
+        "debt-crisis",
+        "refactoring",
+        "recovery"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's cautionary tale about technical debt comes from 2019: the team spent 6 months building features on top of a 'temporary' data pipeline that was supposed to be replaced after 3 months. When the pipeline finally collapsed under load, the replacement took 4 months instead of the original 3 because every new feature had created additional coupling. He calculates the total cost at $380K in engineering time and uses this as his primary argument for the 20% debt budget."
+    },
+    {
+      "chunk_id": "TD-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "technical-debt",
+      "type": "belief",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.84,
+      "context_tags": [
+        "refactoring",
+        "rewriting",
+        "pragmatism"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is deeply skeptical of 'big bang' rewrites and believes that almost every system can be incrementally migrated using the strangler fig pattern. He has approved exactly one ground-up rewrite in 7 years (the event pipeline after the 2019 collapse) and considers it the exception that proves the rule. His standard response to rewrite proposals: 'Show me the migration plan where both systems run in parallel. If you can't, you don't understand the problem well enough to rewrite it.'"
+    },
+    {
+      "chunk_id": "SP-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "security-practices",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "code",
+      "confidence": 0.92,
+      "context_tags": [
+        "secrets-management",
+        "credentials",
+        "security"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces a zero-tolerance policy for secrets in code repositories. The CI pipeline runs automated secret scanning on every commit, and any detection triggers an immediate forced rotation of the compromised credential, a P2 incident report, and a team-wide security review. He implemented this after discovering that a database password committed to a private repo in 2020 was still valid 8 months later because no one had rotated it."
+    },
+    {
+      "chunk_id": "SP-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "security-practices",
+      "type": "framework",
+      "uniqueness": "HIGH",
+      "source": "document",
+      "confidence": 0.89,
+      "context_tags": [
+        "threat-modeling",
+        "security-review",
+        "process"
+      ],
+      "linked_chunks": [],
+      "content": "Jan requires a lightweight threat model for any feature that handles user data, financial transactions, or authentication flows. His threat model template has exactly 4 questions: (1) What data flows through this feature? (2) Who should not have access to this data? (3) What happens if this feature fails open? (4) What's the blast radius of a compromise? He considers this 'security minimum viable process' — lightweight enough to not slow development but thorough enough to catch the top risks."
+    },
+    {
+      "chunk_id": "SP-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "security-practices",
+      "type": "anti-pattern",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.87,
+      "context_tags": [
+        "security-theater",
+        "compliance",
+        "pragmatism"
+      ],
+      "linked_chunks": [],
+      "content": "Jan vocally opposes what he calls 'security theater' — compliance activities that create a false sense of security without reducing actual risk. He has eliminated three quarterly security reports that no one read, replaced annual penetration testing with continuous automated scanning, and refuses to implement IP whitelisting for internal tools because 'it makes people think the network is a security boundary when it hasn't been for a decade.'"
+    },
+    {
+      "chunk_id": "SP-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "security-practices",
+      "type": "belief",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.85,
+      "context_tags": [
+        "security-culture",
+        "shared-responsibility",
+        "education"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that security is a shared responsibility, not a team responsibility. He requires every engineer to complete a security training module during onboarding that he personally designed, covering the OWASP top 10 with examples from the company's own codebase. He also runs quarterly 'bug bounty' events where engineers try to break each other's features. The winning team gets to choose the next team offsite activity."
+    },
+    {
+      "chunk_id": "DA-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "data-architecture",
+      "type": "framework",
+      "uniqueness": "CRITICAL",
+      "source": "document",
+      "confidence": 0.9,
+      "context_tags": [
+        "data-ownership",
+        "boundaries",
+        "governance"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces strict data ownership boundaries: every table in the database must have exactly one owning service, and no other service may write to it directly. Cross-service data access is mediated through APIs or event streams. He considers shared databases the number one cause of accidental coupling in microservice architectures and has spent significant political capital enforcing this boundary, including rewriting a billing integration that bypassed it."
+    },
+    {
+      "chunk_id": "DA-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "data-architecture",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.88,
+      "context_tags": [
+        "schema-evolution",
+        "migrations",
+        "backwards-compatibility"
+      ],
+      "linked_chunks": [],
+      "content": "Jan requires all database schema changes to be backwards-compatible with the previous application version. This means: no dropping columns without a 2-release deprecation cycle, no renaming columns (add new, migrate, drop old), and no NOT NULL constraints on existing columns without a default value. His reasoning: 'We do rolling deployments. At any moment, two versions of the application are running. If your migration breaks the old version, your deployment is a ticking time bomb.'"
+    },
+    {
+      "chunk_id": "DA-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "data-architecture",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.85,
+      "context_tags": [
+        "data-pipeline",
+        "batch-vs-stream",
+        "architecture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's default position on data pipelines is 'stream first, batch only for historical backfills.' He has migrated three batch ETL processes to streaming equivalents since 2021, reducing data latency from hours to seconds. His reasoning is both technical and organizational: 'Batch processing creates invisible deadlines. Stream processing makes problems visible immediately. I'd rather deal with 100 small issues in real-time than one catastrophic batch failure at 3 AM.'"
+    },
+    {
+      "chunk_id": "DA-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "data-architecture",
+      "type": "skill",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.87,
+      "context_tags": [
+        "data-modeling",
+        "normalization",
+        "schema-design"
+      ],
+      "linked_chunks": [],
+      "content": "Jan approaches data modeling with an unusual philosophy: he designs schemas for queryability first and normalization second. He uses a technique he calls 'query-first modeling' where the team writes the 10 most important queries before designing any tables. This sometimes results in deliberate denormalization that academic database design would reject, but Jan argues that 'a normalized schema that requires 12 joins for your most common query is a theoretical victory and a practical defeat.'"
+    },
+    {
+      "chunk_id": "RW-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "remote-work",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.87,
+      "context_tags": [
+        "remote-first",
+        "distributed-teams",
+        "culture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan transitioned his company to remote-first in 2020 and considers it irreversible. He believes that remote work forces better communication habits — everything must be written down, decisions must be documented, and asynchronous communication becomes the default. He has observed that his team's documentation quality improved 300% after going remote because 'you can't rely on hallway conversations to transmit institutional knowledge anymore.'"
+    },
+    {
+      "chunk_id": "RW-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "remote-work",
+      "type": "heuristic",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.83,
+      "context_tags": [
+        "timezone",
+        "overlap",
+        "collaboration"
+      ],
+      "linked_chunks": [],
+      "content": "Jan requires a minimum 4-hour timezone overlap for all team members and structures the overlapping window specifically for synchronous collaboration: code reviews, pair programming, and decision meetings. All other work — coding, documentation, research — happens asynchronously. He considers the 4-hour overlap the 'Goldilocks zone': enough for real-time collaboration without forcing anyone to work outside reasonable hours."
+    },
+    {
+      "chunk_id": "RW-RITL-001",
+      "author": "Jan Kowalski",
+      "cluster": "remote-work",
+      "type": "ritual",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.8,
+      "context_tags": [
+        "virtual-social",
+        "team-bonding",
+        "culture"
+      ],
+      "linked_chunks": [],
+      "content": "Jan hosts a weekly 'Virtual Coffee Roulette' that randomly pairs two engineers for a 15-minute non-work conversation. Participation is optional but strongly encouraged. He also flies the entire team to Warsaw twice a year for a week-long offsite focused 70% on social bonding and 30% on strategic planning. He considers these in-person gatherings essential for building the trust that makes remote collaboration work the rest of the year."
+    },
+    {
+      "chunk_id": "OSS-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "open-source",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.86,
+      "context_tags": [
+        "open-source",
+        "contribution",
+        "community"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that companies that use open source have a moral and practical obligation to contribute back. His company dedicates 5% of engineering time to upstream contributions — fixing bugs, improving documentation, and occasionally contributing features to the open-source tools they depend on. He has found that this investment pays for itself: 'Our engineers become experts in the tools we depend on, and the maintainers know us by name when we report issues.'"
+    },
+    {
+      "chunk_id": "OSS-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "open-source",
+      "type": "heuristic",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.84,
+      "context_tags": [
+        "open-source",
+        "evaluation",
+        "maturity"
+      ],
+      "linked_chunks": [],
+      "content": "Jan evaluates open-source projects using a 5-point maturity checklist: (1) active maintainer team of 3+, (2) automated CI with test coverage above 70%, (3) documented release process with semantic versioning, (4) responsive issue triage (median first response under 7 days), (5) at least one corporate sponsor or a sustainable funding model. Projects that score below 3/5 are classified as 'experimental' and forbidden in production without a written exception approved by Jan."
+    },
+    {
+      "chunk_id": "OSS-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "open-source",
+      "type": "story",
+      "uniqueness": "MEDIUM",
+      "source": "interview",
+      "confidence": 0.82,
+      "context_tags": [
+        "open-source",
+        "contribution",
+        "reputation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's proudest open-source moment was when an engineer on his team discovered and fixed a subtle race condition in a widely-used message queue library. The fix prevented data loss for thousands of users worldwide. The maintainer personally thanked them, and three enterprise customers mentioned the fix during sales calls as evidence of the company's technical depth. Jan uses this story to justify the 5% open-source time allocation: 'One bug fix earned us more credibility than a year of marketing.'"
+    },
+    {
+      "chunk_id": "CP-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "career-philosophy",
+      "type": "belief",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.9,
+      "context_tags": [
+        "career",
+        "management",
+        "individual-contributor"
+      ],
+      "linked_chunks": [],
+      "content": "Jan believes that the management track and the IC track should be truly parallel in compensation, prestige, and influence — not just on paper. He has structured his organization so that a Staff Engineer has the same compensation band, reports to the same VP, and attends the same strategic meetings as an Engineering Manager. He considers organizations where management is the only path to seniority to be 'systematically selecting against their best engineers.'"
+    },
+    {
+      "chunk_id": "CP-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "career-philosophy",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.87,
+      "context_tags": [
+        "career-change",
+        "growth",
+        "stagnation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan advises engineers to change roles or companies every 3-5 years, even if they're happy. His reasoning: 'Comfort is the enemy of growth. After 3 years, you've mastered your environment and you're optimizing locally. The discomfort of a new context forces global optimization.' He practices what he preaches — before founding his company, he deliberately moved from consulting to a startup to a mid-size company to experience different organizational scales."
+    },
+    {
+      "chunk_id": "CP-RANT-001",
+      "author": "Jan Kowalski",
+      "cluster": "career-philosophy",
+      "type": "rant",
+      "uniqueness": "HIGH",
+      "source": "chat",
+      "confidence": 0.88,
+      "context_tags": [
+        "titles",
+        "industry",
+        "inflation"
+      ],
+      "linked_chunks": [],
+      "content": "Jan has a well-known rant about title inflation in the tech industry: 'When everyone is a Senior Engineer after 2 years, the title means nothing. When every team lead is a Director, the org chart is a fiction. I've interviewed \"Principal Engineers\" who couldn't design a system that handles 100 concurrent users. Titles should describe demonstrated impact, not tenure. My company has exactly 4 engineering levels and I will fight title inflation until I retire or lose this fight, whichever comes first.'"
+    },
+    {
+      "chunk_id": "MC-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "meeting-culture",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "observation",
+      "confidence": 0.88,
+      "context_tags": [
+        "meetings",
+        "efficiency",
+        "rules"
+      ],
+      "linked_chunks": [],
+      "content": "Jan enforces three meeting rules that he calls 'The Meeting Manifesto': (1) every meeting must have a written agenda shared 24 hours in advance, (2) every meeting must end with written action items and owners, (3) any meeting without a decision to make is an email. He has walked out of meetings that violate rule #1 and cancelled recurring meetings that consistently fail to produce decisions. His teams estimate this has recovered 6 hours per person per week."
+    },
+    {
+      "chunk_id": "MC-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "meeting-culture",
+      "type": "anti-pattern",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.85,
+      "context_tags": [
+        "status-meetings",
+        "updates",
+        "async"
+      ],
+      "linked_chunks": [],
+      "content": "Jan considers status update meetings the single greatest waste of engineering time. He has replaced all status meetings with a Slack bot that collects async updates and compiles a daily digest. The bot asks three questions: what did you ship, what are you working on, what's blocking you. If nothing is blocking, the update takes 30 seconds. He estimates this change saved his 40-person engineering team 160 person-hours per month — the equivalent of one full-time engineer."
+    },
+    {
+      "chunk_id": "MC-PREF-001",
+      "author": "Jan Kowalski",
+      "cluster": "meeting-culture",
+      "type": "preference",
+      "uniqueness": "MEDIUM",
+      "source": "observation",
+      "confidence": 0.83,
+      "context_tags": [
+        "meeting-length",
+        "timeboxing",
+        "focus"
+      ],
+      "linked_chunks": [],
+      "content": "Jan caps all meetings at 25 minutes (not 30) or 50 minutes (not 60), following the principle that meetings should never consume a full calendar block. The 5-minute buffer between meetings is sacred — it's for context-switching, bio breaks, and the mental reset that prevents 'meeting zombie syndrome.' He has configured the company's Google Calendar to default to these durations and considers the standard 30/60 minute meeting 'a relic of the pre-digital era.'"
+    },
+    {
+      "chunk_id": "SL-STRY-001",
+      "author": "Jan Kowalski",
+      "cluster": "startup-lessons",
+      "type": "story",
+      "uniqueness": "CRITICAL",
+      "source": "interview",
+      "confidence": 0.92,
+      "context_tags": [
+        "founding",
+        "early-days",
+        "survival"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's founding story shapes much of his current philosophy: in the first year, he and his co-founder built the entire platform on a single PostgreSQL instance running on a $40/month Hetzner server. When they landed their first enterprise customer, they had 48 hours to migrate to AWS. Jan did the migration solo in a 36-hour coding session, with zero downtime, by replicating writes to both databases and switching reads with a feature flag. He still considers this his greatest technical achievement and references it when engineers over-plan: 'Ship on Hetzner, scale on AWS.'"
+    },
+    {
+      "chunk_id": "SL-BLEF-001",
+      "author": "Jan Kowalski",
+      "cluster": "startup-lessons",
+      "type": "belief",
+      "uniqueness": "HIGH",
+      "source": "interview",
+      "confidence": 0.89,
+      "context_tags": [
+        "fundraising",
+        "bootstrapping",
+        "independence"
+      ],
+      "linked_chunks": [],
+      "content": "Jan bootstrapped the company for 2 years before taking VC funding, and he considers those bootstrapped years the most important period of the company's life. Without investor pressure, the team could iterate slowly, make mistakes cheaply, and develop genuine product-market fit. He advises other technical founders: 'Take money when you need to scale, not when you need to find product-market fit. Investor money makes you fast, not smart.'"
+    },
+    {
+      "chunk_id": "SL-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "startup-lessons",
+      "type": "heuristic",
+      "uniqueness": "HIGH",
+      "source": "meeting",
+      "confidence": 0.87,
+      "context_tags": [
+        "hiring-timing",
+        "scaling",
+        "growth"
+      ],
+      "linked_chunks": [],
+      "content": "Jan's rule for startup hiring: never hire for a role until the pain of not having that role is felt by at least 3 people on the team. He has seen early-stage startups hire VPs of Engineering with 3 engineers, DevOps teams with 5 developers, and product managers before having a product. His counter-position: 'Every hire at a startup should feel slightly late. If it doesn't feel uncomfortable without this person, you're hiring ahead of your needs.'"
+    },
+    {
+      "chunk_id": "SL-FRMW-001",
+      "author": "Jan Kowalski",
+      "cluster": "startup-lessons",
+      "type": "framework",
+      "uniqueness": "HIGH",
+      "source": "document",
+      "confidence": 0.86,
+      "context_tags": [
+        "decision-speed",
+        "startup-vs-enterprise",
+        "context"
+      ],
+      "linked_chunks": [],
+      "content": "Jan uses a framework he calls 'Decision Metabolism' to calibrate the company's decision-making speed as it scales. In the early days (under 10 people), decisions were made verbally in minutes. At 40 people, he introduced lightweight RFCs. At 100+ people, formal ADRs became necessary. He considers adjusting decision-making overhead to company size a critical leadership skill: 'The process that saved you at 100 people will strangle you at 20. The speed that worked at 10 will create chaos at 100.'"
+    },
+    {
+      "chunk_id": "PO-HEUR-001",
+      "author": "Jan Kowalski",
+      "cluster": "performance-optimization",
+      "type": "heuristic",
+      "uniqueness": "CRITICAL",
+      "source": "code",
+      "confidence": 0.91,
+      "context_tags": [
+        "latency",
+        "sla",
+        "monitoring"
+      ],
+      "linked_chunks": [],
+      "content": "Jan defines performance budgets for every API endpoint at the design phase, not after deployment. Each endpoint gets a p50, p95, and p99 latency target based on its user-facing criticality. Dashboard queries are allowed up to 2 seconds p99, but transaction endpoints must stay under 200ms p99. He bakes these targets into CI: if a load test shows a regression beyond the budget, the PR is automatically blocked until the regression is addressed."
+    },
+    {
+      "chunk_id": "PO-SKIL-001",
+      "author": "Jan Kowalski",
+      "cluster": "performance-optimization",
+      "type": "skill",
+      "uniqueness": "HIGH",
+      "source": "code",
+      "confidence": 0.89,
+      "context_tags": [
+        "profiling",
+        "optimization",
+        "jvm"
+      ],
+      "linked_chunks": [],
+      "content": "Jan is exceptionally proficient at using profiling tools to identify performance bottlenecks. He can navigate flame graphs intuitively and has trained his team to use async-profiler for JVM services and clinic.js for Node.js. His optimization philosophy is ruthlessly empirical: 'Never optimize without a profile. Never profile without a hypothesis. Never hypothesize without a user complaint. Optimization without evidence is superstition.'"
+    },
+    {
+      "chunk_id": "PO-ANTI-001",
+      "author": "Jan Kowalski",
+      "cluster": "performance-optimization",
+      "type": "anti-pattern",
+      "uniqueness": "MEDIUM",
+      "source": "meeting",
+      "confidence": 0.86,
+      "context_tags": [
+        "caching",
+        "complexity",
+        "tradeoffs"
+      ],
+      "linked_chunks": [],
+      "content": "Jan considers caching a 'necessary evil' rather than a performance strategy. He mandates that every cache must have: (1) explicit TTL with justification, (2) cache invalidation strategy documented before implementation, (3) monitoring on hit rate and staleness. He has rejected caching proposals where the invalidation logic was more complex than the original computation, arguing: 'You haven't solved a performance problem — you've traded it for a correctness problem that's harder to debug at 3 AM.'"
+    }
+  ],
+  "relations": [
+    {
+      "source": "TDM-HEUR-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Bus factor heuristic feeds into the ADR framework"
+    },
+    {
+      "source": "TDM-HEUR-002",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "API boundary rule supports the bounded context framework"
+    },
+    {
+      "source": "TDM-HEUR-003",
+      "target": "TDM-PREF-002",
+      "type": "ENABLES",
+      "description": "Anti-premature-scaling supports infrastructure-as-code preference"
+    },
+    {
+      "source": "TDM-FRMW-001",
+      "target": "TDM-RITL-001",
+      "type": "ENABLES",
+      "description": "ADR framework enables the Friday architecture review ritual"
+    },
+    {
+      "source": "TDM-PREF-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "TypeScript preference supports bounded context design"
+    },
+    {
+      "source": "TDM-BLEF-001",
+      "target": "TDM-HEUR-001",
+      "type": "ENABLES",
+      "description": "Reversibility belief reinforces bus factor heuristic"
+    },
+    {
+      "source": "TDM-STRY-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Migration story demonstrates reversibility belief in practice"
+    },
+    {
+      "source": "LDR-BLEF-001",
+      "target": "LDR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Autonomy belief drives the delegation framework"
+    },
+    {
+      "source": "LDR-SKIL-001",
+      "target": "LDR-HEUR-001",
+      "type": "ENABLES",
+      "description": "Conflict resolution skill applies the disagree-and-commit heuristic"
+    },
+    {
+      "source": "LDR-STRY-001",
+      "target": "LDR-BLEF-001",
+      "type": "ENABLES",
+      "description": "Junior dev story exemplifies autonomy belief"
+    },
+    {
+      "source": "LDR-FRMW-001",
+      "target": "LDR-PREF-001",
+      "type": "ENABLES",
+      "description": "Delegation framework supports flat hierarchy preference"
+    },
+    {
+      "source": "LDR-RITL-001",
+      "target": "LDR-EMOT-001",
+      "type": "ENABLES",
+      "description": "Skip-level ritual builds trust emotion"
+    },
+    {
+      "source": "COM-STYL-001",
+      "target": "COM-HEUR-001",
+      "type": "ENABLES",
+      "description": "Direct communication style supports meeting agenda heuristic"
+    },
+    {
+      "source": "COM-SKIL-001",
+      "target": "COM-STYL-002",
+      "type": "ENABLES",
+      "description": "Whiteboard skill reinforces visual communication style"
+    },
+    {
+      "source": "COM-PREF-001",
+      "target": "COM-ANTI-001",
+      "type": "ENABLES",
+      "description": "Written-first preference opposes same anti-patterns"
+    },
+    {
+      "source": "TDM-FRMW-001",
+      "target": "LDR-BLEF-001",
+      "type": "ENABLES",
+      "description": "ADR framework supports team autonomy through transparent decisions"
+    },
+    {
+      "source": "TDM-RITL-001",
+      "target": "LDR-HEUR-001",
+      "type": "ENABLES",
+      "description": "Architecture review ritual enables disagree-and-commit"
+    },
+    {
+      "source": "TDM-BLEF-001",
+      "target": "LDR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Reversibility belief supports delegation by reducing risk"
+    },
+    {
+      "source": "LDR-PREF-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "Flat hierarchy supports bounded context ownership"
+    },
+    {
+      "source": "TDM-FRMW-001",
+      "target": "COM-PREF-001",
+      "type": "ENABLES",
+      "description": "ADRs are the ultimate written-first communication"
+    },
+    {
+      "source": "TDM-RITL-001",
+      "target": "COM-STYL-001",
+      "type": "ENABLES",
+      "description": "Architecture reviews need direct communication"
+    },
+    {
+      "source": "TDM-PREF-001",
+      "target": "DE-SKIL-001",
+      "type": "ENABLES",
+      "description": "TypeScript preference aligns with distributed systems expertise"
+    },
+    {
+      "source": "TDM-PREF-002",
+      "target": "DE-FRMW-001",
+      "type": "ENABLES",
+      "description": "IaC preference supports observability framework"
+    },
+    {
+      "source": "TDM-HEUR-002",
+      "target": "DE-FACT-001",
+      "type": "ENABLES",
+      "description": "API boundary rule supports PostgreSQL expertise"
+    },
+    {
+      "source": "LDR-HEUR-001",
+      "target": "COM-STYL-001",
+      "type": "ENABLES",
+      "description": "Disagree-and-commit needs direct communication"
+    },
+    {
+      "source": "LDR-RITL-001",
+      "target": "COM-RITL-001",
+      "type": "ENABLES",
+      "description": "Skip-levels feed into weekly all-hands ritual"
+    },
+    {
+      "source": "LDR-BLEF-001",
+      "target": "COM-PREF-001",
+      "type": "ENABLES",
+      "description": "Team autonomy requires written documentation"
+    },
+    {
+      "source": "PV-BLEF-001",
+      "target": "LDR-BLEF-001",
+      "type": "ENABLES",
+      "description": "Transparency value drives team autonomy belief"
+    },
+    {
+      "source": "PV-BLEF-002",
+      "target": "LDR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Meritocracy value shapes delegation framework"
+    },
+    {
+      "source": "PV-HEUR-001",
+      "target": "LDR-HEUR-001",
+      "type": "ENABLES",
+      "description": "Intellectual honesty supports disagree-and-commit"
+    },
+    {
+      "source": "PV-EMOT-001",
+      "target": "LDR-EMOT-001",
+      "type": "ENABLES",
+      "description": "Pride in craft sustains trust-building"
+    },
+    {
+      "source": "PV-BLEF-001",
+      "target": "COM-STYL-001",
+      "type": "ENABLES",
+      "description": "Transparency drives direct communication"
+    },
+    {
+      "source": "PV-HEUR-001",
+      "target": "COM-ANTI-001",
+      "type": "ENABLES",
+      "description": "Intellectual honesty opposes jargon anti-patterns"
+    },
+    {
+      "source": "EL-HEUR-001",
+      "target": "LDR-SKIL-001",
+      "type": "ENABLES",
+      "description": "Emotional regulation supports conflict resolution"
+    },
+    {
+      "source": "EL-PREF-001",
+      "target": "LDR-RITL-001",
+      "type": "ENABLES",
+      "description": "Calm preference supports skip-level conversations"
+    },
+    {
+      "source": "MP-META-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Decision-making meta-pattern supports ADR framework"
+    },
+    {
+      "source": "MP-META-002",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Risk assessment pattern supports reversibility belief"
+    },
+    {
+      "source": "MP-FRMW-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "Pattern recognition framework supports bounded contexts"
+    },
+    {
+      "source": "IR-HEUR-001",
+      "target": "TDM-HEUR-003",
+      "type": "ENABLES",
+      "description": "Severity classification aligns with anti-premature-scaling"
+    },
+    {
+      "source": "IR-FRMW-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Incident framework feeds into ADR decisions"
+    },
+    {
+      "source": "IR-SKIL-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "On-call debugging skill reinforces reversibility belief"
+    },
+    {
+      "source": "CR-HEUR-001",
+      "target": "TDM-HEUR-002",
+      "type": "ENABLES",
+      "description": "PR size limits support API boundary hygiene"
+    },
+    {
+      "source": "CR-PREF-001",
+      "target": "TDM-PREF-001",
+      "type": "ENABLES",
+      "description": "Review focus preferences align with TypeScript strictness"
+    },
+    {
+      "source": "CR-BLEF-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Code review belief supports ADR accountability"
+    },
+    {
+      "source": "VM-HEUR-001",
+      "target": "TDM-HEUR-001",
+      "type": "ENABLES",
+      "description": "Exit cost test complements bus factor analysis"
+    },
+    {
+      "source": "VM-PREF-001",
+      "target": "TDM-PREF-002",
+      "type": "ENABLES",
+      "description": "Multi-cloud preference supports infrastructure-as-code"
+    },
+    {
+      "source": "HP-RITL-001",
+      "target": "LDR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Structured interviews support delegation framework"
+    },
+    {
+      "source": "HP-BLEF-001",
+      "target": "LDR-BLEF-001",
+      "type": "ENABLES",
+      "description": "Hiring beliefs reinforce team autonomy"
+    },
+    {
+      "source": "HP-PREF-001",
+      "target": "LDR-PREF-001",
+      "type": "ENABLES",
+      "description": "Diversity preference supports flat hierarchy"
+    },
+    {
+      "source": "PS-FRMW-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "Modified RICE supports bounded context prioritization"
+    },
+    {
+      "source": "PS-HEUR-001",
+      "target": "TDM-HEUR-003",
+      "type": "ENABLES",
+      "description": "MVP rule aligns with anti-premature-scaling"
+    },
+    {
+      "source": "PS-BLEF-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Product iteration belief supports reversibility"
+    },
+    {
+      "source": "TD-FRMW-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Debt classification feeds into ADR decisions"
+    },
+    {
+      "source": "TD-HEUR-001",
+      "target": "TDM-HEUR-003",
+      "type": "ENABLES",
+      "description": "20% debt budget prevents premature scaling on broken foundations"
+    },
+    {
+      "source": "TD-BLEF-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Strangler fig belief reinforces reversibility"
+    },
+    {
+      "source": "SP-HEUR-001",
+      "target": "TDM-PREF-002",
+      "type": "ENABLES",
+      "description": "Secret scanning supports infrastructure-as-code practices"
+    },
+    {
+      "source": "SP-FRMW-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "Threat modeling integrates with bounded context design"
+    },
+    {
+      "source": "DA-FRMW-001",
+      "target": "TDM-HEUR-002",
+      "type": "ENABLES",
+      "description": "Data ownership boundaries reinforce API boundary rules"
+    },
+    {
+      "source": "DA-HEUR-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Backwards-compatible migrations support reversibility"
+    },
+    {
+      "source": "DA-SKIL-001",
+      "target": "TDM-FRMW-002",
+      "type": "ENABLES",
+      "description": "Query-first modeling supports bounded context design"
+    },
+    {
+      "source": "RW-BLEF-001",
+      "target": "COM-PREF-001",
+      "type": "ENABLES",
+      "description": "Remote-first drives written communication preference"
+    },
+    {
+      "source": "RW-HEUR-001",
+      "target": "COM-RITL-001",
+      "type": "ENABLES",
+      "description": "Timezone overlap supports structured rituals"
+    },
+    {
+      "source": "OSS-BLEF-001",
+      "target": "DE-SKIL-001",
+      "type": "ENABLES",
+      "description": "Open-source contribution deepens distributed systems skills"
+    },
+    {
+      "source": "OSS-HEUR-001",
+      "target": "TDM-HEUR-001",
+      "type": "ENABLES",
+      "description": "OSS maturity checklist extends bus factor analysis"
+    },
+    {
+      "source": "CP-BLEF-001",
+      "target": "LDR-PREF-001",
+      "type": "ENABLES",
+      "description": "Parallel tracks support flat hierarchy preference"
+    },
+    {
+      "source": "CP-HEUR-001",
+      "target": "LDR-STRY-001",
+      "type": "ENABLES",
+      "description": "Career change advice informs junior dev mentorship"
+    },
+    {
+      "source": "MC-HEUR-001",
+      "target": "COM-HEUR-001",
+      "type": "ENABLES",
+      "description": "Meeting manifesto reinforces agenda heuristic"
+    },
+    {
+      "source": "MC-ANTI-001",
+      "target": "COM-PREF-001",
+      "type": "ENABLES",
+      "description": "Anti-status-meetings supports written-first communication"
+    },
+    {
+      "source": "MC-PREF-001",
+      "target": "COM-RITL-001",
+      "type": "ENABLES",
+      "description": "Meeting length caps support ritual efficiency"
+    },
+    {
+      "source": "SL-STRY-001",
+      "target": "TDM-BLEF-001",
+      "type": "ENABLES",
+      "description": "Hetzner-to-AWS story embodies reversibility belief"
+    },
+    {
+      "source": "SL-FRMW-001",
+      "target": "TDM-FRMW-001",
+      "type": "ENABLES",
+      "description": "Decision metabolism aligns with ADR framework scaling"
+    },
+    {
+      "source": "PO-HEUR-001",
+      "target": "TDM-HEUR-003",
+      "type": "ENABLES",
+      "description": "Performance budgets prevent premature optimization"
+    },
+    {
+      "source": "PO-SKIL-001",
+      "target": "DE-SKIL-002",
+      "type": "ENABLES",
+      "description": "Profiling skill complements PostgreSQL expertise"
+    },
+    {
+      "source": "IR-STRY-001",
+      "target": "EL-EMOT-002",
+      "type": "ENABLES",
+      "description": "Incident stories evoke protective team emotions"
+    },
+    {
+      "source": "IR-RITL-001",
+      "target": "EL-HEUR-001",
+      "type": "ENABLES",
+      "description": "Blameless post-mortems support emotional regulation"
+    },
+    {
+      "source": "SP-HEUR-001",
+      "target": "IR-HEUR-001",
+      "type": "ENABLES",
+      "description": "Secret detection triggers incident severity classification"
+    },
+    {
+      "source": "SP-ANTI-001",
+      "target": "IR-ANTI-001",
+      "type": "ENABLES",
+      "description": "Anti-security-theater aligns with anti-blame-culture"
+    },
+    {
+      "source": "TD-HEUR-001",
+      "target": "CR-HEUR-001",
+      "type": "ENABLES",
+      "description": "Debt budget creates space for thorough code reviews"
+    },
+    {
+      "source": "TD-FRMW-001",
+      "target": "CR-PREF-001",
+      "type": "ENABLES",
+      "description": "Debt classification informs review priorities"
+    },
+    {
+      "source": "SL-BLEF-001",
+      "target": "PV-BLEF-003",
+      "type": "ENABLES",
+      "description": "Bootstrapping belief aligns with pragmatic values"
+    },
+    {
+      "source": "SL-HEUR-001",
+      "target": "PV-HEUR-001",
+      "type": "ENABLES",
+      "description": "Late hiring heuristic reflects intellectual honesty"
+    },
+    {
+      "source": "RW-BLEF-001",
+      "target": "MC-ANTI-001",
+      "type": "ENABLES",
+      "description": "Remote-first killed status meetings"
+    },
+    {
+      "source": "RW-RITL-001",
+      "target": "MC-PREF-001",
+      "type": "ENABLES",
+      "description": "Virtual coffee fits 25-min meeting cap"
+    },
+    {
+      "source": "CP-BLEF-001",
+      "target": "HP-BLEF-001",
+      "type": "ENABLES",
+      "description": "Parallel tracks inform hiring criteria"
+    },
+    {
+      "source": "CP-RANT-001",
+      "target": "HP-ANTI-001",
+      "type": "ENABLES",
+      "description": "Title inflation rant drives hiring anti-patterns"
+    },
+    {
+      "source": "PO-HEUR-001",
+      "target": "DA-SKIL-001",
+      "type": "ENABLES",
+      "description": "Performance budgets inform query-first data modeling"
+    },
+    {
+      "source": "PO-ANTI-001",
+      "target": "DA-PREF-001",
+      "type": "ENABLES",
+      "description": "Caching skepticism drives streaming preference"
+    },
+    {
+      "source": "OSS-STRY-001",
+      "target": "SP-BLEF-001",
+      "type": "ENABLES",
+      "description": "OSS bug fix story demonstrates security culture"
+    },
+    {
+      "source": "VM-ANTI-001",
+      "target": "DA-FRMW-001",
+      "type": "ENABLES",
+      "description": "Anti-lock-in supports data ownership boundaries"
+    },
+    {
+      "source": "PS-HEUR-001",
+      "target": "SL-BLEF-001",
+      "type": "ENABLES",
+      "description": "MVP rule aligns with bootstrapping philosophy"
+    },
+    {
+      "source": "EL-STRY-001",
+      "target": "PV-STRY-001",
+      "type": "ENABLES",
+      "description": "Emotional stories reinforce personal value narratives"
+    },
+    {
+      "source": "MP-META-003",
+      "target": "LDR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Communication meta-pattern supports delegation"
+    },
+    {
+      "source": "MP-META-004",
+      "target": "EL-HEUR-001",
+      "type": "ENABLES",
+      "description": "Stress meta-pattern supports emotional regulation"
+    },
+    {
+      "source": "DE-FRMW-001",
+      "target": "IR-FRMW-001",
+      "type": "ENABLES",
+      "description": "Observability framework supports incident response"
+    },
+    {
+      "source": "DE-HEUR-001",
+      "target": "PO-HEUR-001",
+      "type": "ENABLES",
+      "description": "Latency heuristics support performance budgets"
+    },
+    {
+      "source": "LDR-ANTI-001",
+      "target": "HP-ANTI-001",
+      "type": "ENABLES",
+      "description": "Anti-micromanagement supports anti-credential-bias in hiring"
+    },
+    {
+      "source": "LDR-ANTI-002",
+      "target": "CR-ANTI-001",
+      "type": "ENABLES",
+      "description": "Anti-hero-culture supports anti-rubber-stamping"
+    },
+    {
+      "source": "COM-RANT-001",
+      "target": "CP-RANT-001",
+      "type": "ENABLES",
+      "description": "Communication rant energy mirrors title inflation rant"
+    },
+    {
+      "source": "PV-PREF-001",
+      "target": "RW-BLEF-001",
+      "type": "ENABLES",
+      "description": "Work-life values support remote-first belief"
+    },
+    {
+      "source": "TDM-HEUR-003",
+      "target": "SL-STRY-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Anti-premature-scaling vs. the 36-hour AWS migration"
+    },
+    {
+      "source": "TDM-BLEF-001",
+      "target": "PS-ANTI-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Reversibility belief vs. feature factory anti-pattern urgency"
+    },
+    {
+      "source": "LDR-BLEF-001",
+      "target": "LDR-ANTI-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Team autonomy belief vs. anti-micromanagement creates tension on oversight"
+    },
+    {
+      "source": "PV-BLEF-001",
+      "target": "EL-PREF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Transparency value vs. calm preference when delivering bad news"
+    },
+    {
+      "source": "PV-CONT-001",
+      "target": "PV-BLEF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Personal contradiction directly challenges transparency value"
+    },
+    {
+      "source": "EL-CONT-001",
+      "target": "EL-EMOT-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Emotional contradiction challenges primary emotion"
+    },
+    {
+      "source": "MP-CONT-001",
+      "target": "MP-META-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Meta contradiction challenges core decision-making pattern"
+    },
+    {
+      "source": "COM-STYL-001",
+      "target": "EL-PREF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Direct communication vs. preference for calm environments"
+    },
+    {
+      "source": "COM-RANT-001",
+      "target": "COM-STYL-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Rant energy contradicts usual measured directness"
+    },
+    {
+      "source": "TD-HEUR-001",
+      "target": "PS-FRMW-001",
+      "type": "CONTRASTS_WITH",
+      "description": "20% debt budget competes with feature prioritization framework"
+    },
+    {
+      "source": "CR-HEUR-002",
+      "target": "SL-FRMW-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Strict review rules vs. startup speed decision metabolism"
+    },
+    {
+      "source": "SP-ANTI-001",
+      "target": "SP-FRMW-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Anti-security-theater partially undermines formal threat modeling"
+    },
+    {
+      "source": "MC-HEUR-001",
+      "target": "RW-HEUR-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Meeting manifesto formality vs. async-first remote work"
+    },
+    {
+      "source": "CP-HEUR-001",
+      "target": "SL-BLEF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Change roles advice vs. founder commitment to one company"
+    },
+    {
+      "source": "PO-ANTI-001",
+      "target": "DE-HEUR-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Caching skepticism vs. practical latency heuristics"
+    },
+    {
+      "source": "VM-HEUR-001",
+      "target": "OSS-BLEF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Exit cost analysis vs. deep open-source investment"
+    },
+    {
+      "source": "HP-HEUR-001",
+      "target": "LDR-PREF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Red flag heuristics can conflict with flat hierarchy openness"
+    },
+    {
+      "source": "DA-PREF-001",
+      "target": "PO-ANTI-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Streaming preference creates caching needs it distrusts"
+    },
+    {
+      "source": "TD-BLEF-001",
+      "target": "SL-STRY-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Never-rewrite belief vs. the one rewrite he approved"
+    },
+    {
+      "source": "PS-RANT-001",
+      "target": "LDR-BLEF-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Product strategy frustration vs. team empowerment belief"
+    },
+    {
+      "source": "IR-ANTI-001",
+      "target": "IR-HEUR-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Anti-blame-culture can conflict with strict severity classification"
+    },
+    {
+      "source": "TDM-HEUR-002",
+      "target": "TDM-FRMW-002",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "7-endpoint limit refines the bounded context framework"
+    },
+    {
+      "source": "TDM-ANTI-001",
+      "target": "TDM-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Resume-driven anti-pattern refines what bus factor heuristic catches"
+    },
+    {
+      "source": "TDM-ANTI-002",
+      "target": "TDM-HEUR-003",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Premature microservices anti-pattern refines scaling heuristic"
+    },
+    {
+      "source": "LDR-ANTI-001",
+      "target": "LDR-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Anti-micromanagement refines delegation framework boundaries"
+    },
+    {
+      "source": "LDR-ANTI-002",
+      "target": "LDR-BLEF-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Anti-hero-culture refines what team autonomy means"
+    },
+    {
+      "source": "COM-ANTI-001",
+      "target": "COM-STYL-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Communication anti-patterns refine direct style boundaries"
+    },
+    {
+      "source": "CR-HEUR-002",
+      "target": "CR-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Review focus refines PR size limit heuristic"
+    },
+    {
+      "source": "CR-ANTI-001",
+      "target": "CR-BLEF-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Anti-rubber-stamping refines code review belief"
+    },
+    {
+      "source": "VM-ANTI-001",
+      "target": "VM-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Vendor lock-in stories refine exit cost test"
+    },
+    {
+      "source": "HP-ANTI-001",
+      "target": "HP-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Credential anti-pattern refines red flag heuristics"
+    },
+    {
+      "source": "PS-ANTI-001",
+      "target": "PS-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Feature factory anti-pattern refines RICE framework"
+    },
+    {
+      "source": "TD-HEUR-001",
+      "target": "TD-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "20% budget is a specific instance of debt classification"
+    },
+    {
+      "source": "SP-ANTI-001",
+      "target": "SP-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Anti-security-theater refines threat model scope"
+    },
+    {
+      "source": "DA-HEUR-001",
+      "target": "DA-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Schema evolution rules refine data ownership framework"
+    },
+    {
+      "source": "MC-ANTI-001",
+      "target": "MC-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Status meeting ban refines meeting manifesto rules"
+    },
+    {
+      "source": "PO-ANTI-001",
+      "target": "PO-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Caching skepticism refines when performance budgets apply"
+    },
+    {
+      "source": "IR-ANTI-001",
+      "target": "IR-RITL-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Anti-blame refines post-mortem ritual boundaries"
+    },
+    {
+      "source": "IR-HEUR-001",
+      "target": "IR-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Severity classification refines incident framework"
+    },
+    {
+      "source": "SL-HEUR-001",
+      "target": "SL-BLEF-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Hiring timing rule refines bootstrapping philosophy"
+    },
+    {
+      "source": "MP-META-003",
+      "target": "COM-STYL-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Communication meta-pattern refines direct style"
+    },
+    {
+      "source": "MP-META-004",
+      "target": "EL-EMOT-003",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Stress pattern refines frustration response"
+    },
+    {
+      "source": "EL-EMOT-002",
+      "target": "EL-EMOT-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Team protection emotion refines primary pride emotion"
+    },
+    {
+      "source": "EL-EMOT-004",
+      "target": "EL-EMOT-003",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Specific trigger refines general frustration"
+    },
+    {
+      "source": "PV-BLEF-002",
+      "target": "PV-BLEF-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Meritocracy refines transparency into action"
+    },
+    {
+      "source": "DE-FACT-002",
+      "target": "DE-FACT-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Specific PostgreSQL knowledge refines general DB expertise"
+    },
+    {
+      "source": "DE-SKIL-002",
+      "target": "DE-SKIL-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Specific distributed skill refines general systems skill"
+    },
+    {
+      "source": "OSS-HEUR-001",
+      "target": "TDM-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "OSS maturity checklist refines bus factor analysis for open-source"
+    },
+    {
+      "source": "SL-FRMW-001",
+      "target": "TDM-FRMW-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Decision metabolism refines ADR framework for different scales"
+    },
+    {
+      "source": "TDM-STRY-001",
+      "target": "TDM-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Migration story illustrates reversibility belief"
+    },
+    {
+      "source": "TDM-STRY-001",
+      "target": "TDM-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Migration story shows bus factor consequences"
+    },
+    {
+      "source": "LDR-STRY-001",
+      "target": "LDR-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Junior dev story exemplifies autonomy belief"
+    },
+    {
+      "source": "LDR-STRY-001",
+      "target": "LDR-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "Junior dev story shows delegation framework in action"
+    },
+    {
+      "source": "PV-STRY-001",
+      "target": "PV-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Personal value story exemplifies transparency"
+    },
+    {
+      "source": "PV-STRY-001",
+      "target": "PV-BLEF-003",
+      "type": "INSTANTIATES",
+      "description": "Value story shows pragmatic belief in action"
+    },
+    {
+      "source": "EL-STRY-001",
+      "target": "EL-EMOT-001",
+      "type": "INSTANTIATES",
+      "description": "Emotional story illustrates pride response"
+    },
+    {
+      "source": "EL-STRY-001",
+      "target": "EL-EMOT-002",
+      "type": "INSTANTIATES",
+      "description": "Story shows team protection emotion"
+    },
+    {
+      "source": "DE-STRY-001",
+      "target": "DE-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "Domain story illustrates observability framework value"
+    },
+    {
+      "source": "DE-STRY-001",
+      "target": "DE-SKIL-001",
+      "type": "INSTANTIATES",
+      "description": "Story demonstrates distributed systems skill"
+    },
+    {
+      "source": "VM-STRY-001",
+      "target": "VM-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Vendor story exemplifies exit cost test"
+    },
+    {
+      "source": "VM-STRY-001",
+      "target": "VM-ANTI-001",
+      "type": "INSTANTIATES",
+      "description": "Story exemplifies vendor lock-in anti-pattern"
+    },
+    {
+      "source": "IR-STRY-001",
+      "target": "IR-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "Incident story exemplifies response framework"
+    },
+    {
+      "source": "IR-STRY-001",
+      "target": "IR-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Story shows severity classification in action"
+    },
+    {
+      "source": "TD-STRY-001",
+      "target": "TD-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "2019 pipeline story exemplifies debt classification"
+    },
+    {
+      "source": "TD-STRY-001",
+      "target": "TD-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Story justifies the 20% debt budget"
+    },
+    {
+      "source": "TD-STRY-001",
+      "target": "TD-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Pipeline collapse exemplifies why rewrites fail"
+    },
+    {
+      "source": "OSS-STRY-001",
+      "target": "OSS-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Race condition fix story exemplifies contribution belief"
+    },
+    {
+      "source": "OSS-STRY-001",
+      "target": "OSS-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Story shows what OSS maturity enables"
+    },
+    {
+      "source": "SL-STRY-001",
+      "target": "SL-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Hetzner founding story exemplifies bootstrapping philosophy"
+    },
+    {
+      "source": "SL-STRY-001",
+      "target": "SL-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "36-hour migration shows decision metabolism at startup scale"
+    },
+    {
+      "source": "SL-STRY-001",
+      "target": "TDM-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Feature flag migration exemplifies reversibility"
+    },
+    {
+      "source": "TDM-RITL-001",
+      "target": "TDM-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "Friday reviews are a living instance of ADR process"
+    },
+    {
+      "source": "LDR-RITL-001",
+      "target": "LDR-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Skip-levels exemplify trust-building autonomy"
+    },
+    {
+      "source": "COM-RITL-001",
+      "target": "COM-PREF-001",
+      "type": "INSTANTIATES",
+      "description": "All-hands ritual exemplifies written communication preference"
+    },
+    {
+      "source": "IR-RITL-001",
+      "target": "IR-ANTI-001",
+      "type": "INSTANTIATES",
+      "description": "Blameless post-mortems exemplify anti-blame culture"
+    },
+    {
+      "source": "HP-RITL-001",
+      "target": "HP-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Structured interview ritual exemplifies hiring beliefs"
+    },
+    {
+      "source": "RW-RITL-001",
+      "target": "RW-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Virtual coffee exemplifies remote-first culture commitment"
+    },
+    {
+      "source": "EL-EMOT-004",
+      "target": "EL-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "Specific frustration trigger shows emotional regulation in context"
+    },
+    {
+      "source": "PV-CONT-001",
+      "target": "MP-CONT-001",
+      "type": "INSTANTIATES",
+      "description": "Personal contradiction exemplifies meta-level contradictions"
+    },
+    {
+      "source": "DA-PREF-001",
+      "target": "DA-FRMW-001",
+      "type": "INSTANTIATES",
+      "description": "Streaming preference exemplifies data ownership in practice"
+    },
+    {
+      "source": "CR-HEUR-001",
+      "target": "CR-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "PR size limit is a concrete instance of review belief"
+    },
+    {
+      "source": "SP-HEUR-001",
+      "target": "SP-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Secret scanning exemplifies security culture belief"
+    },
+    {
+      "source": "MC-PREF-001",
+      "target": "MC-HEUR-001",
+      "type": "INSTANTIATES",
+      "description": "25-min cap exemplifies meeting manifesto in practice"
+    },
+    {
+      "source": "TDM-ANTI-001",
+      "target": "TDM-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Detecting resume-driven dev triggers bus factor check"
+    },
+    {
+      "source": "TDM-ANTI-002",
+      "target": "TDM-HEUR-002",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Premature microservices trigger API boundary enforcement"
+    },
+    {
+      "source": "IR-HEUR-001",
+      "target": "IR-RITL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Severity classification triggers post-mortem process"
+    },
+    {
+      "source": "IR-HEUR-001",
+      "target": "IR-SKIL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "High severity triggers on-call debugging response"
+    },
+    {
+      "source": "SP-HEUR-001",
+      "target": "IR-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Secret detection triggers incident classification"
+    },
+    {
+      "source": "EL-EMOT-003",
+      "target": "EL-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Frustration triggers emotional regulation heuristic"
+    },
+    {
+      "source": "EL-EMOT-004",
+      "target": "COM-RANT-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Specific frustration trigger can lead to communication rants"
+    },
+    {
+      "source": "COM-ANTI-001",
+      "target": "COM-RANT-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Detecting jargon anti-pattern triggers rant response"
+    },
+    {
+      "source": "LDR-ANTI-001",
+      "target": "LDR-SKIL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Detecting micromanagement triggers conflict resolution"
+    },
+    {
+      "source": "LDR-ANTI-002",
+      "target": "LDR-EMOT-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Hero culture detection triggers emotional trust response"
+    },
+    {
+      "source": "CR-ANTI-001",
+      "target": "CR-HEUR-002",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Rubber-stamping detection triggers review focus heuristic"
+    },
+    {
+      "source": "HP-ANTI-001",
+      "target": "HP-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Credential bias triggers structured assessment"
+    },
+    {
+      "source": "PS-ANTI-001",
+      "target": "PS-RANT-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Feature factory detection triggers product strategy rant"
+    },
+    {
+      "source": "VM-ANTI-001",
+      "target": "VM-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Lock-in detection triggers exit cost analysis"
+    },
+    {
+      "source": "TD-STRY-001",
+      "target": "TD-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Pipeline collapse story triggers debt budget enforcement"
+    },
+    {
+      "source": "MC-ANTI-001",
+      "target": "MC-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Status meeting detection triggers meeting manifesto"
+    },
+    {
+      "source": "PO-HEUR-001",
+      "target": "PO-SKIL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Budget violation triggers profiling investigation"
+    },
+    {
+      "source": "DA-HEUR-001",
+      "target": "DA-FRMW-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Schema change triggers ownership boundary check"
+    },
+    {
+      "source": "SP-ANTI-001",
+      "target": "SP-FRMW-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Security theater detection triggers real threat modeling"
+    },
+    {
+      "source": "CP-RANT-001",
+      "target": "HP-ANTI-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Title inflation rant triggers hiring anti-pattern awareness"
+    },
+    {
+      "source": "MP-META-004",
+      "target": "EL-EMOT-003",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Stress meta-pattern triggers frustration recognition"
+    },
+    {
+      "source": "TDM-HEUR-001",
+      "target": "VM-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Low bus factor triggers vendor exit cost analysis"
+    },
+    {
+      "source": "PV-BLEF-001",
+      "target": "COM-STYL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Transparency value triggers direct communication mode"
+    },
+    {
+      "source": "SL-STRY-001",
+      "target": "TD-BLEF-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Founding story informs strangler fig belief"
+    },
+    {
+      "source": "RW-BLEF-001",
+      "target": "MC-ANTI-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Remote-first decision triggered status meeting elimination"
+    },
+    {
+      "source": "IR-STRY-001",
+      "target": "SP-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Past incidents trigger stricter secret scanning"
+    },
+    {
+      "source": "PS-FRMW-001",
+      "target": "TD-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Feature prioritization triggers debt budget negotiation"
+    },
+    {
+      "source": "DE-HEUR-001",
+      "target": "PO-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Latency detection triggers performance budget check"
+    },
+    {
+      "source": "CR-HEUR-001",
+      "target": "TD-FRMW-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Large PRs trigger technical debt classification"
+    },
+    {
+      "source": "LDR-FRMW-001",
+      "target": "HP-RITL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Delegation gaps trigger hiring process"
+    },
+    {
+      "source": "TDM-FRMW-002",
+      "target": "TDM-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Bounded context framework evolved from migration pain"
+    },
+    {
+      "source": "TDM-HEUR-001",
+      "target": "TDM-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Bus factor heuristic evolved from dependency crisis"
+    },
+    {
+      "source": "LDR-FRMW-001",
+      "target": "LDR-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Delegation framework evolved from junior dev experience"
+    },
+    {
+      "source": "LDR-HEUR-001",
+      "target": "LDR-SKIL-001",
+      "type": "LEARNED_FROM",
+      "description": "Disagree-and-commit evolved from conflict resolution experience"
+    },
+    {
+      "source": "IR-FRMW-001",
+      "target": "IR-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Incident framework evolved from actual incident experience"
+    },
+    {
+      "source": "IR-RITL-001",
+      "target": "IR-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Post-mortem ritual evolved from incident learnings"
+    },
+    {
+      "source": "TD-HEUR-001",
+      "target": "TD-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "20% debt budget evolved from 2019 pipeline collapse"
+    },
+    {
+      "source": "TD-FRMW-001",
+      "target": "TD-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Debt classification evolved from pipeline crisis"
+    },
+    {
+      "source": "TD-BLEF-001",
+      "target": "TD-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Anti-rewrite belief evolved from observing collapse"
+    },
+    {
+      "source": "SP-HEUR-001",
+      "target": "SP-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Secret scanning evolved from security culture belief"
+    },
+    {
+      "source": "VM-HEUR-001",
+      "target": "VM-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Exit cost test evolved from vendor lock-in experience"
+    },
+    {
+      "source": "HP-RITL-001",
+      "target": "HP-ANTI-001",
+      "type": "LEARNED_FROM",
+      "description": "Structured interviews evolved from witnessing credential bias"
+    },
+    {
+      "source": "PS-FRMW-001",
+      "target": "PS-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Modified RICE evolved from iteration-first belief"
+    },
+    {
+      "source": "DA-FRMW-001",
+      "target": "DE-FACT-001",
+      "type": "LEARNED_FROM",
+      "description": "Data ownership evolved from database expertise"
+    },
+    {
+      "source": "DA-HEUR-001",
+      "target": "SL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Schema evolution rules evolved from startup deployment pain"
+    },
+    {
+      "source": "MC-HEUR-001",
+      "target": "RW-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Meeting manifesto evolved from remote-first transition"
+    },
+    {
+      "source": "MC-ANTI-001",
+      "target": "RW-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Status meeting ban evolved from remote work experience"
+    },
+    {
+      "source": "SL-FRMW-001",
+      "target": "SL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Decision metabolism evolved from founding experience"
+    },
+    {
+      "source": "SL-BLEF-001",
+      "target": "SL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Bootstrapping belief evolved from founding survival"
+    },
+    {
+      "source": "PO-HEUR-001",
+      "target": "DE-HEUR-001",
+      "type": "LEARNED_FROM",
+      "description": "Performance budgets evolved from latency expertise"
+    },
+    {
+      "source": "PO-ANTI-001",
+      "target": "DE-SKIL-002",
+      "type": "LEARNED_FROM",
+      "description": "Caching skepticism evolved from distributed systems experience"
+    },
+    {
+      "source": "OSS-HEUR-001",
+      "target": "OSS-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "OSS maturity checklist evolved from contribution experience"
+    },
+    {
+      "source": "CP-BLEF-001",
+      "target": "CP-HEUR-001",
+      "type": "LEARNED_FROM",
+      "description": "Parallel tracks belief evolved from career change experience"
+    },
+    {
+      "source": "CP-RANT-001",
+      "target": "HP-ANTI-001",
+      "type": "LEARNED_FROM",
+      "description": "Title rant evolved from witnessing hiring credential bias"
+    },
+    {
+      "source": "CR-HEUR-001",
+      "target": "CR-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "PR size limits evolved from code review philosophy"
+    },
+    {
+      "source": "CR-ANTI-001",
+      "target": "LDR-ANTI-002",
+      "type": "LEARNED_FROM",
+      "description": "Anti-rubber-stamping evolved from anti-hero-culture stance"
+    },
+    {
+      "source": "RW-BLEF-001",
+      "target": "COM-PREF-001",
+      "type": "LEARNED_FROM",
+      "description": "Remote-first belief evolved from written communication preference"
+    },
+    {
+      "source": "RW-HEUR-001",
+      "target": "RW-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Timezone overlap heuristic evolved from remote-first experience"
+    },
+    {
+      "source": "RW-RITL-001",
+      "target": "RW-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Virtual coffee evolved from remote-first commitment"
+    },
+    {
+      "source": "EL-HEUR-001",
+      "target": "EL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Emotional regulation evolved from personal experience"
+    },
+    {
+      "source": "MP-META-001",
+      "target": "TDM-FRMW-001",
+      "type": "LEARNED_FROM",
+      "description": "Decision meta-pattern evolved from ADR practice"
+    },
+    {
+      "source": "MP-META-002",
+      "target": "EL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Risk assessment pattern evolved from emotional experiences"
+    },
+    {
+      "source": "MP-FRMW-001",
+      "target": "DE-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Pattern recognition evolved from domain expertise stories"
+    },
+    {
+      "source": "COM-STYL-001",
+      "target": "PV-BLEF-001",
+      "type": "LEARNED_FROM",
+      "description": "Direct communication evolved from transparency value"
+    },
+    {
+      "source": "COM-SKIL-001",
+      "target": "DE-SKIL-001",
+      "type": "LEARNED_FROM",
+      "description": "Whiteboard skill evolved from systems thinking expertise"
+    },
+    {
+      "source": "PV-HEUR-001",
+      "target": "PV-BLEF-002",
+      "type": "LEARNED_FROM",
+      "description": "Intellectual honesty heuristic evolved from meritocracy belief"
+    },
+    {
+      "source": "DE-BLEF-001",
+      "target": "OSS-BLEF-001",
+      "type": "ENABLES",
+      "description": "Domain mastery belief supports open-source contribution"
+    },
+    {
+      "source": "HP-PREF-001",
+      "target": "PV-BLEF-002",
+      "type": "ENABLES",
+      "description": "Diversity preference supports meritocracy value"
+    },
+    {
+      "source": "SL-FRMW-001",
+      "target": "MC-HEUR-001",
+      "type": "ENABLES",
+      "description": "Decision metabolism supports meeting manifesto scaling"
+    },
+    {
+      "source": "DA-SKIL-001",
+      "target": "DE-FACT-002",
+      "type": "ENABLES",
+      "description": "Query-first modeling leverages PostgreSQL expertise"
+    },
+    {
+      "source": "SP-BLEF-001",
+      "target": "LDR-BLEF-001",
+      "type": "ENABLES",
+      "description": "Security culture requires team autonomy"
+    },
+    {
+      "source": "LDR-PREF-001",
+      "target": "SL-HEUR-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Flat hierarchy vs. deliberately late hiring creates gaps"
+    },
+    {
+      "source": "OSS-BLEF-001",
+      "target": "SP-HEUR-001",
+      "type": "CONTRASTS_WITH",
+      "description": "Open contribution enthusiasm vs. strict secret scanning"
+    },
+    {
+      "source": "DA-SKIL-001",
+      "target": "DA-HEUR-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Query-first modeling refines schema evolution approach"
+    },
+    {
+      "source": "SP-BLEF-001",
+      "target": "SP-ANTI-001",
+      "type": "HARDCODED_EXCEPTION",
+      "description": "Security culture belief refines what counts as theater"
+    },
+    {
+      "source": "TDM-PREF-002",
+      "target": "TDM-FRMW-002",
+      "type": "INSTANTIATES",
+      "description": "IaC preference exemplifies bounded context in infrastructure"
+    },
+    {
+      "source": "LDR-EMOT-001",
+      "target": "PV-EMOT-001",
+      "type": "INSTANTIATES",
+      "description": "Leadership trust exemplifies pride-in-craft value"
+    },
+    {
+      "source": "HP-HEUR-001",
+      "target": "HP-BLEF-001",
+      "type": "INSTANTIATES",
+      "description": "Red flag heuristics exemplify hiring beliefs concretely"
+    },
+    {
+      "source": "EL-EMOT-002",
+      "target": "LDR-SKIL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Team protection emotion triggers conflict resolution"
+    },
+    {
+      "source": "PO-SKIL-001",
+      "target": "DA-SKIL-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Profiling results trigger data model review"
+    },
+    {
+      "source": "OSS-HEUR-001",
+      "target": "VM-HEUR-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Low OSS maturity score triggers vendor exit analysis"
+    },
+    {
+      "source": "HP-BLEF-001",
+      "target": "CP-BLEF-001",
+      "type": "EXPRESSED_THROUGH",
+      "description": "Hiring beliefs trigger parallel track design"
+    },
+    {
+      "source": "SP-FRMW-001",
+      "target": "IR-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Threat modeling evolved from past incident lessons"
+    },
+    {
+      "source": "DA-PREF-001",
+      "target": "DA-FRMW-001",
+      "type": "LEARNED_FROM",
+      "description": "Streaming preference evolved from data ownership practice"
+    },
+    {
+      "source": "SL-HEUR-001",
+      "target": "SL-STRY-001",
+      "type": "LEARNED_FROM",
+      "description": "Hiring timing rule evolved from founding constraints"
+    }
+  ],
+  "metadata": {
+    "completeness_score": 1,
+    "chunk_count": 116,
+    "relation_count": 267,
+    "cluster_coverage": {
+      "technical-decision-making": 12,
+      "team-leadership": 10,
+      "communication": 8,
+      "personal-values": 8,
+      "domain-expertise": 8,
+      "emotional-landscape": 8,
+      "meta-patterns": 6,
+      "incident-response": 6,
+      "code-review": 5,
+      "vendor-management": 4,
+      "hiring-process": 5,
+      "product-strategy": 5,
+      "technical-debt": 4,
+      "security-practices": 4,
+      "data-architecture": 4,
+      "remote-work": 3,
+      "open-source": 3,
+      "career-philosophy": 3,
+      "meeting-culture": 3,
+      "startup-lessons": 4,
+      "performance-optimization": 3
+    }
+  }
+}
