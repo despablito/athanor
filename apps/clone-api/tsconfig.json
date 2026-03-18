@@ -6,6 +6,7 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../../packages/athanor-core" }
+    { "path": "../../packages/athanor-core" },
+    { "path": "../../packages/athanor-extractor" }
   ]
 }

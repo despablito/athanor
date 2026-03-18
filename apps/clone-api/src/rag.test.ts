@@ -1,0 +1,304 @@
+import { describe, it, expect } from "vitest";
+import { vectorSearch, graphExpand, rerank, assembleContext } from "./rag.js";
+import { PortraitStore } from "./portrait-store.js";
+import type { PortraitJSON, Chunk, Relation } from "@athanor/core";
+
+// ─── Test Fixtures ─────────────────────────────────────────────────────────────
+
+function makeChunk(
+  id: string,
+  cluster: string,
+  type: string,
+  uniqueness: string,
+  content: string,
+  confidence: number = 0.9,
+  tags: string[] = [],
+): Chunk {
+  return {
+    chunk_id: id,
+    author: "Jan",
+    cluster,
+    type,
+    uniqueness,
+    source: "interview",
+    confidence,
+    context_tags: tags,
+    linked_chunks: [],
+    content,
+  } as unknown as Chunk;
+}
+
+function makePortrait(
+  chunks: Chunk[],
+  relations: Relation[] = [],
+): PortraitJSON {
+  const coverage: Record<string, number> = {};
+  for (const c of chunks) {
+    coverage[c.cluster] = (coverage[c.cluster] ?? 0) + 1;
+  }
+  return {
+    version: "1.0.0-draft",
+    subject: { name: "Jan", id: "jan" },
+    created_at: new Date().toISOString(),
+    chunks,
+    relations,
+    metadata: {
+      completeness_score: 0.7,
+      chunk_count: chunks.length,
+      relation_count: relations.length,
+      cluster_coverage: coverage,
+    },
+  };
+}
+
+function makeRelation(
+  source: string,
+  target: string,
+  type: string,
+  description?: string,
+): Relation {
+  return { source, target, type, description } as unknown as Relation;
+}
+
+// ─── Test Data ─────────────────────────────────────────────────────────────────
+
+const CHUNKS = [
+  makeChunk("TDM-HEUR-001", "technical-decision-making", "heuristic", "CRITICAL",
+    "Jan always checks the bus factor when evaluating new frameworks", 0.95, ["dependency", "risk"]),
+  makeChunk("TDM-STRY-001", "technical-decision-making", "story", "HIGH",
+    "In 2020 a critical dependency had a single maintainer who disappeared", 0.88, ["incident"]),
+  makeChunk("TDM-ANTI-001", "technical-decision-making", "anti-pattern", "CRITICAL",
+    "Jan never allows full table scans on tables with more than 1 million rows", 0.92, ["database", "performance"]),
+  makeChunk("LDR-BLEF-001", "team-leadership", "belief", "HIGH",
+    "Engineering teams should own their decisions end-to-end", 0.85, ["autonomy"]),
+  makeChunk("LDR-STYL-001", "team-leadership", "style", "MEDIUM",
+    "Jan communicates directly, using sailing metaphors frequently", 0.82, ["communication"]),
+  makeChunk("EML-EMOT-001", "emotional-landscape", "emotion", "HIGH",
+    "Jan becomes frustrated when confronted with copy-pasted code", 0.78, ["frustration", "code-quality"]),
+  makeChunk("PV-BLEF-001", "personal-values", "belief", "CRITICAL",
+    "Reversibility is the most important property of any technical decision", 0.93, ["architecture"]),
+  makeChunk("META-META-001", "meta-patterns", "meta", "HIGH",
+    "Jan shows principled pragmatism: strong opinions with systematic escape hatches", 0.75, ["meta"]),
+];
+
+const RELATIONS = [
+  makeRelation("TDM-HEUR-001", "TDM-STRY-001", "LEARNED_FROM",
+    "Bus factor heuristic was learned from the dependency incident"),
+  makeRelation("TDM-HEUR-001", "PV-BLEF-001", "INSTANTIATES",
+    "Bus factor check instantiates the reversibility principle"),
+  makeRelation("EML-EMOT-001", "LDR-STYL-001", "EXPRESSED_THROUGH",
+    "Frustration manifests through direct communication style"),
+  makeRelation("LDR-BLEF-001", "TDM-ANTI-001", "CONTRASTS_WITH",
+    "Team autonomy contrasts with strict database rules"),
+];
+
+// ─── Tests ─────────────────────────────────────────────────────────────────────
+
+describe("vectorSearch (in-memory keyword fallback)", () => {
+  it("finds chunks matching query terms", () => {
+    const store = new PortraitStore();
+    const portrait = makePortrait(CHUNKS, RELATIONS);
+    store.loadFromJSON(portrait);
+
+    const results = vectorSearch(store, "jan", "bus factor framework evaluation", 10);
+    expect(results.size).toBeGreaterThan(0);
+    expect(results.has("TDM-HEUR-001")).toBe(true);
+  });
+
+  it("returns empty for non-matching query", () => {
+    const store = new PortraitStore();
+    store.loadFromJSON(makePortrait(CHUNKS));
+
+    const results = vectorSearch(store, "jan", "xyzzynonexistent", 10);
+    expect(results.size).toBe(0);
+  });
+});
+
+describe("graphExpand", () => {
+  it("expands 1 hop from seed nodes", () => {
+    const portrait = makePortrait(CHUNKS, RELATIONS);
+    const seeds = new Set(["TDM-HEUR-001"]);
+
+    const expanded = graphExpand(portrait, seeds, 1);
+
+    // Should include the seed itself + direct neighbors
+    expect(expanded.has("TDM-HEUR-001")).toBe(true);
+    expect(expanded.get("TDM-HEUR-001")!.hopDistance).toBe(0);
+
+    // LEARNED_FROM neighbor
+    expect(expanded.has("TDM-STRY-001")).toBe(true);
+    expect(expanded.get("TDM-STRY-001")!.hopDistance).toBe(1);
+
+    // INSTANTIATES neighbor
+    expect(expanded.has("PV-BLEF-001")).toBe(true);
+    expect(expanded.get("PV-BLEF-001")!.hopDistance).toBe(1);
+  });
+
+  it("expands 2 hops from seed nodes", () => {
+    const portrait = makePortrait(CHUNKS, RELATIONS);
+    const seeds = new Set(["EML-EMOT-001"]);
+
+    const expanded = graphExpand(portrait, seeds, 2);
+
+    // Seed
+    expect(expanded.has("EML-EMOT-001")).toBe(true);
+    // 1-hop: EXPRESSED_THROUGH → LDR-STYL-001
+    expect(expanded.has("LDR-STYL-001")).toBe(true);
+  });
+
+  it("ignores ENABLES relation type", () => {
+    // ENABLES is not in the expansion set
+    const portrait = makePortrait(CHUNKS, [
+      makeRelation("TDM-HEUR-001", "TDM-STRY-001", "ENABLES"),
+    ]);
+    const seeds = new Set(["TDM-HEUR-001"]);
+
+    const expanded = graphExpand(portrait, seeds, 1);
+    // Only the seed itself should be present
+    expect(expanded.size).toBe(1);
+    expect(expanded.has("TDM-HEUR-001")).toBe(true);
+  });
+});
+
+describe("rerank", () => {
+  it("scores CRITICAL chunks higher than MEDIUM", () => {
+    const vectorHits = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.8 }], // CRITICAL
+      ["LDR-STYL-001", { chunk: CHUNKS[4], score: 0.8 }], // MEDIUM
+    ]);
+    const graphExpanded = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
+      ["LDR-STYL-001", { chunk: CHUNKS[4], hopDistance: 0 }],
+    ]);
+
+    const ranked = rerank(vectorHits, graphExpanded, 10);
+
+    expect(ranked.length).toBe(2);
+    // CRITICAL (1.5 weight) should rank above MEDIUM (1.0 weight)
+    expect(ranked[0].chunk.chunk_id).toBe("TDM-HEUR-001");
+    expect(ranked[0].uniquenessWeight).toBe(1.5);
+    expect(ranked[1].uniquenessWeight).toBe(1.0);
+  });
+
+  it("applies relation bonus for 1-hop neighbors", () => {
+    const vectorHits = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.6 }],
+    ]);
+    const graphExpanded = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
+      ["TDM-STRY-001", { chunk: CHUNKS[1], hopDistance: 1 }],
+    ]);
+
+    const ranked = rerank(vectorHits, graphExpanded, 10);
+
+    const story = ranked.find((r) => (r.chunk.chunk_id as string) === "TDM-STRY-001");
+    expect(story).toBeDefined();
+    expect(story!.relationBonus).toBe(1.3);
+  });
+
+  it("applies layer coverage bonus when all 3 layers present", () => {
+    const vectorHits = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.8 }],  // knowledge
+      ["LDR-BLEF-001", { chunk: CHUNKS[3], score: 0.7 }],   // identity
+      ["TDM-STRY-001", { chunk: CHUNKS[1], score: 0.6 }],   // context
+    ]);
+    const graphExpanded = new Map([
+      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
+      ["LDR-BLEF-001", { chunk: CHUNKS[3], hopDistance: 0 }],
+      ["TDM-STRY-001", { chunk: CHUNKS[1], hopDistance: 0 }],
+    ]);
+
+    const ranked = rerank(vectorHits, graphExpanded, 10);
+
+    // All chunks should have layerBonus = 1.15
+    for (const r of ranked) {
+      expect(r.layerBonus).toBe(1.15);
+    }
+  });
+
+  it("limits output to topN", () => {
+    const vectorHits = new Map(
+      CHUNKS.map((c) => [(c.chunk_id as string), { chunk: c, score: 0.5 }]),
+    );
+    const graphExpanded = new Map(
+      CHUNKS.map((c) => [(c.chunk_id as string), { chunk: c, hopDistance: 0 }]),
+    );
+
+    const ranked = rerank(vectorHits, graphExpanded, 3);
+    expect(ranked.length).toBe(3);
+  });
+});
+
+describe("assembleContext", () => {
+  it("orders identity chunks before knowledge and context", () => {
+    const scored = [
+      { chunk: CHUNKS[0], relevance: 0.9, uniquenessWeight: 1.5, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.35, hopDistance: 0 }, // heuristic → knowledge
+      { chunk: CHUNKS[3], relevance: 0.85, uniquenessWeight: 1.2, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.02, hopDistance: 0 }, // belief → identity
+      { chunk: CHUNKS[1], relevance: 0.8, uniquenessWeight: 1.2, relationBonus: 1.0, layerBonus: 1.0, finalScore: 0.96, hopDistance: 0 }, // story → context
+    ];
+
+    const { context, usedChunks } = assembleContext(scored, RELATIONS, 4000);
+
+    // Identity (belief) should come first
+    const beliefIdx = context.indexOf("LDR-BLEF-001");
+    const heurIdx = context.indexOf("TDM-HEUR-001");
+    const storyIdx = context.indexOf("TDM-STRY-001");
+
+    expect(beliefIdx).toBeLessThan(heurIdx);
+    expect(heurIdx).toBeLessThan(storyIdx);
+    expect(usedChunks.length).toBe(3);
+  });
+
+  it("includes relation metadata between selected chunks", () => {
+    const scored = [
+      { chunk: CHUNKS[0], relevance: 0.9, uniquenessWeight: 1.5, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.35, hopDistance: 0 },
+      { chunk: CHUNKS[1], relevance: 0.8, uniquenessWeight: 1.2, relationBonus: 1.3, layerBonus: 1.0, finalScore: 1.25, hopDistance: 1 },
+    ];
+
+    const { context } = assembleContext(scored, RELATIONS, 4000);
+
+    expect(context).toContain("LEARNED_FROM");
+    expect(context).toContain("TDM-STRY-001");
+  });
+
+  it("respects token budget", () => {
+    const scored = CHUNKS.map((c) => ({
+      chunk: c,
+      relevance: 0.8,
+      uniquenessWeight: 1.0,
+      relationBonus: 1.0,
+      layerBonus: 1.0,
+      finalScore: 0.8,
+      hopDistance: 0,
+    }));
+
+    // Very small budget — should only fit a few chunks
+    const { usedChunks } = assembleContext(scored, [], 200);
+    expect(usedChunks.length).toBeLessThan(CHUNKS.length);
+    expect(usedChunks.length).toBeGreaterThan(0);
+  });
+});
+
+describe("full RAG pipeline integration", () => {
+  it("retrieves, expands, and reranks for a query", async () => {
+    const store = new PortraitStore();
+    const portrait = makePortrait(CHUNKS, RELATIONS);
+    store.loadFromJSON(portrait);
+
+    const { ragPipeline: pipeline } = await import("./rag.js");
+    const result = pipeline(store, portrait, "bus factor dependency evaluation", {
+      topK: 5,
+      topN: 10,
+      contextBudgetTokens: 4000,
+    });
+
+    expect(result.chunks.length).toBeGreaterThan(0);
+    expect(result.totalRetrieved).toBeGreaterThan(0);
+
+    // The bus factor chunk should be among the top results
+    const busFactorChunk = result.chunks.find(
+      (sc: any) => sc.chunk.chunk_id === "TDM-HEUR-001",
+    );
+    expect(busFactorChunk).toBeDefined();
+  });
+});

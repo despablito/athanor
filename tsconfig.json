@@ -15,7 +15,8 @@
     "composite": true,
     "paths": {
       "@athanor/core": ["./packages/athanor-core/src"],
-      "@athanor/extractor": ["./packages/athanor-extractor/src"]
+      "@athanor/extractor": ["./packages/athanor-extractor/src"],
+      "@athanor/clone-api": ["./apps/clone-api/src"]
     }
   },
   "exclude": ["node_modules", "dist"]

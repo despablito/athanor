@@ -14,6 +14,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
+    "@athanor/clone-api": "workspace:*",
     "@athanor/core": "workspace:*",
     "@athanor/extractor": "workspace:*",
     "chalk": "^5.4.0",
