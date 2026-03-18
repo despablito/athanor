@@ -4,21 +4,24 @@
   "private": true,
   "type": "module",
   "bin": {
-    "athanor": "./dist/index.js"
+    "athanor": "./dist/bin/athanor.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
     "lint": "eslint src/",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx src/bin/athanor.ts",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
     "@athanor/core": "workspace:*",
     "@athanor/extractor": "workspace:*",
-    "commander": "^13.0.0"
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0",
+    "ora": "^8.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
