@@ -1,7 +1,12 @@
 import type { LLMProvider } from "./provider.js";
 import type { ChunkCandidate } from "./types.js";
 import { loadPrompt } from "./prompts.js";
-import { CHUNK_TYPES, UNIQUENESS_LEVELS, SOURCE_TYPES } from "@athanor/core";
+import {
+  CHUNK_TYPES,
+  UNIQUENESS_LEVELS,
+  SOURCE_TYPES,
+  type SourceType,
+} from "@athanor/core";
 
 export interface ChunkerOptions {
   source?: string;
@@ -78,6 +83,21 @@ function parseChunkResponse(response: string): ChunkCandidate[] {
   }
 }
 
+/** Map LLM output to a canonical `SOURCE_TYPES` value (preserves underscores where defined). */
+export function normalizeChunkSource(input: string): SourceType | null {
+  const raw = String(input ?? "").trim().toLowerCase();
+  if (!raw) return null;
+
+  for (const canonical of SOURCE_TYPES) {
+    const c = canonical.toLowerCase();
+    if (c === raw) return canonical;
+    // LLMs sometimes emit hyphenated forms for snake_case sources (e.g. second-order-analysis).
+    if (c.replace(/_/g, "-") === raw) return canonical;
+    if (c === raw.replace(/-/g, "_")) return canonical;
+  }
+  return null;
+}
+
 function validateCandidate(chunk: ChunkCandidate): boolean {
   if (!chunk.content || chunk.content.length < 20) return false;
   if (!chunk.cluster || typeof chunk.cluster !== "string") return false;
@@ -97,9 +117,9 @@ function validateCandidate(chunk: ChunkCandidate): boolean {
     chunk.uniqueness = "MEDIUM";
   }
 
-  const rawSource = String(chunk.source ?? "").trim().toLowerCase().replace(/_/g, "-");
-  if (SOURCE_TYPES.includes(rawSource as typeof SOURCE_TYPES[number])) {
-    chunk.source = rawSource as ChunkCandidate["source"];
+  const normalizedSource = normalizeChunkSource(String(chunk.source ?? ""));
+  if (normalizedSource) {
+    chunk.source = normalizedSource;
   } else {
     chunk.source = "inferred";
   }

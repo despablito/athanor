@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { extractChunks } from "./chunker.js";
+import { extractChunks, normalizeChunkSource } from "./chunker.js";
 import { MockLLMProvider } from "./provider.test.js";
 
 const VALID_CHUNKS_RESPONSE = JSON.stringify([
@@ -65,6 +65,21 @@ const INVALID_CHUNKS_RESPONSE = JSON.stringify([
   },
 ]);
 
+describe("normalizeChunkSource", () => {
+  it("maps second_order_analysis and preserves canonical underscore form", () => {
+    expect(normalizeChunkSource("second_order_analysis")).toBe("second_order_analysis");
+    expect(normalizeChunkSource("Second_Order_Analysis")).toBe("second_order_analysis");
+  });
+
+  it("maps hyphenated LLM variant to canonical second_order_analysis", () => {
+    expect(normalizeChunkSource("second-order-analysis")).toBe("second_order_analysis");
+  });
+
+  it("returns null for unknown sources", () => {
+    expect(normalizeChunkSource("made-up-source")).toBeNull();
+  });
+});
+
 describe("extractChunks", () => {
   it("extracts valid chunks from LLM response", async () => {
     const mock = new MockLLMProvider(VALID_CHUNKS_RESPONSE);
@@ -123,6 +138,46 @@ describe("extractChunks", () => {
     expect(mock.calls[0].user).toContain("Jan Kowalski");
     expect(mock.calls[0].user).toContain("interview");
     expect(mock.calls[0].user).toContain("pl");
+  });
+
+  it("preserves second_order_analysis on chunks from LLM", async () => {
+    const response = JSON.stringify([
+      {
+        cluster: "meta-patterns",
+        type: "meta",
+        uniqueness: "HIGH",
+        source: "second_order_analysis",
+        confidence: 0.9,
+        context_tags: [],
+        content:
+          "Second-order consequence: compartmentalization under stress removes practiced cross-domain responses when integration is most needed.",
+      },
+    ]);
+    const mock = new MockLLMProvider(response);
+    const chunks = await extractChunks(mock, "text");
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0].source).toBe("second_order_analysis");
+  });
+
+  it("maps second-order-analysis to canonical second_order_analysis", async () => {
+    const response = JSON.stringify([
+      {
+        cluster: "meta-patterns",
+        type: "meta",
+        uniqueness: "HIGH",
+        source: "second-order-analysis",
+        confidence: 0.9,
+        context_tags: [],
+        content:
+          "Hyphenated source string should still resolve to second_order_analysis in SOURCE_TYPES.",
+      },
+    ]);
+    const mock = new MockLLMProvider(response);
+    const chunks = await extractChunks(mock, "text");
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0].source).toBe("second_order_analysis");
   });
 
   it("fixes missing context_tags and out-of-range confidence", async () => {

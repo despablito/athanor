@@ -151,7 +151,7 @@ export type {
   ExtractorConfig,
 } from "./types.js";
 export type { ChunkerOptions } from "./chunker.js";
-export { extractChunks } from "./chunker.js";
+export { extractChunks, normalizeChunkSource } from "./chunker.js";
 export { classifyChunks } from "./classifier.js";
 export { detectRelations } from "./linker.js";
 export { generateMetaChunks } from "./meta-generator.js";
