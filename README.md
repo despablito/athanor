@@ -5,7 +5,7 @@
 **Deep identity cloning through structured knowledge graphs — not shallow vector similarity.**
 
 <p>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="Apache 2.0 License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
   <a href="https://github.com/despablito/athanor/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/despablito/athanor/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-blue.svg?style=for-the-badge" alt="TypeScript"></a>
   <a href=".nvmrc"><img src="https://img.shields.io/badge/Node-%3E%3D22-green.svg?style=for-the-badge" alt="Node"></a>
@@ -286,4 +286,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and ho
 
 ## License
 
-[Apache License 2.0](LICENSE)
+[MIT License](LICENSE)
