@@ -3,7 +3,7 @@ import ora from "ora";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import { createProvider, generateSecondOrderConsequences } from "@athanor/extractor";
-import { asChunkId } from "@athanor/core";
+import { asChunkId, type SourceType, type Uniqueness } from "@athanor/core";
 import { loadPortraitJSON, jsonToPortrait, savePortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
 import { errorBox, successBox, warnBox } from "../lib/ui.js";
 
@@ -92,11 +92,13 @@ export const secondOrderCommand = new Command("second-order")
             author: portraitJSON.subject.name,
             cluster: suggested.cluster as string,
             type: "meta",
-            uniqueness: suggested.uniqueness as any,
-            source: suggested.source as any,
+            uniqueness: suggested.uniqueness as Uniqueness,
+            source: suggested.source as SourceType,
             confidence: suggested.confidence as number,
             context_tags: (suggested.context_tags ?? []) as string[],
-            linked_chunks: (suggested.linked_chunks ?? []) as any,
+            linked_chunks: ((suggested.linked_chunks ?? []) as string[]).map((id) =>
+              asChunkId(id),
+            ),
             content: suggested.content as string,
           });
 
