@@ -17,6 +17,7 @@ Command-line interface for the Athanor identity cloning toolkit. Manages the ful
 | `embed` | Generate vector embeddings |
 | `explore` | Analyze and filter chunks |
 | `serve` | Start the Clone API server |
+| `chat` | Interactive terminal chat with your clone (no HTTP server) |
 | `mcp` | Start the MCP server |
 
 ## Usage
