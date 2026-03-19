@@ -50,4 +50,4 @@ const embeddings = await extractor.embedChunks(portrait);
 
 ## License
 
-Apache 2.0
+MIT
