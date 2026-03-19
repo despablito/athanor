@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Athanor! This document covers eve
 
 - **Node.js** >= 22 (see `.nvmrc`)
 - **pnpm** >= 10
-- **Docker** (optional — only for PostgreSQL + Apache AGE or the Compose stack; local dev can use embedded SQLite / JSON)
+- **Docker** (optional — only if you’re developing against PostgreSQL + Apache AGE or the bundled Compose stack; local development can use embedded SQLite / JSON)
 
 ### Getting Started
 
