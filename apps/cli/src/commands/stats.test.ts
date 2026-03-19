@@ -12,41 +12,60 @@ const run = (args: string[]) =>
   execFileSync("npx", ["tsx", CLI, ...args], {
     encoding: "utf-8",
     env: { ...process.env, NO_COLOR: "1" },
+    maxBuffer: 10 * 1024 * 1024,
   });
+
+const subprocessTimeoutMs = 60_000;
 
 describe("athanor stats", () => {
-  it("displays basic stats for the example portrait", () => {
-    const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT]);
+  it(
+    "displays basic stats for the example portrait",
+    () => {
+      const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT]);
 
-    expect(output).toContain("Portrait Stats");
-    expect(output).toContain("Chunks by cluster:");
-    expect(output).toContain("Chunks by type:");
-    expect(output).toContain("Chunks by uniqueness:");
-    expect(output).toContain("Relations by type:");
-    expect(output).toContain("Total chunks:");
-    expect(output).toContain("Total relations:");
-  });
+      expect(output).toContain("Portrait Stats");
+      expect(output).toContain("Chunks by cluster:");
+      expect(output).toContain("Chunks by type:");
+      expect(output).toContain("Chunks by uniqueness:");
+      expect(output).toContain("Relations by type:");
+      expect(output).toContain("Total chunks:");
+      expect(output).toContain("Total relations:");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("shows centrality analysis", () => {
-    const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT, "--centrality"]);
+  it(
+    "shows centrality analysis",
+    () => {
+      const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT, "--centrality"]);
 
-    expect(output).toContain("Top 10 Most Connected Chunks");
-  });
+      expect(output).toContain("Top 10 Most Connected Chunks");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("shows tensions", () => {
-    const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT, "--tensions"]);
+  it(
+    "shows tensions",
+    () => {
+      const output = run(["stats", "--portrait", EXAMPLE_PORTRAIT, "--tensions"]);
 
-    expect(output).toContain("Tensions (CONTRASTS_WITH)");
-  });
+      expect(output).toContain("Tensions (CONTRASTS_WITH)");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("shows learning chains", () => {
-    const output = run([
-      "stats",
-      "--portrait",
-      EXAMPLE_PORTRAIT,
-      "--learning-chains",
-    ]);
+  it(
+    "shows learning chains",
+    () => {
+      const output = run([
+        "stats",
+        "--portrait",
+        EXAMPLE_PORTRAIT,
+        "--learning-chains",
+      ]);
 
-    expect(output).toContain("Learning Chains (LEARNED_FROM)");
-  });
+      expect(output).toContain("Learning Chains (LEARNED_FROM)");
+    },
+    subprocessTimeoutMs,
+  );
 });

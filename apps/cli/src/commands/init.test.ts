@@ -10,7 +10,10 @@ const run = (args: string[], cwd?: string) =>
     encoding: "utf-8",
     cwd: cwd ?? process.cwd(),
     env: { ...process.env, NO_COLOR: "1" },
+    maxBuffer: 10 * 1024 * 1024,
   });
+
+const subprocessTimeoutMs = 60_000;
 
 describe("athanor init", () => {
   let tmpDir: string;
@@ -24,46 +27,58 @@ describe("athanor init", () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it("creates a valid skeleton portrait.json", () => {
-    const outputDir = join(tmpDir, "my-portrait");
+  it(
+    "creates a valid skeleton portrait.json",
+    () => {
+      const outputDir = join(tmpDir, "my-portrait");
 
-    run(["init", "Jan Kowalski", "--output", outputDir]);
+      run(["init", "Jan Kowalski", "--output", outputDir]);
 
-    const portraitPath = join(outputDir, "portrait.json");
-    expect(existsSync(portraitPath)).toBe(true);
+      const portraitPath = join(outputDir, "portrait.json");
+      expect(existsSync(portraitPath)).toBe(true);
 
-    const portrait = JSON.parse(readFileSync(portraitPath, "utf-8"));
-    expect(portrait.version).toBe("1.0.0-draft");
-    expect(portrait.subject.name).toBe("Jan Kowalski");
-    expect(portrait.subject.id).toBe("jan-kowalski");
-    expect(portrait.chunks).toEqual([]);
-    expect(portrait.relations).toEqual([]);
-    expect(portrait.metadata.completeness_score).toBe(0);
-    expect(portrait.metadata.chunk_count).toBe(0);
-    expect(portrait.metadata.relation_count).toBe(0);
-    expect(portrait.metadata.cluster_coverage).toEqual({});
-    expect(portrait.created_at).toBeTruthy();
-  });
+      const portrait = JSON.parse(readFileSync(portraitPath, "utf-8"));
+      expect(portrait.version).toBe("1.0.0-draft");
+      expect(portrait.subject.name).toBe("Jan Kowalski");
+      expect(portrait.subject.id).toBe("jan-kowalski");
+      expect(portrait.chunks).toEqual([]);
+      expect(portrait.relations).toEqual([]);
+      expect(portrait.metadata.completeness_score).toBe(0);
+      expect(portrait.metadata.chunk_count).toBe(0);
+      expect(portrait.metadata.relation_count).toBe(0);
+      expect(portrait.metadata.cluster_coverage).toEqual({});
+      expect(portrait.created_at).toBeTruthy();
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("generates a slug id from special characters", () => {
-    const outputDir = join(tmpDir, "special");
+  it(
+    "generates a slug id from special characters",
+    () => {
+      const outputDir = join(tmpDir, "special");
 
-    run(["init", "María García-López", "--output", outputDir]);
+      run(["init", "María García-López", "--output", outputDir]);
 
-    const portrait = JSON.parse(
-      readFileSync(join(outputDir, "portrait.json"), "utf-8"),
-    );
-    expect(portrait.subject.id).toBe("mar-a-garc-a-l-pez");
-    expect(portrait.subject.name).toBe("María García-López");
-  });
+      const portrait = JSON.parse(
+        readFileSync(join(outputDir, "portrait.json"), "utf-8"),
+      );
+      expect(portrait.subject.id).toBe("mar-a-garc-a-l-pez");
+      expect(portrait.subject.name).toBe("María García-López");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("refuses to overwrite existing portrait", () => {
-    const outputDir = join(tmpDir, "existing");
+  it(
+    "refuses to overwrite existing portrait",
+    () => {
+      const outputDir = join(tmpDir, "existing");
 
-    run(["init", "First", "--output", outputDir]);
+      run(["init", "First", "--output", outputDir]);
 
-    expect(() => {
-      run(["init", "Second", "--output", outputDir]);
-    }).toThrow();
-  });
+      expect(() => {
+        run(["init", "Second", "--output", outputDir]);
+      }).toThrow();
+    },
+    subprocessTimeoutMs,
+  );
 });

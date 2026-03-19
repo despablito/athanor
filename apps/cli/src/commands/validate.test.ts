@@ -15,7 +15,11 @@ const run = (args: string[], cwd?: string) =>
     encoding: "utf-8",
     cwd: cwd ?? process.cwd(),
     env: { ...process.env, NO_COLOR: "1" },
+    maxBuffer: 10 * 1024 * 1024,
   });
+
+// Spawning `npx tsx` can exceed 5s on cold CI runners
+const subprocessTimeoutMs = 60_000;
 
 describe("athanor validate", () => {
   let tmpDir: string;
@@ -29,45 +33,57 @@ describe("athanor validate", () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it("validates the example portrait successfully", () => {
-    const output = run(["validate", "--portrait", EXAMPLE_PORTRAIT]);
+  it(
+    "validates the example portrait successfully",
+    () => {
+      const output = run(["validate", "--portrait", EXAMPLE_PORTRAIT]);
 
-    expect(output).toContain("Schema valid");
-    expect(output).toContain("116 chunks");
-    expect(output).toContain("267 relations");
-    expect(output).toContain("Score:");
-  });
+      expect(output).toContain("Schema valid");
+      expect(output).toContain("116 chunks");
+      expect(output).toContain("267 relations");
+      expect(output).toContain("Score:");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("validates a skeleton portrait", () => {
-    const portraitPath = join(tmpDir, "portrait.json");
-    writeFileSync(
-      portraitPath,
-      JSON.stringify({
-        version: "1.0.0-draft",
-        subject: { name: "Test", id: "test" },
-        created_at: new Date().toISOString(),
-        chunks: [],
-        relations: [],
-        metadata: {
-          completeness_score: 0,
-          chunk_count: 0,
-          relation_count: 0,
-          cluster_coverage: {},
-        },
-      }),
-    );
+  it(
+    "validates a skeleton portrait",
+    () => {
+      const portraitPath = join(tmpDir, "portrait.json");
+      writeFileSync(
+        portraitPath,
+        JSON.stringify({
+          version: "1.0.0-draft",
+          subject: { name: "Test", id: "test" },
+          created_at: new Date().toISOString(),
+          chunks: [],
+          relations: [],
+          metadata: {
+            completeness_score: 0,
+            chunk_count: 0,
+            relation_count: 0,
+            cluster_coverage: {},
+          },
+        }),
+      );
 
-    const output = run(["validate", "--portrait", portraitPath]);
-    expect(output).toContain("Schema valid");
-    expect(output).toContain("0 chunks");
-  });
+      const output = run(["validate", "--portrait", portraitPath]);
+      expect(output).toContain("Schema valid");
+      expect(output).toContain("0 chunks");
+    },
+    subprocessTimeoutMs,
+  );
 
-  it("reports errors for invalid portrait", () => {
-    const portraitPath = join(tmpDir, "bad.json");
-    writeFileSync(portraitPath, JSON.stringify({ invalid: true }));
+  it(
+    "reports errors for invalid portrait",
+    () => {
+      const portraitPath = join(tmpDir, "bad.json");
+      writeFileSync(portraitPath, JSON.stringify({ invalid: true }));
 
-    expect(() => {
-      run(["validate", "--portrait", portraitPath]);
-    }).toThrow();
-  });
+      expect(() => {
+        run(["validate", "--portrait", portraitPath]);
+      }).toThrow();
+    },
+    subprocessTimeoutMs,
+  );
 });
