@@ -15,9 +15,12 @@ const run = (args: string[], cwd?: string) =>
     encoding: "utf-8",
     cwd: cwd ?? process.cwd(),
     env: { ...process.env, NO_COLOR: "1" },
+    maxBuffer: 10 * 1024 * 1024,
   });
 
 describe("athanor validate", () => {
+  // Spawning `npx tsx` can exceed 5s on cold CI runners
+  const execTimeoutMs = 60_000;
   let tmpDir: string;
 
   beforeEach(() => {
@@ -29,14 +32,18 @@ describe("athanor validate", () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it("validates the example portrait successfully", () => {
-    const output = run(["validate", "--portrait", EXAMPLE_PORTRAIT]);
+  it(
+    "validates the example portrait successfully",
+    () => {
+      const output = run(["validate", "--portrait", EXAMPLE_PORTRAIT]);
 
-    expect(output).toContain("Schema valid");
-    expect(output).toContain("116 chunks");
-    expect(output).toContain("267 relations");
-    expect(output).toContain("Score:");
-  });
+      expect(output).toContain("Schema valid");
+      expect(output).toContain("116 chunks");
+      expect(output).toContain("267 relations");
+      expect(output).toContain("Score:");
+    },
+    execTimeoutMs,
+  );
 
   it("validates a skeleton portrait", () => {
     const portraitPath = join(tmpDir, "portrait.json");
@@ -60,14 +67,19 @@ describe("athanor validate", () => {
     const output = run(["validate", "--portrait", portraitPath]);
     expect(output).toContain("Schema valid");
     expect(output).toContain("0 chunks");
-  });
+  },
+  execTimeoutMs);
 
-  it("reports errors for invalid portrait", () => {
-    const portraitPath = join(tmpDir, "bad.json");
-    writeFileSync(portraitPath, JSON.stringify({ invalid: true }));
+  it(
+    "reports errors for invalid portrait",
+    () => {
+      const portraitPath = join(tmpDir, "bad.json");
+      writeFileSync(portraitPath, JSON.stringify({ invalid: true }));
 
-    expect(() => {
-      run(["validate", "--portrait", portraitPath]);
-    }).toThrow();
-  });
+      expect(() => {
+        run(["validate", "--portrait", portraitPath]);
+      }).toThrow();
+    },
+    execTimeoutMs,
+  );
 });

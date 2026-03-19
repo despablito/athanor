@@ -273,6 +273,7 @@ export class SqliteGraphStore implements GraphStore {
         throw new Error(
           `SQLite vector functions are not available in this libSQL build (${msg}). ` +
             `Use a libSQL build with vector support or PostgreSQL + pgvector.`,
+          { cause: e },
         );
       }
       throw e;
