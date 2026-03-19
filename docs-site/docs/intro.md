@@ -33,7 +33,7 @@ When you ask an Athanor Clone a question, it doesn't just do keyword search. It 
 
 | Component | What it does |
 |---|---|
-| **@athanor/core** | Types, Portrait class, GraphStore, validation, export (JSON/Cypher/Markdown/Obsidian) |
+| **@athanor/core** | Types, Portrait class, graph storage (Postgres+AGE or libSQL), validation, export (JSON/Cypher/Markdown/Obsidian) |
 | **@athanor/extractor** | LLM-powered extraction: chunking, classification, relation detection, meta-generation |
 | **@athanor/clone-api** | REST API with graph-aware RAG pipeline for talking to clones |
 | **@athanor/explorer** | Next.js web UI with D3 force-directed graph visualization |

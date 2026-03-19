@@ -29,4 +29,4 @@ athanor serve --portrait ./portrait.json --port 3001
 
 ## License
 
-Apache 2.0
+MIT

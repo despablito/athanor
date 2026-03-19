@@ -164,4 +164,4 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
+By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).

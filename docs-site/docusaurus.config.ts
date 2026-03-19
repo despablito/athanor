@@ -81,7 +81,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Athanor Contributors. Apache 2.0 License.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Athanor Contributors. MIT License.`,
     },
     prism: {
       theme: prismThemes.github,

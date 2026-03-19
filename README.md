@@ -166,14 +166,14 @@ pnpm --filter @athanor/explorer dev
 | Contradictions | First-class (HARDCODED_EXCEPTION) | Ignored | Ignored | Averaged out |
 | Export formats | JSON, Cypher, Markdown, Obsidian | Proprietary | Proprietary | None |
 | Self-hostable | Yes (Docker) | No | No | No |
-| Open source | Apache 2.0 | No | No | No |
+| Open source | MIT | No | No | No |
 
 ## Project Structure
 
 ```
 athanor/
 ├── packages/
-│   ├── athanor-core/          # Core types, Portrait, GraphStore, validation, export
+│   ├── athanor-core/          # Core types, Portrait, graph stores (Postgres / libSQL), validation, export
 │   ├── athanor-extractor/     # LLM extraction: chunker, classifier, linker, embedder
 │   └── athanor-interviewer/   # AI interview agent: 5-phase adaptive identity extraction
 ├── apps/
