@@ -162,6 +162,18 @@ Project maintainers are responsible for clarifying the standards of acceptable b
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1.
 
+## CI, Changesets, and releases
+
+- **CI** (`.github/workflows/ci.yml`) runs on every PR and on pushes to `main`: `pnpm lint`, `pnpm test`, and `pnpm build`, with pnpm store + Turborepo `.turbo` caching.
+- **npm releases** (`.github/workflows/publish.yml`) uses [Changesets](https://github.com/changesets/changesets). After you merge a “Version packages” PR, the workflow publishes with `changeset publish` (see `package.json` scripts `changeset`, `version-packages`, `release`).
+- **Docs** (`.github/workflows/docs.yml`) builds `docs-site/` and pushes static output to the **`gh-pages`** branch.
+
+**Maintainers:** add an **`NPM_TOKEN`** repository secret (npm automation token with publish access) so releases can publish to the registry. `GITHUB_TOKEN` is supplied automatically for opening version PRs and pushing `gh-pages`.
+
+**Proposing a release:** run `pnpm changeset` locally, commit the generated `.changeset/*.md` file, and open a PR. After merge, the bot opens a version PR; when that merges, packages publish (if `NPM_TOKEN` is set).
+
+For GitHub Pages docs, enable **Settings → Pages → Deploy from a branch** using **`gh-pages`** branch.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
