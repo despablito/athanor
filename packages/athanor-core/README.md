@@ -45,4 +45,4 @@ const markdown = toMarkdown(portrait);
 
 ## License
 
-Apache 2.0
+MIT

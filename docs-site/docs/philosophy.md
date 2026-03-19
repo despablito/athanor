@@ -42,6 +42,6 @@ Athanor's 9 source types (interview, email, document, code, meeting, chat, socia
 
 Your identity data is yours. It shouldn't be locked in a proprietary platform, inaccessible to you, trainable without your consent.
 
-Athanor portraits are plain JSON, exportable to Markdown, Obsidian, Cypher, and more. The protocol is open. The code is Apache 2.0. You can self-host everything — including the LLM inference via Ollama.
+Athanor portraits are plain JSON, exportable to Markdown, Obsidian, Cypher, and more. The protocol is open. The code is MIT licensed. You can self-host everything — including the LLM inference via Ollama.
 
 The bet is that open standards win. If Athanor's protocol is good, others will build on it. If it's not, you can take your data and leave. That's the point.

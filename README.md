@@ -166,7 +166,7 @@ pnpm --filter @athanor/explorer dev
 | Contradictions | First-class (HARDCODED_EXCEPTION) | Ignored | Ignored | Averaged out |
 | Export formats | JSON, Cypher, Markdown, Obsidian | Proprietary | Proprietary | None |
 | Self-hostable | Yes (Docker) | No | No | No |
-| Open source | Apache 2.0 | No | No | No |
+| Open source | MIT | No | No | No |
 
 ## Project Structure
 
