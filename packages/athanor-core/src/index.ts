@@ -30,6 +30,12 @@ export { validateChunk, validateRelation, validatePortrait } from "./validator.j
 
 export { Portrait } from "./portrait.js";
 
-export { GraphStore } from "./graph.js";
+export type { GraphStore } from "./graph.js";
+export {
+  PostgresGraphStore,
+  SqliteGraphStore,
+  createGraphStore,
+  normalizeLibsqlUrl,
+} from "./graph.js";
 
 export { toJSON, toCypher, toMarkdown, toObsidian } from "./export.js";

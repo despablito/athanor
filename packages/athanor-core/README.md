@@ -1,6 +1,6 @@
 # @athanor/core
 
-Core library for the Athanor identity cloning toolkit. Provides types, the Portrait class, GraphStore (PostgreSQL + Apache AGE), validation, and export functions.
+Core library for the Athanor identity cloning toolkit. Provides types, the Portrait class, graph storage (`createGraphStore` → PostgreSQL + Apache AGE or local libSQL/SQLite), validation, and export functions.
 
 ## Usage
 
@@ -38,8 +38,9 @@ const markdown = toMarkdown(portrait);
 
 ## Exports
 
-- **Classes**: `Portrait`, `GraphStore`
-- **Functions**: `validateChunk`, `validateRelation`, `validatePortrait`, `toJSON`, `toCypher`, `toMarkdown`, `toObsidian`, `asChunkId`
+- **Classes**: `Portrait`, `PostgresGraphStore`, `SqliteGraphStore`
+- **Functions**: `createGraphStore`, `normalizeLibsqlUrl`, `validateChunk`, `validateRelation`, `validatePortrait`, `toJSON`, `toCypher`, `toMarkdown`, `toObsidian`, `asChunkId`
+- **Interface**: `GraphStore`
 - **Types**: `Chunk`, `Relation`, `PortraitJSON`, `ChunkType`, `RelationType`, `Uniqueness`, `SourceType`, `ValidationResult`, `PortraitStats`
 - **Constants**: `CHUNK_TYPES`, `RELATION_TYPES`, `UNIQUENESS_LEVELS`, `SOURCE_TYPES`, `RECOMMENDED_CLUSTERS`
 

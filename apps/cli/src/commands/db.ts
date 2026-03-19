@@ -3,19 +3,28 @@ import { Command } from "commander";
 import { resolve } from "node:path";
 import ora from "ora";
 import chalk from "chalk";
-import { GraphStore, type PortraitJSON, type Chunk, type Relation } from "@athanor/core";
+import {
+  createGraphStore,
+  type PortraitJSON,
+  type Chunk,
+  type Relation,
+} from "@athanor/core";
 import { loadPortraitJSON, jsonToPortrait, resolvePortraitPath, savePortraitJSON } from "../lib/portrait-io.js";
 import { errorBox, successBox } from "../lib/ui.js";
 
-const DEFAULT_CONNECTION = "postgres://localhost:5432/athanor";
+const DEFAULT_CONNECTION = "file:./portrait.db";
 
 export const dbCommand = new Command("db")
-  .description("Database operations (PostgreSQL + Apache AGE)");
+  .description("Database operations (libSQL/SQLite or PostgreSQL + Apache AGE)");
 
 dbCommand
   .command("push")
-  .description("Push portrait to PostgreSQL+AGE database")
-  .option("--connection <url>", "PostgreSQL connection string", DEFAULT_CONNECTION)
+  .description("Push portrait to the configured database (libSQL file or PostgreSQL+AGE)")
+  .option(
+    "--connection <url>",
+    "Database URL (file:./portrait.db, postgres://…)",
+    DEFAULT_CONNECTION,
+  )
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .action(async (opts: { connection: string; portrait: string }) => {
     const portraitPath = resolvePortraitPath(opts.portrait);
@@ -28,7 +37,7 @@ dbCommand
 
       spinner.text = `Connecting to database…`;
       const graphName = `portrait_${json.subject.id.replace(/[^a-z0-9_]/g, "_")}`;
-      const store = new GraphStore(opts.connection, graphName);
+      const store = createGraphStore(opts.connection, graphName);
 
       try {
         await store.connect();
@@ -54,6 +63,12 @@ dbCommand
           "Could not connect to database.",
           `Ensure PostgreSQL is running at ${opts.connection} with the AGE extension installed.`,
         );
+      } else if (
+        message.includes("SQLITE") ||
+        message.includes("Unable to open") ||
+        message.includes("unable to open")
+      ) {
+        errorBox("Could not open SQLite database file.", message);
       } else {
         errorBox(message);
       }
@@ -64,7 +79,11 @@ dbCommand
 dbCommand
   .command("pull")
   .description("Export portrait from database to JSON")
-  .option("--connection <url>", "PostgreSQL connection string", DEFAULT_CONNECTION)
+  .option(
+    "--connection <url>",
+    "Database URL (file:./portrait.db, postgres://…)",
+    DEFAULT_CONNECTION,
+  )
   .option("--output <path>", "Output portrait file path", "./portrait.json")
   .option("--subject <id>", "Subject ID to export")
   .action(async (opts: { connection: string; output: string; subject?: string }) => {
@@ -80,7 +99,7 @@ dbCommand
     const spinner = ora("Connecting to database…").start();
 
     try {
-      const store = new GraphStore(opts.connection);
+      const store = createGraphStore(opts.connection);
 
       try {
         await store.connect();
@@ -88,8 +107,8 @@ dbCommand
         spinner.text = `Exporting portrait for ${opts.subject}…`;
         const raw = await store.exportPortrait(opts.subject);
 
-        const chunks = (raw.chunks ?? []) as Chunk[];
-        const relations = (raw.relations ?? []) as Relation[];
+        const chunks = (raw.chunks ?? []) as unknown as Chunk[];
+        const relations = (raw.relations ?? []) as unknown as Relation[];
 
         const clusterCoverage: Record<string, number> = {};
         for (const c of chunks) {
@@ -131,6 +150,12 @@ dbCommand
           "Could not connect to database.",
           `Ensure PostgreSQL is running at ${opts.connection} with the AGE extension installed.`,
         );
+      } else if (
+        message.includes("SQLITE") ||
+        message.includes("Unable to open") ||
+        message.includes("unable to open")
+      ) {
+        errorBox("Could not open SQLite database file.", message);
       } else {
         errorBox(message);
       }

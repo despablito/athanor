@@ -173,7 +173,7 @@ pnpm --filter @athanor/explorer dev
 ```
 athanor/
 ├── packages/
-│   ├── athanor-core/          # Core types, Portrait, GraphStore, validation, export
+│   ├── athanor-core/          # Core types, Portrait, graph stores (Postgres / libSQL), validation, export
 │   ├── athanor-extractor/     # LLM extraction: chunker, classifier, linker, embedder
 │   └── athanor-interviewer/   # AI interview agent: 5-phase adaptive identity extraction
 ├── apps/
