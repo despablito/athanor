@@ -30,6 +30,13 @@ export interface ChatResponse {
     emotion_tone: string;
     chunks_retrieved: number;
     chunks_used: number;
+    retrieval_meta: {
+      seed_chunks: number;
+      expanded_chunks: number;
+      expired_filtered: number;
+      total_context: number;
+      expansion_paths: string[];
+    };
   };
 }
 
@@ -87,7 +94,7 @@ export class CloneEngine {
     // Step 6: Compose response with metadata
     const sources = usedChunks.map((sc) => ({
       chunk_id: sc.chunk.chunk_id as string,
-      relevance: Math.round(sc.finalScore * 100) / 100,
+      relevance: Math.round(sc.score * 100) / 100,
       type: sc.chunk.type,
       cluster: sc.chunk.cluster,
     }));
@@ -107,6 +114,10 @@ export class CloneEngine {
         emotion_tone: emotionTone,
         chunks_retrieved: retrieval.totalRetrieved,
         chunks_used: usedChunks.length,
+        retrieval_meta: {
+          ...retrieval.meta,
+          total_context: usedChunks.length,
+        },
       },
     };
   }

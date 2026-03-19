@@ -155,6 +155,10 @@ export { extractChunks } from "./chunker.js";
 export { classifyChunks } from "./classifier.js";
 export { detectRelations } from "./linker.js";
 export { generateMetaChunks } from "./meta-generator.js";
+export {
+  generateSecondOrderConsequences,
+} from "./second-order.js";
+export type { SecondOrderAnalysis, SecondOrderResult } from "./second-order.js";
 export { generateClonePrompt } from "./clone-generator.js";
 export { embedChunks } from "./embedder.js";
 export type { EmbedProgress } from "./embedder.js";

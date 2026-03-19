@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { vectorSearch, graphExpand, rerank, assembleContext, type ScoredChunk } from "./rag.js";
+import { vectorSearch, graphExpand, scoreChunk, assembleContext, type ScoredChunk } from "./rag.js";
 import { PortraitStore } from "./portrait-store.js";
 import type { PortraitJSON, Chunk, Relation } from "@athanor/core";
 
@@ -13,6 +13,11 @@ function makeChunk(
   content: string,
   confidence: number = 0.9,
   tags: string[] = [],
+  temporal?: Partial<{
+    stability_score: number;
+    last_confirmed: string;
+    valid_until: string;
+  }>,
 ): Chunk {
   return {
     chunk_id: id,
@@ -25,6 +30,7 @@ function makeChunk(
     context_tags: tags,
     linked_chunks: [],
     content,
+    ...(temporal ? ({ _temporal: temporal } as unknown as Record<string, unknown>) : {}),
   } as unknown as Chunk;
 }
 
@@ -128,6 +134,7 @@ describe("graphExpand", () => {
     // LEARNED_FROM neighbor
     expect(expanded.has("TDM-STRY-001")).toBe(true);
     expect(expanded.get("TDM-STRY-001")!.hopDistance).toBe(1);
+    expect(expanded.get("TDM-STRY-001")!.relationPath).toBe("TDM-HEUR-001 → LEARNED_FROM → TDM-STRY-001");
 
     // INSTANTIATES neighbor
     expect(expanded.has("PV-BLEF-001")).toBe(true);
@@ -160,84 +167,130 @@ describe("graphExpand", () => {
   });
 });
 
-describe("rerank", () => {
-  it("scores CRITICAL chunks higher than MEDIUM", () => {
-    const vectorHits = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.8 }], // CRITICAL
-      ["LDR-STYL-001", { chunk: CHUNKS[4], score: 0.8 }], // MEDIUM
-    ]);
-    const graphExpanded = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
-      ["LDR-STYL-001", { chunk: CHUNKS[4], hopDistance: 0 }],
-    ]);
+describe("scoreChunk", () => {
+  it("seed chunks score higher than expanded chunks at equal similarity", () => {
+    const temporal = { stability_score: 0.7, last_confirmed: new Date().toISOString() };
 
-    const ranked = rerank(vectorHits, graphExpanded, 10);
+    const seed = scoreChunk({
+      chunk: makeChunk("SEED-1", "technical-decision-making", "heuristic", "MEDIUM", "seed", 0.9, [], temporal) as unknown as Chunk,
+      similarity: 0,
+      isSeed: true,
+      hopCount: 0,
+    });
 
-    expect(ranked.length).toBe(2);
-    // CRITICAL (1.5 weight) should rank above MEDIUM (1.0 weight)
-    expect(ranked[0].chunk.chunk_id).toBe("TDM-HEUR-001");
-    expect(ranked[0].uniquenessWeight).toBe(1.5);
-    expect(ranked[1].uniquenessWeight).toBe(1.0);
+    const expanded = scoreChunk({
+      chunk: makeChunk("EXP-1", "technical-decision-making", "heuristic", "MEDIUM", "expanded", 0.9, [], temporal) as unknown as Chunk,
+      similarity: 0,
+      isSeed: false,
+      hopCount: 1,
+    });
+
+    expect(seed.score).toBeGreaterThan(expanded.score);
   });
 
-  it("applies relation bonus for 1-hop neighbors", () => {
-    const vectorHits = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.6 }],
-    ]);
-    const graphExpanded = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
-      ["TDM-STRY-001", { chunk: CHUNKS[1], hopDistance: 1 }],
-    ]);
+  it("recent chunks score higher than chunks confirmed 6 months ago", () => {
+    const now = Date.now();
+    const temporalRecent = { stability_score: 0.7, last_confirmed: new Date(now).toISOString() };
+    const temporalOld = {
+      stability_score: 0.7,
+      last_confirmed: new Date(now - 1000 * 60 * 60 * 24 * 180).toISOString(),
+    };
 
-    const ranked = rerank(vectorHits, graphExpanded, 10);
+    const recent = scoreChunk({
+      chunk: makeChunk("RECENT-1", "technical-decision-making", "heuristic", "MEDIUM", "recent", 0.9, [], temporalRecent) as unknown as Chunk,
+      similarity: 0.5,
+      isSeed: true,
+      hopCount: 0,
+    });
 
-    const story = ranked.find((r) => (r.chunk.chunk_id as string) === "TDM-STRY-001");
-    expect(story).toBeDefined();
-    expect(story!.relationBonus).toBe(1.3);
+    const old = scoreChunk({
+      chunk: makeChunk("OLD-1", "technical-decision-making", "heuristic", "MEDIUM", "old", 0.9, [], temporalOld) as unknown as Chunk,
+      similarity: 0.5,
+      isSeed: true,
+      hopCount: 0,
+    });
+
+    expect(recent.score).toBeGreaterThan(old.score);
   });
 
-  it("applies layer coverage bonus when all 3 layers present", () => {
-    const vectorHits = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], score: 0.8 }],  // knowledge
-      ["LDR-BLEF-001", { chunk: CHUNKS[3], score: 0.7 }],   // identity
-      ["TDM-STRY-001", { chunk: CHUNKS[1], score: 0.6 }],   // context
-    ]);
-    const graphExpanded = new Map([
-      ["TDM-HEUR-001", { chunk: CHUNKS[0], hopDistance: 0 }],
-      ["LDR-BLEF-001", { chunk: CHUNKS[3], hopDistance: 0 }],
-      ["TDM-STRY-001", { chunk: CHUNKS[1], hopDistance: 0 }],
-    ]);
+  it("CRITICAL uniqueness multiplies final score by 1.5", () => {
+    const temporal = { stability_score: 0.7, last_confirmed: new Date().toISOString() };
 
-    const ranked = rerank(vectorHits, graphExpanded, 10);
+    const critical = scoreChunk({
+      chunk: makeChunk("CRIT-1", "technical-decision-making", "heuristic", "CRITICAL", "critical", 0.9, [], temporal) as unknown as Chunk,
+      similarity: 0.5,
+      isSeed: true,
+      hopCount: 0,
+    });
 
-    // All chunks should have layerBonus = 1.15
-    for (const r of ranked) {
-      expect(r.layerBonus).toBe(1.15);
-    }
+    const medium = scoreChunk({
+      chunk: makeChunk("MED-1", "technical-decision-making", "heuristic", "MEDIUM", "medium", 0.9, [], temporal) as unknown as Chunk,
+      similarity: 0.5,
+      isSeed: true,
+      hopCount: 0,
+    });
+
+    expect(critical.score).toBeCloseTo(medium.score * 1.5, 6);
   });
 
-  it("limits output to topN", () => {
-    const vectorHits = new Map(
-      CHUNKS.map((c) => [(c.chunk_id as string), { chunk: c, score: 0.5 }]),
+  it("chunks with valid_until in the past are excluded", async () => {
+    const store = new PortraitStore();
+    const now = Date.now();
+
+    const pastChunk = makeChunk(
+      "PAST-1",
+      "technical-decision-making",
+      "heuristic",
+      "MEDIUM",
+      "jan past chunk bus factor",
+      0.9,
+      ["risk"],
+      {
+        valid_until: new Date(now - 1000 * 60 * 60 * 24).toISOString(),
+        stability_score: 0.7,
+        last_confirmed: new Date(now).toISOString(),
+      },
     );
-    const graphExpanded = new Map(
-      CHUNKS.map((c) => [(c.chunk_id as string), { chunk: c, hopDistance: 0 }]),
+
+    const futureChunk = makeChunk(
+      "FUTURE-1",
+      "technical-decision-making",
+      "heuristic",
+      "MEDIUM",
+      "jan future chunk bus factor",
+      0.9,
+      ["risk"],
+      {
+        valid_until: new Date(now + 1000 * 60 * 60 * 24).toISOString(),
+        stability_score: 0.7,
+        last_confirmed: new Date(now).toISOString(),
+      },
     );
 
-    const ranked = rerank(vectorHits, graphExpanded, 3);
-    expect(ranked.length).toBe(3);
+    const portrait = makePortrait([pastChunk, futureChunk], []);
+    store.loadFromJSON(portrait);
+
+    const { ragPipeline: pipeline } = await import("./rag.js");
+    const result = pipeline(store, portrait, "jan bus factor", {
+      topK: 10,
+      topN: 10,
+      contextBudgetTokens: 4000,
+    });
+
+    expect(result.chunks.some((sc: ScoredChunk) => sc.chunk.chunk_id === "PAST-1")).toBe(false);
+    expect(result.chunks.some((sc: ScoredChunk) => sc.chunk.chunk_id === "FUTURE-1")).toBe(true);
   });
 });
 
 describe("assembleContext", () => {
   it("orders identity chunks before knowledge and context", () => {
     const scored = [
-      { chunk: CHUNKS[0], relevance: 0.9, uniquenessWeight: 1.5, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.35, hopDistance: 0 }, // heuristic → knowledge
-      { chunk: CHUNKS[3], relevance: 0.85, uniquenessWeight: 1.2, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.02, hopDistance: 0 }, // belief → identity
-      { chunk: CHUNKS[1], relevance: 0.8, uniquenessWeight: 1.2, relationBonus: 1.0, layerBonus: 1.0, finalScore: 0.96, hopDistance: 0 }, // story → context
+      { chunk: CHUNKS[0], score: 1.35, breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1, uniquenessWeight: 1.5 }, isSeed: true, hopCount: 0 }, // heuristic → knowledge
+      { chunk: CHUNKS[3], score: 1.02, breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1, uniquenessWeight: 1.2 }, isSeed: true, hopCount: 0 }, // belief → identity
+      { chunk: CHUNKS[1], score: 0.96, breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1, uniquenessWeight: 1.2 }, isSeed: true, hopCount: 0 }, // story → context
     ];
 
-    const { context, usedChunks } = assembleContext(scored, RELATIONS, 4000);
+    const { context, usedChunks } = assembleContext(scored as ScoredChunk[], RELATIONS, 4000);
 
     // Identity (belief) should come first
     const beliefIdx = context.indexOf("LDR-BLEF-001");
@@ -251,11 +304,11 @@ describe("assembleContext", () => {
 
   it("includes relation metadata between selected chunks", () => {
     const scored = [
-      { chunk: CHUNKS[0], relevance: 0.9, uniquenessWeight: 1.5, relationBonus: 1.0, layerBonus: 1.0, finalScore: 1.35, hopDistance: 0 },
-      { chunk: CHUNKS[1], relevance: 0.8, uniquenessWeight: 1.2, relationBonus: 1.3, layerBonus: 1.0, finalScore: 1.25, hopDistance: 1 },
+      { chunk: CHUNKS[0], score: 1.35, breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1, uniquenessWeight: 1.5 }, isSeed: true, hopCount: 0 },
+      { chunk: CHUNKS[1], score: 1.25, breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1.3, uniquenessWeight: 1.2 }, isSeed: false, hopCount: 1 },
     ];
 
-    const { context } = assembleContext(scored, RELATIONS, 4000);
+    const { context } = assembleContext(scored as ScoredChunk[], RELATIONS, 4000);
 
     expect(context).toContain("LEARNED_FROM");
     expect(context).toContain("TDM-STRY-001");
@@ -264,16 +317,14 @@ describe("assembleContext", () => {
   it("respects token budget", () => {
     const scored = CHUNKS.map((c) => ({
       chunk: c,
-      relevance: 0.8,
-      uniquenessWeight: 1.0,
-      relationBonus: 1.0,
-      layerBonus: 1.0,
-      finalScore: 0.8,
-      hopDistance: 0,
+      score: 0.8,
+      breakdown: { similarity: 0, stability: 0.7, recency: 1, relationBonus: 1, uniquenessWeight: 1.0 },
+      isSeed: true,
+      hopCount: 0,
     }));
 
     // Very small budget — should only fit a few chunks
-    const { usedChunks } = assembleContext(scored, [], 200);
+    const { usedChunks } = assembleContext(scored as ScoredChunk[], [], 200);
     expect(usedChunks.length).toBeLessThan(CHUNKS.length);
     expect(usedChunks.length).toBeGreaterThan(0);
   });
@@ -302,3 +353,5 @@ describe("full RAG pipeline integration", () => {
     expect(busFactorChunk).toBeDefined();
   });
 });
+
+// (moved into scoreChunk suite above)

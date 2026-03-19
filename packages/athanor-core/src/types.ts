@@ -61,6 +61,7 @@ export const SOURCE_TYPES = [
   "social",
   "observation",
   "inferred",
+  "second_order_analysis",
 ] as const;
 
 export type SourceType = (typeof SOURCE_TYPES)[number];

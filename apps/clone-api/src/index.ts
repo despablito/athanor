@@ -63,7 +63,7 @@ export {
   ragPipeline,
   vectorSearch,
   graphExpand,
-  rerank,
+  scoreChunk,
   assembleContext,
 } from "./rag.js";
 export type { ScoredChunk, RetrievalResult, RAGConfig } from "./rag.js";

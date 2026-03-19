@@ -56,14 +56,23 @@ function parseChunkResponse(response: string): ChunkCandidate[] {
   // Find the JSON array in the response
   const arrayStart = cleaned.indexOf("[");
   const arrayEnd = cleaned.lastIndexOf("]");
-  if (arrayStart === -1 || arrayEnd === -1) {
-    return [];
+  if (arrayStart !== -1 && arrayEnd !== -1) {
+    try {
+      const parsed = JSON.parse(cleaned.slice(arrayStart, arrayEnd + 1));
+      if (!Array.isArray(parsed)) return [];
+      return parsed as ChunkCandidate[];
+    } catch {
+      // Fall through to object-wrapper parsing.
+    }
   }
 
+  // Some smaller local models return wrapped payloads, e.g.
+  // { "chunks": [...] } or { "candidates": [...] }.
   try {
-    const parsed = JSON.parse(cleaned.slice(arrayStart, arrayEnd + 1));
-    if (!Array.isArray(parsed)) return [];
-    return parsed as ChunkCandidate[];
+    const parsed = JSON.parse(cleaned) as { chunks?: unknown; candidates?: unknown };
+    if (Array.isArray(parsed.chunks)) return parsed.chunks as ChunkCandidate[];
+    if (Array.isArray(parsed.candidates)) return parsed.candidates as ChunkCandidate[];
+    return [];
   } catch {
     return [];
   }
@@ -72,11 +81,29 @@ function parseChunkResponse(response: string): ChunkCandidate[] {
 function validateCandidate(chunk: ChunkCandidate): boolean {
   if (!chunk.content || chunk.content.length < 20) return false;
   if (!chunk.cluster || typeof chunk.cluster !== "string") return false;
-  if (!CHUNK_TYPES.includes(chunk.type as typeof CHUNK_TYPES[number])) return false;
-  if (!UNIQUENESS_LEVELS.includes(chunk.uniqueness as typeof UNIQUENESS_LEVELS[number])) return false;
-  if (!SOURCE_TYPES.includes(chunk.source as typeof SOURCE_TYPES[number])) {
+
+  // Normalize common weak-model variants before strict validation.
+  const rawType = String(chunk.type ?? "").trim().toLowerCase().replace(/_/g, "-");
+  if (CHUNK_TYPES.includes(rawType as typeof CHUNK_TYPES[number])) {
+    chunk.type = rawType as ChunkCandidate["type"];
+  } else {
+    return false;
+  }
+
+  const rawUniqueness = String(chunk.uniqueness ?? "").trim().toUpperCase();
+  if (UNIQUENESS_LEVELS.includes(rawUniqueness as typeof UNIQUENESS_LEVELS[number])) {
+    chunk.uniqueness = rawUniqueness as ChunkCandidate["uniqueness"];
+  } else {
+    chunk.uniqueness = "MEDIUM";
+  }
+
+  const rawSource = String(chunk.source ?? "").trim().toLowerCase().replace(/_/g, "-");
+  if (SOURCE_TYPES.includes(rawSource as typeof SOURCE_TYPES[number])) {
+    chunk.source = rawSource as ChunkCandidate["source"];
+  } else {
     chunk.source = "inferred";
   }
+
   if (typeof chunk.confidence !== "number" || chunk.confidence < 0 || chunk.confidence > 1) {
     chunk.confidence = 0.7;
   }

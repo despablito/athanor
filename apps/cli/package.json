@@ -21,6 +21,7 @@
     "@athanor/mcp-server": "workspace:*",
     "chalk": "^5.4.0",
     "commander": "^13.0.0",
+    "inquirer": "^13.3.2",
     "ora": "^8.0.0"
   },
   "devDependencies": {

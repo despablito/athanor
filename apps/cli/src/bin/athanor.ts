@@ -14,6 +14,7 @@ import { exploreCommand } from "../commands/explore.js";
 import { serveCommand } from "../commands/serve.js";
 import { mcpCommand } from "../commands/mcp.js";
 import { interviewCommand } from "../commands/interview.js";
+import { secondOrderCommand } from "../commands/second-order.js";
 
 const program = new Command();
 
@@ -36,5 +37,6 @@ program.addCommand(exploreCommand);
 program.addCommand(serveCommand);
 program.addCommand(mcpCommand);
 program.addCommand(interviewCommand);
+program.addCommand(secondOrderCommand);
 
 program.parse();

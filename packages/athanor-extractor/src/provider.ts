@@ -97,27 +97,108 @@ export class OllamaProvider implements LLMProvider {
   }
 
   async complete(system: string, user: string): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/api/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: this.model,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        stream: false,
-        options: { temperature: 0.3 },
-      }),
-    });
+    // The extraction pipeline can send fairly large prompts, and Ollama may
+    // occasionally close the connection under load. Add a small retry + a
+    // hard timeout to keep the E2E flow moving.
+    const maxAttempts = 2;
+    // CPU-only local Ollama can be slow for long JSON prompts; allow generous
+    // per-attempt timeout.
+    const timeoutMs = 900_000;
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Ollama request failed (${response.status}): ${text}`);
+    let lastError: unknown = null;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(`${this.baseUrl}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: this.model,
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: user },
+            ],
+            stream: true,
+            options: {
+              temperature: 0.3,
+              // Keep responses bounded to structured JSON payload sizes used by
+              // chunking/classification prompts.
+              num_predict: 320,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`Ollama request failed (${response.status}): ${text}`);
+        }
+
+        const body = response.body;
+        if (!body) {
+          throw new Error("Ollama response body is empty");
+        }
+
+        const reader = body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let content = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            let packet: { message?: { content?: string }; done?: boolean };
+            try {
+              packet = JSON.parse(trimmed) as { message?: { content?: string }; done?: boolean };
+            } catch {
+              continue;
+            }
+
+            if (packet.message?.content) content += packet.message.content;
+            if (packet.done) return content;
+          }
+        }
+
+        // Parse trailing buffered line (if any).
+        const tail = buffer.trim();
+        if (tail) {
+          try {
+            const packet = JSON.parse(tail) as { message?: { content?: string } };
+            if (packet.message?.content) content += packet.message.content;
+          } catch {
+            // ignore malformed tail
+          }
+        }
+
+        return content;
+      } catch (err) {
+        lastError = err;
+        if (attempt < maxAttempts) {
+          // Small linear backoff (avoid tight retry loops).
+          await new Promise((r) => setTimeout(r, 1000 * attempt));
+          continue;
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
     }
 
-    const data = (await response.json()) as { message?: { content?: string } };
-    return data.message?.content ?? "";
+    throw new Error(
+      `Ollama request failed after retries: ${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }`,
+    );
   }
 }
 
