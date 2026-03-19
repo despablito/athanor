@@ -20,10 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pin comes from root package.json "packageManager" (omit version: here)
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
