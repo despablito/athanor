@@ -141,6 +141,9 @@ export {
   OllamaProvider,
   OllamaEmbeddingProvider,
   OpenAIEmbeddingProvider,
+  warmupOllamaChat,
+  DEFAULT_OLLAMA_CHAT_MODEL,
+  DEFAULT_OLLAMA_EMBEDDING_MODEL,
 } from "./provider.js";
 export type {
   ChunkCandidate,

@@ -21,6 +21,78 @@ export interface EmbeddingConfig {
   baseUrl?: string;
 }
 
+/** Default Ollama chat model when none is set (override with `OLLAMA_MODEL`, `LLM_MODEL`, or `--model`). */
+export const DEFAULT_OLLAMA_CHAT_MODEL = "llama3.2";
+
+/** Default Ollama embedding model (override with env or config). */
+export const DEFAULT_OLLAMA_EMBEDDING_MODEL = "nomic-embed-text";
+
+/** Max new tokens for Ollama chat completions (`OLLAMA_NUM_PREDICT`, default 320). */
+function ollamaNumPredict(): number {
+  const raw = process.env.OLLAMA_NUM_PREDICT;
+  if (raw === undefined || raw === "") return 320;
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n)) return 320;
+  return Math.min(8192, Math.max(16, n));
+}
+
+function normalizeOllamaBaseUrl(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+/**
+ * Single non-streaming `/api/chat` call to load the model into RAM/VRAM.
+ * Use before interactive flows so the first “real” step isn’t mislabeled as stuck on app work.
+ */
+export async function warmupOllamaChat(options: {
+  model: string;
+  baseUrl?: string;
+  signal?: AbortSignal;
+}): Promise<void> {
+  const baseUrl = normalizeOllamaBaseUrl(
+    options.baseUrl ?? process.env.OLLAMA_BASE_URL ?? "http://localhost:11434",
+  );
+  const response = await fetch(`${baseUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal: options.signal,
+    body: JSON.stringify({
+      model: options.model,
+      messages: [{ role: "user", content: "." }],
+      stream: false,
+      options: { temperature: 0, num_predict: 1 },
+    }),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(ollamaChatErrorMessage(response.status, text, options.model));
+  }
+  await response.json().catch(() => undefined);
+}
+
+function ollamaChatErrorMessage(status: number, body: string, model: string): string {
+  const trimmed = body.trim();
+  if (status === 404 || /not found/i.test(trimmed)) {
+    return (
+      `Ollama request failed (${status}): ${trimmed}\n` +
+      `  Hint: install this model: ollama pull ${model}\n` +
+      `  Or pick one you already have (ollama list) and pass --model <name> or set OLLAMA_MODEL / LLM_MODEL.`
+    );
+  }
+  return `Ollama request failed (${status}): ${trimmed}`;
+}
+
+function ollamaEmbedErrorMessage(status: number, body: string, model: string): string {
+  const trimmed = body.trim();
+  if (status === 404 || /not found/i.test(trimmed)) {
+    return (
+      `Ollama embed failed (${status}): ${trimmed}\n` +
+      `  Hint: ollama pull ${model}`
+    );
+  }
+  return `Ollama embed failed (${status}): ${trimmed}`;
+}
+
 // ─── Anthropic Provider ────────────────────────────────────────────────────────
 
 export class AnthropicProvider implements LLMProvider {
@@ -92,8 +164,14 @@ export class OllamaProvider implements LLMProvider {
   private baseUrl: string;
 
   constructor(model?: string, baseUrl?: string) {
-    this.model = model ?? "llama3.1";
-    this.baseUrl = baseUrl ?? process.env.OLLAMA_BASE_URL ?? "http://localhost:11434";
+    this.model =
+      model ??
+      process.env.OLLAMA_MODEL ??
+      process.env.LLM_MODEL ??
+      DEFAULT_OLLAMA_CHAT_MODEL;
+    this.baseUrl = normalizeOllamaBaseUrl(
+      baseUrl ?? process.env.OLLAMA_BASE_URL ?? "http://localhost:11434",
+    );
   }
 
   async complete(system: string, user: string): Promise<string> {
@@ -124,16 +202,15 @@ export class OllamaProvider implements LLMProvider {
             stream: true,
             options: {
               temperature: 0.3,
-              // Keep responses bounded to structured JSON payload sizes used by
-              // chunking/classification prompts.
-              num_predict: 320,
+              // Keep responses bounded; override with OLLAMA_NUM_PREDICT (e.g. 128 for short answers).
+              num_predict: ollamaNumPredict(),
             },
           }),
         });
 
         if (!response.ok) {
           const text = await response.text();
-          throw new Error(`Ollama request failed (${response.status}): ${text}`);
+          throw new Error(ollamaChatErrorMessage(response.status, text, this.model));
         }
 
         const body = response.body;
@@ -209,7 +286,8 @@ export class OllamaEmbeddingProvider implements EmbeddingProvider {
   private baseUrl: string;
 
   constructor(model?: string, baseUrl?: string) {
-    this.model = model ?? "nomic-embed-text";
+    this.model =
+      model ?? process.env.OLLAMA_EMBEDDING_MODEL ?? DEFAULT_OLLAMA_EMBEDDING_MODEL;
     this.baseUrl = baseUrl ?? process.env.OLLAMA_BASE_URL ?? "http://localhost:11434";
   }
 
@@ -228,7 +306,7 @@ export class OllamaEmbeddingProvider implements EmbeddingProvider {
 
       if (!response.ok) {
         const body = await response.text();
-        throw new Error(`Ollama embed failed (${response.status}): ${body}`);
+        throw new Error(ollamaEmbedErrorMessage(response.status, body, this.model));
       }
 
       const data = (await response.json()) as { embeddings?: number[][] };

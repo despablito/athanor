@@ -203,6 +203,9 @@ function detectIdentitySignals(chunks: ScoredChunk[]): string[] {
   const hasRitual = chunks.some((sc) => sc.chunk.type === "ritual");
   if (hasRitual) signals.push("habitual_process");
 
+  const hasHardRule = chunks.some((sc) => sc.chunk.type === "hard_rule");
+  if (hasHardRule) signals.push("hard_rule");
+
   const hasCritical = chunks.some((sc) => sc.chunk.uniqueness === "CRITICAL");
   if (hasCritical) signals.push("high_distinctiveness");
 

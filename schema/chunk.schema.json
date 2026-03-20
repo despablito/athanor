@@ -46,7 +46,8 @@
         "framework",
         "rant",
         "meta",
-        "ritual"
+        "ritual",
+        "hard_rule"
       ],
       "description": "The chunk type classification."
     },
