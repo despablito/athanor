@@ -11,7 +11,9 @@ import { requireCloudApiKey } from "../lib/llm-provider-config.js";
 import { errorBox } from "../lib/ui.js";
 
 export const chatCommand = new Command("chat")
-  .description("Interactive terminal chat with your clone (no HTTP server)")
+  .description(
+    "Graph-aware RAG chat with your clone; does not modify the portrait (use `athanor interview` to add chunks via dialogue)",
+  )
   .option("--portrait <path>", "Portrait JSON file", "./portrait.json")
   .option(
     "--connection <url>",
@@ -64,6 +66,11 @@ export const chatCommand = new Command("chat")
     ) => {
       console.log("");
       console.log(chalk.bold("Athanor clone chat"));
+      console.log(
+        chalk.dim(
+          "Read-only on the portrait — graph-aware RAG. To grow the graph via Q&A, run: ",
+        ) + chalk.cyan("athanor interview"),
+      );
       console.log(chalk.dim("Type exit or quit to leave.\n"));
 
       let store: PortraitStore;

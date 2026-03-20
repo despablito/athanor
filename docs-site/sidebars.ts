@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
       label: 'Guides',
       items: [
         'guides/installation',
+        'guides/portrait-lifecycle',
         'guides/first-portrait',
         'guides/self-portrait',
         'guides/ai-extraction',

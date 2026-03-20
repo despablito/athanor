@@ -1,4 +1,4 @@
-import type { PortraitJSON, ChunkType, SourceType } from "@athanor/core";
+import type { ChunkType, PortraitJSON, SourceType } from "@athanor/core";
 import type { ChunkCandidate } from "@athanor/extractor";
 
 // ─── Phase Types ──────────────────────────────────────────────────────────────
@@ -69,6 +69,8 @@ export interface SessionOptions {
   mode: InterviewMode;
   phase?: PhaseId | "all";
   portraitPath?: string;
+  /** Loaded portrait at session start — used to open phases in a graph-aware way */
+  initialPortrait?: PortraitJSON;
   statePath?: string;
   language?: string;
 }

@@ -7,8 +7,10 @@ import type {
   SessionState,
   DepthAnalysis,
   PhaseId,
+  PhaseDefinition,
 } from "./types.js";
 import { PHASES, getNextPhase } from "./phases.js";
+import { buildPortraitBriefForInterview } from "./portrait-brief.js";
 import { getPhaseSystemPrompt } from "./phases.js";
 import { analyzeDepth, getAdaptiveFollowUp } from "./adaptive.js";
 import {
@@ -71,6 +73,8 @@ export class InterviewSessionImpl implements InterviewSession {
   private config: InterviewerConfig;
   private _state: SessionState;
   private options: SessionOptions;
+  /** Snapshot at session start — same file as `portraitPath`, never mixed with other portraits */
+  private initialPortrait?: PortraitJSON;
   private questionQueue: string[] = [];
   private targetPhase: PhaseId | "all";
 
@@ -84,6 +88,7 @@ export class InterviewSessionImpl implements InterviewSession {
     this.config = config;
     this._state = state;
     this.options = options;
+    this.initialPortrait = options.initialPortrait;
     this.targetPhase = options.phase ?? "all";
   }
 
@@ -102,9 +107,9 @@ export class InterviewSessionImpl implements InterviewSession {
     const phase = PHASES[this._state.currentPhase];
     const progress = this._state.phaseProgress[this._state.currentPhase];
 
-    // First question of a phase: use entry questions
+    // First question of a phase: graph-aware opening when the loaded portrait already has chunks
     if (progress.questionsAsked === 0) {
-      const entryQ = phase.entryQuestions[0];
+      const entryQ = await this.resolveEntryQuestion(phase);
       // Queue the remaining entry questions for follow-up if needed
       this.questionQueue.push(...phase.entryQuestions.slice(1));
       this.recordTurn("interviewer", entryQ);
@@ -301,6 +306,64 @@ export class InterviewSessionImpl implements InterviewSession {
 
     if (role === "interviewer") {
       this._state.phaseProgress[this._state.currentPhase].questionsAsked++;
+    }
+  }
+
+  private portraitHasChunks(): boolean {
+    const n = this.initialPortrait?.chunks?.length ?? 0;
+    return n > 0;
+  }
+
+  /**
+   * First question of each phase: use static cold-start copy only when the portrait has no chunks yet.
+   * Otherwise ask the LLM to open from the current graph (same portrait file the CLI loaded).
+   */
+  private async resolveEntryQuestion(phase: PhaseDefinition): Promise<string> {
+    if (!this.portraitHasChunks()) {
+      return phase.entryQuestions[0];
+    }
+    return await this.generateGraphAwareEntryQuestion(phase);
+  }
+
+  private async generateGraphAwareEntryQuestion(
+    phase: PhaseDefinition,
+  ): Promise<string> {
+    const portrait = this.initialPortrait!;
+    const brief = buildPortraitBriefForInterview(portrait);
+    const mode = this._state.mode;
+    const baseSystem = mode === "self" ? SELF_INTERVIEW_SYSTEM : INTERVIEWER_SYSTEM;
+    const phaseSystem = getPhaseSystemPrompt(this._state.currentPhase);
+
+    const system = `${baseSystem}\n\n${phaseSystem}\n\nYou are generating the OPENING question for this phase.
+
+The subject already has an identity graph (summary below). Your question must:
+- Build on themes, tensions, or obvious gaps implied by that graph. Sound like you have read their portrait, not like a generic intake form.
+- Avoid "cold start" questions (e.g. broad landscape / "what do you do") unless the summary is essentially empty.
+- Ask exactly ONE conversational question. No preamble, no bullet list. Output only the question text.`;
+
+    const fallback = phase.entryQuestions[0];
+    const user = `Identity graph summary for this session (single portrait file):
+
+${brief}
+
+---
+
+Phase: ${phase.id} — ${phase.name}
+Phase intent: ${phase.description}
+
+If the graph is thin, you may still take inspiration from this style: ${fallback}
+
+Output only the opening question for this phase.`;
+
+    try {
+      const response = await this.provider.complete(system, user);
+      const cleaned = cleanQuestionResponse(response);
+      if (cleaned.length < 8) {
+        return fallback;
+      }
+      return cleaned;
+    } catch {
+      return phase.entryQuestions[0];
     }
   }
 

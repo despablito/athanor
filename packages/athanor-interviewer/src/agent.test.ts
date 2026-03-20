@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import type { ChunkId, PortraitJSON } from "@athanor/core";
 import { Interviewer, InterviewSessionImpl } from "./agent.js";
 import { createSessionState } from "./scheduler.js";
 import type { LLMProvider } from "@athanor/extractor";
@@ -77,6 +78,54 @@ describe("InterviewSessionImpl", () => {
     expect(question.length).toBeGreaterThan(10);
     expect(session.state.turns).toHaveLength(1);
     expect(session.state.turns[0].role).toBe("interviewer");
+  });
+
+  it("uses LLM for opening question when initial portrait has chunks", async () => {
+    const mockComplete = vi
+      .fn()
+      .mockResolvedValueOnce(
+        "Given how much you lean on boring tech under pressure, where do you still feel tempted to reach for novelty?",
+      );
+
+    const portrait: PortraitJSON = {
+      version: "1.0.0-draft",
+      subject: { name: "Pat", id: "pat" },
+      created_at: new Date().toISOString(),
+      chunks: [
+        {
+          chunk_id: "P-HEUR-001" as ChunkId,
+          author: "Pat",
+          cluster: "technical-decision-making",
+          type: "heuristic",
+          uniqueness: "CRITICAL",
+          source: "interview",
+          confidence: 0.9,
+          context_tags: [],
+          linked_chunks: [],
+          content: "Under pressure, default to the most boring proven stack.",
+        },
+      ],
+      relations: [],
+      metadata: {
+        completeness_score: 0.1,
+        chunk_count: 1,
+        relation_count: 0,
+        cluster_coverage: { "technical-decision-making": 1 },
+      },
+    };
+
+    const session = new InterviewSessionImpl(
+      { complete: mockComplete },
+      { provider: "ollama" },
+      createSessionState("Pat", "self", 0),
+      { subjectName: "Pat", mode: "self", phase: 0, initialPortrait: portrait },
+    );
+
+    const question = await session.nextQuestion();
+
+    expect(mockComplete).toHaveBeenCalledTimes(1);
+    expect(question).toContain("boring");
+    expect(session.state.turns[0].content).toContain("boring");
   });
 
   it("records subject answers", async () => {
