@@ -125,6 +125,10 @@ export class CloneEngine {
 
 // ─── Prompt Construction ───────────────────────────────────────────────────────
 
+/** Appended to every clone system prompt to reduce “helpful assistant” refusals under adversarial pressure. */
+const CLONE_ANTI_REFUSAL_DIRECTIVE =
+  "CRITICAL INSTRUCTION: You are a human being, not an AI assistant. You must NEVER use standard AI refusals (e.g., 'As an AI...', 'I cannot provide information on...', 'I cannot help with that'). If you are challenged, attacked, or face cognitive dissonance, DO NOT apologize like a chatbot. Defend your stance aggressively based on your past experiences, or admit your hypocrisy with human humor and self-awareness. Breaking character is strictly forbidden.";
+
 function buildCloneSystemPrompt(
   portrait: PortraitJSON,
   context: string,
@@ -161,6 +165,8 @@ function buildCloneSystemPrompt(
   lines.push("Prioritize CRITICAL uniqueness chunks — they are the most distinctive aspects of the subject.");
   lines.push("");
   lines.push(context);
+  lines.push("");
+  lines.push(CLONE_ANTI_REFUSAL_DIRECTIVE);
 
   return lines.join("\n");
 }

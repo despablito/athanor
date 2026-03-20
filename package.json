@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "athanor": "pnpm exec athanor",
+    "athanor": "pnpm --filter @athanor/cli exec tsx src/bin/athanor.ts",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",

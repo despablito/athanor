@@ -73,71 +73,46 @@ export async function savePortraitJSON(path: string, data: PortraitJSON): Promis
   await writeFile(resolved, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
-/** Default portrait path when none is passed (current working directory). */
-export const DEFAULT_PORTRAIT_FILE = "./portrait.json";
+/** Default when `--portrait` is omitted; resolved relative to `process.cwd()`. */
+export const DEFAULT_CLI_PORTRAIT = "./portrait.json";
 
-/** Example portrait shipped in the repo (for dev / demos when `./portrait.json` is missing). */
-export const EXAMPLE_PORTRAIT_RELATIVE = "examples/portraits/fictional-cto/portrait.json";
+/**
+ * Example portrait shipped in the repo (path relative to workspace root).
+ * Used when the default `./portrait.json` is missing and the user did not pass `--portrait`.
+ */
+export const WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE =
+  "examples/portraits/fictional-cto/portrait.json";
 
-export type ResolvePortraitOptions = {
-  /**
-   * When `./portrait.json` is missing, try the fictional CTO example (cwd, then bundled path).
-   * Disable for commands that write or merge into the portrait file.
-   * @default true
-   */
-  fallbackToExample?: boolean;
-};
-
-function bundledExamplePortraitPath(): string {
-  return join(
-    dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "..",
-    "..",
-    "..",
-    EXAMPLE_PORTRAIT_RELATIVE,
-  );
+export function resolvePortraitPath(option: string | undefined): string {
+  return resolve(option ?? DEFAULT_CLI_PORTRAIT);
 }
 
-function isDefaultPortraitLocation(option: string | undefined): boolean {
-  if (option === undefined) return true;
-  return resolve(option) === resolve(DEFAULT_PORTRAIT_FILE);
+function findWorkspaceExamplePortraitPath(): string | undefined {
+  let dir = process.cwd();
+  for (let i = 0; i < 16; i++) {
+    const candidate = resolve(dir, WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE);
+    if (existsSync(candidate)) return candidate;
+    const parent = resolve(dir, "..");
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return undefined;
 }
 
 /**
- * Resolve a portrait JSON path. When the default `./portrait.json` is missing and
- * `fallbackToExample` is true, falls back to `examples/portraits/fictional-cto/portrait.json`
- * (from cwd, then next to the CLI package in the monorepo).
+ * Resolves the portrait file like {@link resolvePortraitPath}.
+ * When the file is missing and `allowWorkspaceExampleFallback` is true, walks up from
+ * `process.cwd()` to find {@link WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE} (so `pnpm --filter`
+ * runs from `apps/cli` still pick up the repo example).
  */
-export function resolvePortraitPath(
-  option: string | undefined,
-  options: ResolvePortraitOptions = {},
+export function resolvePortraitPathWithWorkspaceFallback(
+  portrait: string | undefined,
+  opts: { allowWorkspaceExampleFallback: boolean },
 ): string {
-  const { fallbackToExample = true } = options;
-  const input = option ?? DEFAULT_PORTRAIT_FILE;
-  const resolved = resolve(input);
-
-  if (existsSync(resolved)) {
-    return resolved;
-  }
-
-  if (!fallbackToExample || !isDefaultPortraitLocation(option)) {
-    throw new Error(`Portrait file not found: ${resolved}`);
-  }
-
-  const fromCwd = resolve(process.cwd(), EXAMPLE_PORTRAIT_RELATIVE);
-  if (existsSync(fromCwd)) {
-    return fromCwd;
-  }
-
-  const bundled = bundledExamplePortraitPath();
-  if (existsSync(bundled)) {
-    return bundled;
-  }
-
-  throw new Error(
-    `Portrait file not found: ${resolved}\n` +
-      `  Also tried example: ${fromCwd}\n` +
-      `  Create ${DEFAULT_PORTRAIT_FILE}, copy from ${EXAMPLE_PORTRAIT_RELATIVE}, or pass --portrait <path>.`,
-  );
+  const primary = resolvePortraitPath(portrait);
+  if (existsSync(primary)) return primary;
+  if (!opts.allowWorkspaceExampleFallback) return primary;
+  const example = findWorkspaceExamplePortraitPath();
+  if (example) return example;
+  return primary;
 }

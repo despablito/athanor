@@ -58,7 +58,9 @@ describe("createProvider", () => {
     const origKey = process.env.ANTHROPIC_API_KEY;
     delete process.env.ANTHROPIC_API_KEY;
     try {
-      expect(() => createProvider({ provider: "anthropic" })).toThrow("API key required");
+      expect(() => createProvider({ provider: "anthropic" })).toThrow(
+        /API Key is missing.*ANTHROPIC_API_KEY/,
+      );
     } finally {
       if (origKey) process.env.ANTHROPIC_API_KEY = origKey;
     }
@@ -68,7 +70,9 @@ describe("createProvider", () => {
     const origKey = process.env.OPENAI_API_KEY;
     delete process.env.OPENAI_API_KEY;
     try {
-      expect(() => createProvider({ provider: "openai" })).toThrow("API key required");
+      expect(() => createProvider({ provider: "openai" })).toThrow(
+        /API Key is missing.*OPENAI_API_KEY/,
+      );
     } finally {
       if (origKey) process.env.OPENAI_API_KEY = origKey;
     }
