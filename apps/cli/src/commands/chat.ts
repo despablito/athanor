@@ -7,6 +7,7 @@ import {
   loadPortraitIntoStore,
   DEFAULT_CLONE_CONNECTION,
 } from "../lib/load-clone-portrait.js";
+import { requireCloudApiKey } from "../lib/llm-provider-config.js";
 import { errorBox } from "../lib/ui.js";
 
 export const chatCommand = new Command("chat")
@@ -92,11 +93,20 @@ export const chatCommand = new Command("chat")
         return;
       }
 
+      let resolvedApiKey: string | undefined;
+      try {
+        resolvedApiKey = requireCloudApiKey(provider, opts.apiKey);
+      } catch (err) {
+        errorBox(err instanceof Error ? err.message : String(err));
+        process.exit(1);
+        return;
+      }
+
       const engine = new CloneEngine(store, {
         provider: {
           provider,
           model: opts.model,
-          apiKey: opts.apiKey,
+          apiKey: resolvedApiKey,
           baseUrl: provider === "ollama" ? opts.ollamaUrl : undefined,
         },
         ragConfig: {

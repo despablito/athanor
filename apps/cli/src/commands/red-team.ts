@@ -18,6 +18,7 @@ import {
   loadPortraitIntoStore,
   DEFAULT_CLONE_CONNECTION,
 } from "../lib/load-clone-portrait.js";
+import { requireCloudApiKey } from "../lib/llm-provider-config.js";
 import { errorBox } from "../lib/ui.js";
 
 const IDENTITY_GAP_THRESHOLD = 0.4;
@@ -269,6 +270,15 @@ export const redTeamCommand = new Command("red-team")
         return;
       }
 
+      let resolvedApiKey: string | undefined;
+      try {
+        resolvedApiKey = requireCloudApiKey(provider, opts.apiKey);
+      } catch (err) {
+        errorBox(err instanceof Error ? err.message : String(err));
+        process.exit(1);
+        return;
+      }
+
       const cfg = resolveRedTeamConfig(opts, cmd);
       const scenarioCount = cfg.scenarioCount;
       const available = pickAttackVectors(portrait, 9999);
@@ -286,7 +296,7 @@ export const redTeamCommand = new Command("red-team")
       const llm = createProvider({
         provider,
         model: cfg.effectiveModel,
-        apiKey: opts.apiKey,
+        apiKey: resolvedApiKey,
         baseUrl: provider === "ollama" ? opts.ollamaUrl : undefined,
       });
 
@@ -294,7 +304,7 @@ export const redTeamCommand = new Command("red-team")
         provider: {
           provider,
           model: cfg.effectiveModel,
-          apiKey: opts.apiKey,
+          apiKey: resolvedApiKey,
           baseUrl: provider === "ollama" ? opts.ollamaUrl : undefined,
         },
         ragConfig: {

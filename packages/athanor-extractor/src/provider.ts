@@ -104,7 +104,7 @@ export class AnthropicProvider implements LLMProvider {
     this.apiKey = apiKey ?? process.env.ANTHROPIC_API_KEY ?? "";
     if (!this.apiKey) {
       throw new Error(
-        "Anthropic API key required. Set ANTHROPIC_API_KEY or pass --api-key.",
+        "API Key is missing. Please provide it via --api-key flag or set the ANTHROPIC_API_KEY environment variable.",
       );
     }
   }
@@ -137,7 +137,7 @@ export class OpenAIProvider implements LLMProvider {
     this.apiKey = apiKey ?? process.env.OPENAI_API_KEY ?? "";
     if (!this.apiKey) {
       throw new Error(
-        "OpenAI API key required. Set OPENAI_API_KEY or pass --api-key.",
+        "API Key is missing. Please provide it via --api-key flag or set the OPENAI_API_KEY environment variable.",
       );
     }
   }
@@ -330,7 +330,7 @@ export class OpenAIEmbeddingProvider implements EmbeddingProvider {
     this.apiKey = apiKey ?? process.env.OPENAI_API_KEY ?? "";
     if (!this.apiKey) {
       throw new Error(
-        "OpenAI API key required. Set OPENAI_API_KEY or pass --api-key.",
+        "API Key is missing. Please provide it via --api-key flag or set the OPENAI_API_KEY environment variable.",
       );
     }
   }

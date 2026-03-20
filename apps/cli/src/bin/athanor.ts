@@ -16,6 +16,7 @@ import { mcpCommand } from "../commands/mcp.js";
 import { interviewCommand } from "../commands/interview.js";
 import { secondOrderCommand } from "../commands/second-order.js";
 import { chatCommand } from "../commands/chat.js";
+import { redTeamCommand } from "../commands/red-team.js";
 
 const program = new Command();
 
@@ -40,5 +41,6 @@ program.addCommand(mcpCommand);
 program.addCommand(interviewCommand);
 program.addCommand(secondOrderCommand);
 program.addCommand(chatCommand);
+program.addCommand(redTeamCommand);
 
 program.parse();
