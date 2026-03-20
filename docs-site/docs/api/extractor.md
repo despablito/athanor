@@ -37,7 +37,7 @@ interface ExtractorConfig {
 |---|---|
 | Anthropic | claude-sonnet-4-20250514 |
 | OpenAI | gpt-4o |
-| Ollama | llama3.1 |
+| Ollama | llama3.2 (or `OLLAMA_MODEL`) |
 
 ### Methods
 

@@ -89,6 +89,7 @@ const LAYER_MAP: Record<string, string> = {
   rant: "identity",
   meta: "knowledge",
   ritual: "identity",
+  hard_rule: "knowledge",
 };
 
 // ─── Step 1: Vector Search (in-memory fallback) ────────────────────────────────

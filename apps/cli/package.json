@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "bin": {
-    "athanor": "./dist/bin/athanor.js"
+    "athanor": "./bin/athanor.mjs"
   },
   "scripts": {
+    "athanor": "node bin/athanor.mjs",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
     "lint": "eslint src/",

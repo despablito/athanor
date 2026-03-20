@@ -46,7 +46,7 @@ const embeddings = await extractor.embedChunks(portrait);
 |---|---|---|
 | Anthropic | claude-sonnet-4-20250514 | `ANTHROPIC_API_KEY` |
 | OpenAI | gpt-4o | `OPENAI_API_KEY` |
-| Ollama | llama3.1 | None (local) |
+| Ollama | llama3.2 (default; override with `OLLAMA_MODEL` / `--model`) | None (local) |
 
 ## License
 

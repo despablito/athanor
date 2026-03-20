@@ -58,7 +58,7 @@ athanor chat
 
 That’s it: a portrait on disk, chunks extracted from your text, then a **live interactive clone** in your terminal — ask questions, probe beliefs, and watch graph-aware retrieval keep the model grounded.
 
-> **Contributors / monorepo:** clone the repo, run `pnpm install && pnpm build`, then `pnpm --filter @athanor/cli dev -- <command>`. Same commands; no global install needed.
+> **Contributors / monorepo:** clone the repo, run `pnpm install && pnpm build`, then **`pnpm athanor <command>`** (runs the CLI via `tsx`; no global install). Alternatively: `pnpm --filter @athanor/cli run athanor -- <command>` after building the CLI, or `pnpm --filter @athanor/cli dev -- <command>`.
 
 ---
 
@@ -228,7 +228,8 @@ pnpm lint
 ```
 
 ```bash
-pnpm --filter @athanor/cli dev -- <command>
+pnpm athanor <command>          # CLI from repo root (recommended)
+pnpm --filter @athanor/cli dev -- <command>   # same, explicit
 pnpm --filter @athanor/explorer dev
 pnpm --filter @athanor/clone-api dev
 ```
@@ -252,7 +253,12 @@ athanor chat                   Interactive terminal chat with your clone
 athanor serve                  Start the Clone API server
 athanor explore                Open the Explorer UI
 athanor mcp                    Start the MCP server
+athanor red-team               Adversarial identity probes (use --fast on CPU)
 ```
+
+Most commands default to `./portrait.json`. If that file is missing, the CLI **falls back** to the repo example `examples/portraits/fictional-cto/portrait.json` (when run from the monorepo root, or via the bundled path next to `@athanor/cli`). Commands that **write** into the portrait (`import`, `extract`, `db push`, `embed`, `interview`, `meta-generate`, `second-order`) do **not** use this fallback—pass `--portrait` explicitly.
+
+**Local LLM (Ollama):** the default chat model is **`llama3.2`**. Install it with `ollama pull llama3.2`, or use whatever you already have (`ollama list`) and pass `--model <name>` or set **`OLLAMA_MODEL`** / **`LLM_MODEL`**. Embeddings default to **`nomic-embed-text`** (`ollama pull nomic-embed-text`). Optional: **`OLLAMA_NUM_PREDICT`** caps completion length (default `320`; try `128` for faster short answers on CPU). For **`athanor red-team`**, **`--fast`** picks one scenario, tighter RAG, **`OLLAMA_NUM_PREDICT=128`** (if unset), and defaults to **`llama3.2:1b`** (`ollama pull llama3.2:1b`) unless you pass **`--model`**.
 
 ---
 

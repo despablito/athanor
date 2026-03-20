@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@athanor/cli':
+        specifier: workspace:*
+        version: link:apps/cli
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.30.0(@types/node@22.19.15)
@@ -276,6 +279,9 @@ importers:
 
   packages/athanor-interviewer:
     dependencies:
+      '@athanor/clone-api':
+        specifier: workspace:*
+        version: link:../../apps/clone-api
       '@athanor/core':
         specifier: workspace:*
         version: link:../athanor-core
