@@ -33,7 +33,9 @@ export const interviewCommand = new Command("interview")
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .option("--state <path>", "Session state file path", "./interview-state.json")
   .action(async (opts: InterviewOpts) => {
-    const portraitPath = resolvePortraitPath(opts.portrait);
+    const portraitPath = resolvePortraitPath(opts.portrait, {
+      fallbackToExample: false,
+    });
     const statePath = resolve(opts.state);
 
     // Ensure portrait exists
