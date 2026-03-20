@@ -58,7 +58,9 @@ athanor chat
 
 That’s it: a portrait on disk, chunks extracted from your text, then a **live interactive clone** in your terminal — ask questions, probe beliefs, and watch graph-aware retrieval keep the model grounded.
 
-> **Contributors / monorepo:** clone the repo, run `pnpm install && pnpm build`, then `pnpm --filter @athanor/cli dev -- <command>`. Same commands; no global install needed.
+> **Contributors / monorepo:** clone the repo, run `pnpm install && pnpm build`, then run the CLI with **`pnpm athanor <command>`** (root script) or `pnpm --filter @athanor/cli dev -- <command>`. Same commands; no global install needed.
+
+For **Anthropic / OpenAI** (`--provider anthropic` or `openai`), put keys in a **`.env`** at the repo root (or `apps/cli/.env`). The CLI loads the first `.env` it finds walking up from the current working directory — Node does not read `.env` files by itself.
 
 ---
 

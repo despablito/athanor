@@ -72,6 +72,46 @@ export async function savePortraitJSON(path: string, data: PortraitJSON): Promis
   await writeFile(resolved, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
+/** Default when `--portrait` is omitted; resolved relative to `process.cwd()`. */
+export const DEFAULT_CLI_PORTRAIT = "./portrait.json";
+
+/**
+ * Example portrait shipped in the repo (path relative to workspace root).
+ * Used when the default `./portrait.json` is missing and the user did not pass `--portrait`.
+ */
+export const WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE =
+  "examples/portraits/fictional-cto/portrait.json";
+
 export function resolvePortraitPath(option: string | undefined): string {
-  return resolve(option ?? "./portrait.json");
+  return resolve(option ?? DEFAULT_CLI_PORTRAIT);
+}
+
+function findWorkspaceExamplePortraitPath(): string | undefined {
+  let dir = process.cwd();
+  for (let i = 0; i < 16; i++) {
+    const candidate = resolve(dir, WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE);
+    if (existsSync(candidate)) return candidate;
+    const parent = resolve(dir, "..");
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return undefined;
+}
+
+/**
+ * Resolves the portrait file like {@link resolvePortraitPath}.
+ * When the file is missing and `allowWorkspaceExampleFallback` is true, walks up from
+ * `process.cwd()` to find {@link WORKSPACE_EXAMPLE_PORTRAIT_RELATIVE} (so `pnpm --filter`
+ * runs from `apps/cli` still pick up the repo example).
+ */
+export function resolvePortraitPathWithWorkspaceFallback(
+  portrait: string | undefined,
+  opts: { allowWorkspaceExampleFallback: boolean },
+): string {
+  const primary = resolvePortraitPath(portrait);
+  if (existsSync(primary)) return primary;
+  if (!opts.allowWorkspaceExampleFallback) return primary;
+  const example = findWorkspaceExamplePortraitPath();
+  if (example) return example;
+  return primary;
 }

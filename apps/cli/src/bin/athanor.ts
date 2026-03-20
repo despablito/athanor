@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "../lib/load-env.js";
 import { Command } from "commander";
 import { initCommand } from "../commands/init.js";
 import { importCommand } from "../commands/import.js";
@@ -17,6 +18,7 @@ import { interviewCommand } from "../commands/interview.js";
 import { secondOrderCommand } from "../commands/second-order.js";
 import { chatCommand } from "../commands/chat.js";
 import { redTeamCommand } from "../commands/red-team.js";
+import { stripDoubleDashBeforeSubcommand } from "../lib/cli-argv.js";
 
 const program = new Command();
 
@@ -43,4 +45,10 @@ program.addCommand(secondOrderCommand);
 program.addCommand(chatCommand);
 program.addCommand(redTeamCommand);
 
-program.parse();
+const argv = stripDoubleDashBeforeSubcommand(process.argv);
+/** Commander’s default is exit 1 when no subcommand is given — treat as “show help”. */
+if (argv.slice(2).length === 0) {
+  program.outputHelp();
+  process.exit(0);
+}
+program.parse(argv);

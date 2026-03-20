@@ -46,19 +46,22 @@ export const chatCommand = new Command("chat")
     "4000",
   )
   .action(
-    async (opts: {
-      portrait: string;
-      connection: string;
-      subject?: string;
-      subjectName?: string;
-      provider: string;
-      model?: string;
-      apiKey?: string;
-      ollamaUrl: string;
-      vectorTopK: string;
-      rerankTopN: string;
-      contextTokens: string;
-    }) => {
+    async (
+      opts: {
+        portrait: string;
+        connection: string;
+        subject?: string;
+        subjectName?: string;
+        provider: string;
+        model?: string;
+        apiKey?: string;
+        ollamaUrl: string;
+        vectorTopK: string;
+        rerankTopN: string;
+        contextTokens: string;
+      },
+      cmd: Command,
+    ) => {
       console.log("");
       console.log(chalk.bold("Athanor clone chat"));
       console.log(chalk.dim("Type exit or quit to leave.\n"));
@@ -70,6 +73,8 @@ export const chatCommand = new Command("chat")
           connection: opts.connection,
           subject: opts.subject,
           subjectName: opts.subjectName,
+          allowWorkspaceExampleFallback:
+            cmd.getOptionValueSource?.("portrait") !== "cli",
         });
       } catch (err) {
         errorBox(err instanceof Error ? err.message : String(err));

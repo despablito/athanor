@@ -6,7 +6,9 @@ import {
   type Relation,
 } from "@athanor/core";
 import { PortraitStore } from "@athanor/clone-api";
-import { resolvePortraitPath } from "./portrait-io.js";
+import {
+  resolvePortraitPathWithWorkspaceFallback,
+} from "./portrait-io.js";
 
 export const DEFAULT_CLONE_CONNECTION = "file:./portrait.db";
 
@@ -41,6 +43,8 @@ export async function loadPortraitIntoStore(opts: {
   connection: string;
   subject?: string;
   subjectName?: string;
+  /** When true and the portrait file is missing, look for the repo example portrait upward from cwd. */
+  allowWorkspaceExampleFallback?: boolean;
 }): Promise<PortraitStore> {
   const store = new PortraitStore();
 
@@ -59,12 +63,15 @@ export async function loadPortraitIntoStore(opts: {
     return store;
   }
 
-  const path = resolvePortraitPath(opts.portrait);
+  const path = resolvePortraitPathWithWorkspaceFallback(opts.portrait, {
+    allowWorkspaceExampleFallback: Boolean(opts.allowWorkspaceExampleFallback),
+  });
   if (!existsSync(path)) {
     throw new Error(
       `Portrait not found: ${path}\n` +
         `  Push a portrait with: athanor db push --portrait ./portrait.json\n` +
-        `  Or load from the graph DB: athanor chat --subject <id> --connection ${DEFAULT_CLONE_CONNECTION}`,
+        `  Or load from the graph DB: athanor chat --subject <id> --connection ${DEFAULT_CLONE_CONNECTION}\n` +
+        `  Or pass a file: athanor chat --portrait path/to/portrait.json`,
     );
   }
   await store.loadFromFile(path);

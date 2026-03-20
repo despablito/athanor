@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.29.3",
   "scripts": {
+    "athanor": "pnpm --filter @athanor/cli exec tsx src/bin/athanor.ts",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -18,6 +19,7 @@
     ]
   },
   "devDependencies": {
+    "@athanor/cli": "workspace:*",
     "@changesets/cli": "^2.30.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.0.3",

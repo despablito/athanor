@@ -241,6 +241,8 @@ export const redTeamCommand = new Command("red-team")
           connection: opts.connection,
           subject: opts.subject,
           subjectName: opts.subjectName,
+          allowWorkspaceExampleFallback:
+            cmd.getOptionValueSource?.("portrait") !== "cli",
         });
       } catch (err) {
         errorBox(err instanceof Error ? err.message : String(err));
