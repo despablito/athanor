@@ -12,7 +12,7 @@ import EmotionRadar from "./EmotionRadar";
 type RightTab = "detail" | "stats" | "emotions";
 
 export default function PortraitDashboard() {
-  const { portrait, loading, error, selectedChunkId } = usePortrait();
+  const { portrait, loading, error, selectedChunkId, filters, setFilters } = usePortrait();
   const [rightTab, setRightTab] = useState<RightTab>("detail");
 
   // Auto-switch to detail when a chunk is selected
@@ -46,6 +46,10 @@ export default function PortraitDashboard() {
 
   const criticalCount = portrait.chunks.filter((c) => c.uniqueness === "CRITICAL").length;
   const clusterCount = new Set(portrait.chunks.map((c) => c.cluster)).size;
+  const edgeCount = portrait.relations.length;
+
+  // Unique types for filter dropdown
+  const types = [...new Set(portrait.chunks.map((c) => c.type))].sort();
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "var(--surface-0)" }}>
@@ -61,24 +65,70 @@ export default function PortraitDashboard() {
           <span className="text-xs font-mono" style={{ color: "var(--text-secondary)" }}>
             {portrait.subject.name}
           </span>
+          {/* Stats inline */}
+          <div className="flex items-center gap-3 font-mono text-xs ml-2">
+            <span>
+              <span style={{ color: "#5b9cf6" }}>{portrait.chunks.length}</span>
+              <span className="ml-1" style={{ color: "var(--text-dim)" }}>nodes</span>
+            </span>
+            <span>
+              <span style={{ color: "#34d399" }}>{edgeCount}</span>
+              <span className="ml-1" style={{ color: "var(--text-dim)" }}>edges</span>
+            </span>
+            <span>
+              <span style={{ color: "#e85d75" }}>{criticalCount}</span>
+              <span className="ml-1" style={{ color: "var(--text-dim)" }}>CRITICAL</span>
+            </span>
+            <span>
+              <span style={{ color: "#fbbf24" }}>{clusterCount}</span>
+              <span className="ml-1" style={{ color: "var(--text-dim)" }}>clusters</span>
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-4 font-mono text-xs">
-          <div>
-            <span style={{ color: "#5b9cf6" }}>{portrait.chunks.length}</span>
-            <span className="ml-1" style={{ color: "var(--text-dim)" }}>chunks</span>
-          </div>
-          <div>
-            <span style={{ color: "#34d399" }}>{portrait.relations.length}</span>
-            <span className="ml-1" style={{ color: "var(--text-dim)" }}>relations</span>
-          </div>
-          <div>
-            <span style={{ color: "#e85d75" }}>{criticalCount}</span>
-            <span className="ml-1" style={{ color: "var(--text-dim)" }}>CRITICAL</span>
-          </div>
-          <div>
-            <span style={{ color: "#fbbf24" }}>{clusterCount}</span>
-            <span className="ml-1" style={{ color: "var(--text-dim)" }}>clusters</span>
-          </div>
+
+        {/* Filter dropdowns */}
+        <div className="flex items-center gap-2">
+          <select
+            value={filters.type ?? ""}
+            onChange={(e) => setFilters({ ...filters, type: e.target.value || null })}
+            className="font-mono text-xs rounded border px-2 py-1 focus:outline-none focus:border-accent-blue"
+            style={{
+              background: "var(--surface-2)",
+              borderColor: "var(--border)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <option value="">All types</option>
+            {types.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+
+          <select
+            value={filters.uniqueness ?? ""}
+            onChange={(e) => setFilters({ ...filters, uniqueness: e.target.value || null })}
+            className="font-mono text-xs rounded border px-2 py-1 focus:outline-none focus:border-accent-blue"
+            style={{
+              background: "var(--surface-2)",
+              borderColor: "var(--border)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            <option value="">All uniqueness</option>
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+          </select>
+
+          {(filters.type || filters.uniqueness || filters.cluster) && (
+            <button
+              onClick={() => setFilters({ cluster: null, type: null, uniqueness: null, search: "" })}
+              className="text-xs font-mono transition-colors"
+              style={{ color: "var(--text-dim)" }}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </header>
 

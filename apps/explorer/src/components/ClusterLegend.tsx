@@ -36,12 +36,22 @@ export default function ClusterLegend() {
               }}
             >
               <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: clusterColor(name) }}
+                className="rounded-full flex-shrink-0"
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  backgroundColor: clusterColor(name),
+                  opacity: isActive ? 1 : 0.8,
+                }}
               />
               <span
-                className="text-[10px] font-mono truncate"
-                style={{ color: isActive ? "var(--text-primary)" : "var(--text-dim)" }}
+                className="font-mono truncate"
+                style={{
+                  fontSize: "9px",
+                  color: isActive ? "var(--text-primary)" : undefined,
+                  opacity: isActive ? 1 : 0.7,
+                  fontWeight: isActive ? 600 : 400,
+                }}
               >
                 {name}
               </span>
