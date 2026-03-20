@@ -20,7 +20,9 @@ export const metaGenerateCommand = new Command("meta-generate")
   .option("--api-key <key>", "API key for the provider")
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .action(async (opts: MetaOpts) => {
-    const portraitPath = resolvePortraitPath(opts.portrait);
+    const portraitPath = resolvePortraitPath(opts.portrait, {
+      fallbackToExample: false,
+    });
     const spinner = ora("Loading portrait…").start();
 
     try {

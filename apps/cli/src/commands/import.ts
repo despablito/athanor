@@ -43,7 +43,9 @@ export const importCommand = new Command("import")
       process.exit(1);
     }
 
-    const portraitPath = resolvePortraitPath(opts.portrait);
+    const portraitPath = resolvePortraitPath(opts.portrait, {
+      fallbackToExample: false,
+    });
     if (!existsSync(portraitPath)) {
       errorBox(
         `Portrait file not found: ${portraitPath}`,

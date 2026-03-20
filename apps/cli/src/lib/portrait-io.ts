@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   Portrait,
   asChunkId,
@@ -72,6 +73,71 @@ export async function savePortraitJSON(path: string, data: PortraitJSON): Promis
   await writeFile(resolved, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
-export function resolvePortraitPath(option: string | undefined): string {
-  return resolve(option ?? "./portrait.json");
+/** Default portrait path when none is passed (current working directory). */
+export const DEFAULT_PORTRAIT_FILE = "./portrait.json";
+
+/** Example portrait shipped in the repo (for dev / demos when `./portrait.json` is missing). */
+export const EXAMPLE_PORTRAIT_RELATIVE = "examples/portraits/fictional-cto/portrait.json";
+
+export type ResolvePortraitOptions = {
+  /**
+   * When `./portrait.json` is missing, try the fictional CTO example (cwd, then bundled path).
+   * Disable for commands that write or merge into the portrait file.
+   * @default true
+   */
+  fallbackToExample?: boolean;
+};
+
+function bundledExamplePortraitPath(): string {
+  return join(
+    dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "..",
+    "..",
+    "..",
+    EXAMPLE_PORTRAIT_RELATIVE,
+  );
+}
+
+function isDefaultPortraitLocation(option: string | undefined): boolean {
+  if (option === undefined) return true;
+  return resolve(option) === resolve(DEFAULT_PORTRAIT_FILE);
+}
+
+/**
+ * Resolve a portrait JSON path. When the default `./portrait.json` is missing and
+ * `fallbackToExample` is true, falls back to `examples/portraits/fictional-cto/portrait.json`
+ * (from cwd, then next to the CLI package in the monorepo).
+ */
+export function resolvePortraitPath(
+  option: string | undefined,
+  options: ResolvePortraitOptions = {},
+): string {
+  const { fallbackToExample = true } = options;
+  const input = option ?? DEFAULT_PORTRAIT_FILE;
+  const resolved = resolve(input);
+
+  if (existsSync(resolved)) {
+    return resolved;
+  }
+
+  if (!fallbackToExample || !isDefaultPortraitLocation(option)) {
+    throw new Error(`Portrait file not found: ${resolved}`);
+  }
+
+  const fromCwd = resolve(process.cwd(), EXAMPLE_PORTRAIT_RELATIVE);
+  if (existsSync(fromCwd)) {
+    return fromCwd;
+  }
+
+  const bundled = bundledExamplePortraitPath();
+  if (existsSync(bundled)) {
+    return bundled;
+  }
+
+  throw new Error(
+    `Portrait file not found: ${resolved}\n` +
+      `  Also tried example: ${fromCwd}\n` +
+      `  Create ${DEFAULT_PORTRAIT_FILE}, copy from ${EXAMPLE_PORTRAIT_RELATIVE}, or pass --portrait <path>.`,
+  );
 }

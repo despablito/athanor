@@ -2,79 +2,12 @@ import { Command } from "commander";
 import { input } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
-import { existsSync } from "node:fs";
-import {
-  createGraphStore,
-  type PortraitJSON,
-  type Chunk,
-  type Relation,
-} from "@athanor/core";
 import { CloneEngine, PortraitStore } from "@athanor/clone-api";
-import { resolvePortraitPath } from "../lib/portrait-io.js";
+import {
+  loadPortraitIntoStore,
+  DEFAULT_CLONE_CONNECTION,
+} from "../lib/load-clone-portrait.js";
 import { errorBox } from "../lib/ui.js";
-
-const DEFAULT_CONNECTION = "file:./portrait.db";
-
-function portraitJsonFromGraphExport(
-  subjectId: string,
-  displayName: string,
-  raw: { chunks: unknown[]; relations: unknown[] },
-): PortraitJSON {
-  const chunks = raw.chunks as unknown as Chunk[];
-  const relations = raw.relations as unknown as Relation[];
-  const cluster_coverage: Record<string, number> = {};
-  for (const c of chunks) {
-    cluster_coverage[c.cluster] = (cluster_coverage[c.cluster] ?? 0) + 1;
-  }
-  return {
-    version: "1.0.0-draft",
-    subject: { id: subjectId, name: displayName },
-    created_at: new Date().toISOString(),
-    chunks,
-    relations,
-    metadata: {
-      completeness_score: 0,
-      chunk_count: chunks.length,
-      relation_count: relations.length,
-      cluster_coverage,
-    },
-  };
-}
-
-async function loadPortraitIntoStore(opts: {
-  portrait: string;
-  connection: string;
-  subject?: string;
-  subjectName?: string;
-}): Promise<PortraitStore> {
-  const store = new PortraitStore();
-
-  if (opts.subject) {
-    const graph = createGraphStore(opts.connection);
-    await graph.connect();
-    try {
-      const raw = await graph.exportPortrait(opts.subject);
-      const displayName = opts.subjectName ?? opts.subject;
-      store.loadFromJSON(
-        portraitJsonFromGraphExport(opts.subject, displayName, raw),
-      );
-    } finally {
-      await graph.close();
-    }
-    return store;
-  }
-
-  const path = resolvePortraitPath(opts.portrait);
-  if (!existsSync(path)) {
-    throw new Error(
-      `Portrait not found: ${path}\n` +
-        `  Push a portrait with: athanor db push --portrait ./portrait.json\n` +
-        `  Or load from the graph DB: athanor chat --subject <id> --connection ${DEFAULT_CONNECTION}`,
-    );
-  }
-  await store.loadFromFile(path);
-  return store;
-}
 
 export const chatCommand = new Command("chat")
   .description("Interactive terminal chat with your clone (no HTTP server)")
@@ -82,7 +15,7 @@ export const chatCommand = new Command("chat")
   .option(
     "--connection <url>",
     "Database URL (with --subject)",
-    DEFAULT_CONNECTION,
+    DEFAULT_CLONE_CONNECTION,
   )
   .option(
     "--subject <id>",

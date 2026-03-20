@@ -34,11 +34,11 @@ athanor extract source.txt \
 
 ```bash
 # Make sure Ollama is running with a model pulled
-ollama pull llama3.1
+ollama pull llama3.2
 
 athanor extract source.txt \
   --provider ollama \
-  --model llama3.1
+  --model llama3.2
 ```
 
 ## The Extraction Pipeline
