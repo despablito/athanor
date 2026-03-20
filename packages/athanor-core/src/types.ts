@@ -123,6 +123,8 @@ export interface RelationInput {
 export interface PortraitSubject {
   name: string;
   id: string;
+  /** BCP 47 tag for interview / extraction (e.g. en, pl). */
+  language?: string;
 }
 
 export interface PortraitMetadata {

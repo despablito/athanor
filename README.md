@@ -11,7 +11,7 @@
   <a href=".nvmrc"><img src="https://img.shields.io/badge/Node-%3E%3D22-green.svg?style=for-the-badge" alt="Node"></a>
 </p>
 
-[Quick Start](#-quick-start-the-magic-mirror) · [How It Works](#how-it-works) · [Protocol](protocol/PROTOCOL.md) · [Docs](docs-site/) · [Contributing](CONTRIBUTING.md)
+[Quick Start](#-quick-start-the-magic-mirror) · [Graph vs chat](#building-the-graph-vs-talking-to-the-clone) · [How It Works](#how-it-works) · [Protocol](protocol/PROTOCOL.md) · [Docs](docs-site/) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -31,11 +31,11 @@ When you talk to an Athanor **Clone**, retrieval isn’t “top-5 similar paragr
 
 - **Zero-config local mode** — Embedded graph + vector database (libSQL/SQLite). **No Docker required** to get started.
 - **Structured identity model** — 15 chunk types, 6 relation types, 3-level uniqueness scoring, per-chunk confidence
-- **AI Interviewer** — 5-phase adaptive interview agent for deep identity extraction
+- **AI Interviewer** (`athanor interview`) — 5-phase adaptive Q&A; **merges new chunks** into the portrait after the session (unlike `chat`, which is read-only RAG)
 - **Graph-aware RAG** — Vector search → graph expansion → reranking → layer assembly
 - **Second-order thinking** — LLM-driven consequence analysis of meta-chunks ("And then what?")
 - **Red-team probes** — Adversarial identity interrogation via contradiction vectors and orphan hard rules
-- **Interactive chat** — `athanor chat` for a terminal clone session (no HTTP server)
+- **Interactive chat** — `athanor chat` for graph-aware RAG with your clone (**does not modify** the portrait; use `interview` or `extract` to grow the graph)
 - **Interactive Explorer** — D3.js force-directed graph, cluster maps, stats dashboards
 - **MCP integration** — Model Context Protocol server for Claude, Cursor, and friends
 - **Multi-provider LLM** — Anthropic, OpenAI, and Ollama (local)
@@ -64,6 +64,24 @@ That's it: a portrait on disk, chunks extracted from your text, then a **live in
 
 ---
 
+## Building the graph vs talking to the clone
+
+Athanor separates **two jobs** people often mix up:
+
+| Goal | What to run | Portrait file |
+|------|-------------|----------------|
+| **Add / expand chunks** (bulk text) | `athanor extract <file>` … | **Writes** new chunks (and relations from the pipeline) |
+| **Add / expand chunks** (guided dialogue) | `athanor interview` — AI asks, you answer; session ends with extraction **merged** into `portrait.json` | **Writes** |
+| **Talk to the clone** (no graph edits) | `athanor chat` — graph-aware RAG only | **Read-only** |
+
+So: **Quick Start** above is the *file → extract → chat* path. If you want the *“interviewer probes gaps and the graph grows from our back-and-forth”* path, use **`athanor interview`** (any time — not only right after `init`). After either extraction path, run **`athanor embed`** when you use vector retrieval.
+
+**Full walkthrough:** [docs-site/docs/guides/portrait-lifecycle.md](docs-site/docs/guides/portrait-lifecycle.md) (also published on the docs site under *Guides → Portrait lifecycle*).
+
+**Maintainers:** use [contributing/graph-building-audit-prompt.md](contributing/graph-building-audit-prompt.md) to sanity-check docs vs code when this area changes.
+
+---
+
 ## How It Works
 
 ```
@@ -75,14 +93,15 @@ That's it: a portrait on disk, chunks extracted from your text, then a **live in
                                │
                     ┌──────────▼──────────┐
                     │    AI Interviewer    │
+                    │  (CLI: interview)    │
                     │  5-phase adaptive    │
-                    │  identity extraction │
                     └──────────┬──────────┘
                                │
               ┌────────────────▼────────────────┐
-              │          Extraction Pipeline      │
-              │  Chunker → Classifier → Linker   │
-              │  → Meta-Generator → Embedder     │
+              │     Extraction Pipeline         │
+              │  (batch: extract <file>)        │
+              │  Chunker → Classifier → Linker  │
+              │  → Meta-Generator → Embedder    │
               └────────────────┬────────────────┘
                                │
               ┌────────────────▼────────────────┐
@@ -94,8 +113,8 @@ That's it: a portrait on disk, chunks extracted from your text, then a **live in
     ┌────────────▼──┐ ┌──────▼────────┐ ┌─▼────────────────┐
     │  Clone API    │ │  Explorer     │ │  Second-Order     │
     │  + CLI chat   │ │  D3.js force  │ │  Consequence      │
-    │  Graph-aware  │ │  graph + stats│ │  analysis feeds   │
-    │  RAG pipeline │ │               │ │  back → Portrait  │
+    │  (chat reads  │ │  graph + stats│ │  analysis feeds   │
+    │   graph only) │ │               │ │  back → Portrait  │
     └───────┬───────┘ └───────────────┘ └──────────────────┘
             │
     ┌───────▼───────┐
@@ -105,6 +124,8 @@ That's it: a portrait on disk, chunks extracted from your text, then a **live in
     │  probes       │
     └───────────────┘
 ```
+
+*The **interview** path and **`extract <file>`** path both feed the Portrait (not sequential steps). **Chat** only consumes the graph.*
 
 ---
 
@@ -250,7 +271,7 @@ pnpm --filter @athanor/clone-api dev
 ## CLI Commands
 
 ```
-athanor init <name>            Create a new portrait
+athanor init <name>            Create ./portrait.json (TTY: language prompt; or -l en|pl|…)
 athanor interview              Run AI-guided identity interview
 athanor import <file>          Import chunks from JSON/transcript
 athanor extract <file>         LLM-extract chunks from text
@@ -268,7 +289,7 @@ athanor mcp                    Start the MCP server
 athanor red-team               Adversarial identity probes (use --fast on CPU)
 ```
 
-Most commands default to `./portrait.json`. If that file is missing, the CLI **falls back** to the repo example `examples/portraits/fictional-cto/portrait.json` (when run from the monorepo root, or via the bundled path next to `@athanor/cli`). Commands that **write** into the portrait (`import`, `extract`, `db push`, `embed`, `interview`, `meta-generate`, `second-order`) do **not** use this fallback—pass `--portrait` explicitly.
+Most commands default to `./portrait.json`. If that file is missing, the CLI **falls back** to the repo example `examples/portraits/fictional-cto/portrait.json` (walking up from `cwd` so `pnpm --filter @athanor/cli …` still works). **Read-only** commands (`chat`, `red-team`, …) load that file directly. **Writing** commands (`import`, `extract`, `db push`, `embed`, `meta-generate`, `second-order`) require an explicit `--portrait` or an existing `./portrait.json` — they do not silently use the example. **`interview`** is special: if you use the default portrait path and `./portrait.json` is missing, it **copies** the example to `./portrait.json` in your current directory first, then runs the session (so merges never overwrite the bundled example).
 
 **Local LLM (Ollama):** the default chat model is **`llama3.2`**. Install it with `ollama pull llama3.2`, or use whatever you already have (`ollama list`) and pass `--model <name>` or set **`OLLAMA_MODEL`** / **`LLM_MODEL`**. Embeddings default to **`nomic-embed-text`** (`ollama pull nomic-embed-text`). Optional: **`OLLAMA_NUM_PREDICT`** caps completion length (default `320`; try `128` for faster short answers on CPU). For **`athanor red-team`**, **`--fast`** picks one scenario, tighter RAG, **`OLLAMA_NUM_PREDICT=128`** (if unset), and defaults to **`llama3.2:1b`** (`ollama pull llama3.2:1b`) unless you pass **`--model`**.
 

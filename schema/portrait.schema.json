@@ -31,6 +31,13 @@
           "type": "string",
           "minLength": 1,
           "description": "A unique identifier for the subject."
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 16,
+          "pattern": "^[a-z]{2}(-[A-Za-z0-9]+)?$",
+          "description": "Primary language for interviews/extraction (BCP 47 tag, e.g. en, pl)."
         }
       },
       "additionalProperties": false

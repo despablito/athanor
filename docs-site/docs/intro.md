@@ -43,6 +43,7 @@ When you ask an Athanor Clone a question, it doesn't just do keyword search. It 
 ## Next Steps
 
 - [Installation](guides/installation) — Get Athanor running locally
+- [Portrait lifecycle](guides/portrait-lifecycle) — **Grow the graph** (`extract`, `interview`) vs **`chat`** (read-only clone)
 - [Core Concepts](concepts/three-layers) — Understand the three semantic layers
 - [First Portrait](guides/first-portrait) — Build your first identity portrait
 - [Philosophy](philosophy) — Why depth beats breadth

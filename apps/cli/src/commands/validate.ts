@@ -2,14 +2,19 @@ import { Command } from "commander";
 import ora from "ora";
 import chalk from "chalk";
 import { validatePortrait, RECOMMENDED_CLUSTERS } from "@athanor/core";
-import { loadPortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
+import {
+  loadPortraitJSON,
+  resolvePortraitPath,
+  resolvePortraitPathForReadCommand,
+} from "../lib/portrait-io.js";
 import { ok, warn, fail, heading, errorBox } from "../lib/ui.js";
 
 export const validateCommand = new Command("validate")
   .description("Validate a portrait against the Athanor protocol schema")
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .action(async (opts: { portrait: string }) => {
-    const portraitPath = resolvePortraitPath(opts.portrait);
+    const naivePath = resolvePortraitPath(opts.portrait);
+    const portraitPath = resolvePortraitPathForReadCommand(opts.portrait);
 
     const spinner = ora("Validating portrait…").start();
 
@@ -22,6 +27,11 @@ export const validateCommand = new Command("validate")
       console.log("");
       console.log(`  ${heading("Portrait Validation")}`);
       console.log(`  ${chalk.dim(portraitPath)}`);
+      if (portraitPath !== naivePath) {
+        console.log(
+          `  ${chalk.dim("(default --portrait resolved here; flat ./portrait.json vs ./portrait/portrait.json)")}`,
+        );
+      }
       console.log("");
 
       if (result.valid) {

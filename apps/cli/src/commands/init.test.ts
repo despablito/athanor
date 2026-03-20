@@ -41,6 +41,7 @@ describe("athanor init", () => {
       expect(portrait.version).toBe("1.0.0-draft");
       expect(portrait.subject.name).toBe("Jan Kowalski");
       expect(portrait.subject.id).toBe("jan-kowalski");
+      expect(portrait.subject.language).toBe("en");
       expect(portrait.chunks).toEqual([]);
       expect(portrait.relations).toEqual([]);
       expect(portrait.metadata.completeness_score).toBe(0);
@@ -48,6 +49,21 @@ describe("athanor init", () => {
       expect(portrait.metadata.relation_count).toBe(0);
       expect(portrait.metadata.cluster_coverage).toEqual({});
       expect(portrait.created_at).toBeTruthy();
+    },
+    subprocessTimeoutMs,
+  );
+
+  it(
+    "stores --language in subject",
+    () => {
+      const outputDir = join(tmpDir, "lang-pl");
+
+      run(["init", "Test", "--output", outputDir, "--language", "pl"]);
+
+      const portrait = JSON.parse(
+        readFileSync(join(outputDir, "portrait.json"), "utf-8"),
+      );
+      expect(portrait.subject.language).toBe("pl");
     },
     subprocessTimeoutMs,
   );

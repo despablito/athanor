@@ -29,6 +29,9 @@ export {
   estimateSessionDuration,
 } from "./scheduler.js";
 
+export { buildPortraitBriefForInterview } from "./portrait-brief.js";
+export type { PortraitBriefOptions } from "./portrait-brief.js";
+
 export type {
   PhaseId,
   PhaseDefinition,

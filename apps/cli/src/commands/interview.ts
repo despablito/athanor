@@ -1,15 +1,37 @@
 import { Command } from "commander";
-import { existsSync } from "node:fs";
+import { input } from "@inquirer/prompts";
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { createInterface } from "node:readline";
 import ora from "ora";
 import chalk from "chalk";
 import { Interviewer } from "@athanor/interviewer";
 import type { InterviewSessionImpl, PhaseId, InterviewMode } from "@athanor/interviewer";
 import type { PortraitJSON, Chunk } from "@athanor/core";
-import { loadPortraitJSON, savePortraitJSON, resolvePortraitPath } from "../lib/portrait-io.js";
+import {
+  loadPortraitJSON,
+  savePortraitJSON,
+  resolvePortraitPathForMutatingCommand,
+} from "../lib/portrait-io.js";
 import { errorBox, successBox, warnBox } from "../lib/ui.js";
+
+/** Recognize skip/done (with or without leading /). Slash+word looks like a path to zsh if typed at the shell by mistake. */
+function parseInterviewCommandLine(trimmed: string): "/skip" | "/done" | null {
+  const t = trimmed.toLowerCase();
+  if (t === "skip" || t === "/skip") return "/skip";
+  if (t === "done" || t === "/done") return "/done";
+  if (t === "exit" || t === "/exit" || t === "quit" || t === "/quit") {
+    return "/done";
+  }
+  return null;
+}
+
+function isInquirerCancel(err: unknown): boolean {
+  return (
+    err instanceof Error &&
+    (err.name === "ExitPromptError" ||
+      err.message.includes("User force closed"))
+  );
+}
 
 interface InterviewOpts {
   mode: InterviewMode;
@@ -23,7 +45,9 @@ interface InterviewOpts {
 }
 
 export const interviewCommand = new Command("interview")
-  .description("Run an interactive identity interview session")
+  .description(
+    "Guided identity interview: AI asks questions; ends with chunk extraction merged into portrait (use this to grow the graph — unlike `chat`, which is read-only)",
+  )
   .option("--mode <mode>", "Interview mode: sync, async, self", "self")
   .option("--phase <phase>", "Phase: all, 0, 1, 2, 3, 4", "all")
   .option("--language <lang>", "Language", "en")
@@ -32,18 +56,21 @@ export const interviewCommand = new Command("interview")
   .option("--api-key <key>", "API key for the provider")
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .option("--state <path>", "Session state file path", "./interview-state.json")
-  .action(async (opts: InterviewOpts) => {
-    const portraitPath = resolvePortraitPath(opts.portrait);
-    const statePath = resolve(opts.state);
-
-    // Ensure portrait exists
-    if (!existsSync(portraitPath)) {
+  .action(async (opts: InterviewOpts, cmd: Command) => {
+    let portraitPath: string;
+    try {
+      portraitPath = await resolvePortraitPathForMutatingCommand(opts.portrait, {
+        allowWorkspaceExampleFallback: cmd.getOptionValueSource?.("portrait") !== "cli",
+      });
+    } catch (err) {
       errorBox(
-        `Portrait file not found: ${portraitPath}`,
-        "Run 'athanor init <name>' first to create a portrait.",
+        err instanceof Error ? err.message : String(err),
+        "Run 'athanor init <name>' first, or pass --portrait <path>.",
       );
       process.exit(1);
     }
+
+    const statePath = resolve(opts.state);
 
     const portrait = await loadPortraitJSON(portraitPath);
     const phase = opts.phase === "all" ? "all" : (Number(opts.phase) as PhaseId);
@@ -58,8 +85,32 @@ export const interviewCommand = new Command("interview")
     console.log(`  Phase:   ${chalk.bold(opts.phase)}`);
     console.log(`  Provider:${chalk.bold(opts.provider)}`);
     console.log("");
-    console.log(chalk.dim("  Type your answers. Press Enter twice to submit."));
-    console.log(chalk.dim("  Type /skip to skip a question, /done to end the session."));
+    console.log(
+      chalk.dim(
+        "  Wait for the “>” prompt after each question (stdin for this program — not your shell).",
+      ),
+    );
+    console.log(
+      chalk.dim(
+        "  Long answers: type text, then Enter, then a blank line to submit. ",
+      ) +
+        chalk.dim("End session: ") +
+        chalk.cyan("done") +
+        chalk.dim(" · skip question: ") +
+        chalk.cyan("skip") +
+        chalk.dim(" (one line + Enter). "),
+    );
+    console.log(
+      chalk.dim(
+        "  Also: /skip /done — ",
+      ) +
+        chalk.yellow("do not type these at your shell prompt") +
+        chalk.dim(
+          " (zsh treats /done as a path). Type them only after the ",
+        ) +
+        chalk.dim("> ") +
+        chalk.dim("under a question."),
+    );
     console.log(chalk.dim("  ─────────────────────────────────────────────"));
     console.log("");
 
@@ -76,6 +127,7 @@ export const interviewCommand = new Command("interview")
       mode: opts.mode,
       phase,
       portraitPath,
+      initialPortrait: portrait,
       statePath,
     });
 
@@ -89,30 +141,45 @@ async function runInteractiveLoop(
   portraitPath: string,
   statePath: string,
 ): Promise<void> {
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  const ask = (prompt: string): Promise<string> => {
-    return new Promise((resolve) => {
-      rl.question(prompt, resolve);
-    });
-  };
-
+  // Use @inquirer/prompts (same as `athanor chat`) — raw readline often loses stdin under
+  // pnpm/tsx/ora and drops straight back to the shell after printing the question.
   const readMultilineAnswer = async (): Promise<string> => {
+    let first: string;
+    try {
+      first = await input({
+        message: chalk.bold.cyan("  >"),
+      });
+    } catch (err) {
+      if (isInquirerCancel(err)) return "/done";
+      throw err;
+    }
+
+    const trimmed = first.trim();
+    if (trimmed !== "") {
+      const cmd = parseInterviewCommandLine(trimmed);
+      if (cmd) return cmd;
+    }
+
     const lines: string[] = [];
-    let emptyLineCount = 0;
+    if (first !== "") lines.push(first);
 
     while (true) {
-      const line = await ask("");
-      if (line === "") {
-        emptyLineCount++;
-        if (emptyLineCount >= 1 && lines.length > 0) break;
-      } else {
-        emptyLineCount = 0;
-        lines.push(line);
+      let line: string;
+      try {
+        line = await input({
+          message: chalk.dim("   ·"),
+        });
+      } catch (err) {
+        if (isInquirerCancel(err)) {
+          return lines.length > 0 ? lines.join("\n") : "/done";
+        }
+        throw err;
       }
+      if (line === "") {
+        if (lines.length > 0) break;
+        continue;
+      }
+      lines.push(line);
     }
 
     return lines.join("\n");
@@ -121,8 +188,7 @@ async function runInteractiveLoop(
   let questionCount = 0;
   let shouldExit = false;
 
-  try {
-    while (!session.isComplete() && !shouldExit) {
+  while (!session.isComplete() && !shouldExit) {
       // Get next question
       const spinner = ora({ text: "Thinking...", color: "cyan" }).start();
       let question: string;
@@ -141,24 +207,25 @@ async function runInteractiveLoop(
       console.log("");
       console.log(chalk.cyan.bold(`  Q${questionCount}: `) + chalk.cyan(question));
       console.log("");
-      process.stdout.write(chalk.dim("  > "));
 
-      // Read the answer
+      // Read the answer (prompt drawn by @inquirer `input`, same stack as `athanor chat`)
       const answer = await readMultilineAnswer();
 
-      // Handle commands
-      if (answer.trim() === "/skip") {
+      // Handle commands (skip | done with or without leading /)
+      const cmd = parseInterviewCommandLine(answer.trim());
+      if (cmd === "/skip") {
         console.log(chalk.dim("  (Skipped)"));
         continue;
       }
 
-      if (answer.trim() === "/done") {
-        shouldExit = true;
+      if (cmd === "/done") {
         break;
       }
 
       if (answer.trim().length < 5) {
-        warnBox("Answer too short. Please provide a more detailed response, or type /skip.");
+        warnBox(
+          "Answer too short. Add more detail, or type skip (or /skip) to skip this question.",
+        );
         continue;
       }
 
@@ -199,9 +266,6 @@ async function runInteractiveLoop(
       if (questionCount % 3 === 0) {
         await session.save();
       }
-    }
-  } finally {
-    rl.close();
   }
 
   // ─── Post-session processing ─────────────────────────────────────────────

@@ -174,6 +174,10 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 
 For GitHub Pages docs, enable **Settings → Pages → Deploy from a branch** using **`gh-pages`** branch.
 
+## Docs: graph building vs `chat`
+
+When you change README, CLI help text, or guides around **`extract`**, **`interview`**, and **`chat`**, use the checklist in [contributing/graph-building-audit-prompt.md](contributing/graph-building-audit-prompt.md) so users never lose track of which commands **write** to the portrait.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
