@@ -9,7 +9,7 @@ import {
   UNIQUENESS_RADIUS,
   META_RADIUS,
 } from "@/lib/colors";
-import type { Chunk, Relation } from "@/lib/types";
+import type { Chunk } from "@/lib/types";
 
 /* ── Simulation node / link ────────────────────────────────────── */
 
@@ -19,7 +19,7 @@ interface SimNode extends d3.SimulationNodeDatum {
 }
 
 interface SimLink extends d3.SimulationLinkDatum<SimNode> {
-  relation: Relation;
+  relation: { source: string; target: string; type: string; weight?: number; description?: string };
 }
 
 /* ── Helpers ───────────────────────────────────────────────────── */
@@ -44,9 +44,7 @@ function nodeStroke(chunk: Chunk): { color: string; width: number; dash: string 
   return { color: base, width: 1.2, dash: "" };
 }
 
-/** Strip common prefix from chunk_id for short labels */
 function shortLabel(id: string): string {
-  // e.g. "TDM-HEUR-001" → "HEUR-001"
   const parts = id.split("-");
   return parts.length > 2 ? parts.slice(1).join("-") : id;
 }
@@ -58,17 +56,17 @@ export default function GraphView() {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const {
     portrait,
-    filteredChunks,
     selectedChunkId,
     selectChunk,
     viewMode,
+    filters,
   } = usePortrait();
   const simulationRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
-
   const [graphSearch, setGraphSearch] = useState("");
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
 
-  /* ── Build graph ───────────────────────────────────────────── */
+  /* ── Build graph (uses ALL chunks — dimming is visual only) ── */
 
   const buildGraph = useCallback(() => {
     if (!svgRef.current || !portrait) return;
@@ -79,16 +77,17 @@ export default function GraphView() {
     const rect = svgRef.current.getBoundingClientRect();
     const width = rect.width || 800;
     const height = rect.height || 600;
+    const cx = width / 2;
+    const cy = height / 2;
 
-    const filteredIds = new Set(filteredChunks.map((c) => c.chunk_id));
-
-    const nodes: SimNode[] = filteredChunks.map((chunk) => ({
+    const nodes: SimNode[] = portrait.chunks.map((chunk) => ({
       id: chunk.chunk_id,
       chunk,
     }));
 
+    const chunkIds = new Set(portrait.chunks.map((c) => c.chunk_id));
     const links: SimLink[] = portrait.relations
-      .filter((r) => filteredIds.has(r.source) && filteredIds.has(r.target))
+      .filter((r) => chunkIds.has(r.source) && chunkIds.has(r.target))
       .map((relation) => ({
         source: relation.source,
         target: relation.target,
@@ -104,21 +103,15 @@ export default function GraphView() {
         d3
           .forceLink<SimNode, SimLink>(links)
           .id((d) => d.id)
-          .distance((d) =>
-            d.relation.type === "EXPRESSED_THROUGH" ? 52 : 84,
-          )
+          .distance((d) => (d.relation.type === "EXPRESSED_THROUGH" ? 65 : 100))
           .strength(0.26),
       )
-      .force("charge", d3.forceManyBody().strength(-300))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force(
-        "collision",
-        d3.forceCollide<SimNode>().radius(26),
-      );
+      .force("charge", d3.forceManyBody().strength(-180))
+      .force("center", d3.forceCenter(cx, cy))
+      .force("collision", d3.forceCollide<SimNode>().radius(26));
 
-    // Custom cluster gravity force
+    // Custom cluster gravity
     simulation.force("clusterGravity", (alpha: number) => {
-      // Compute cluster centroids
       const centroids: Record<string, { x: number; y: number; count: number }> = {};
       for (const node of nodes) {
         const c = node.chunk.cluster;
@@ -128,17 +121,30 @@ export default function GraphView() {
         centroids[c].count++;
       }
       for (const key of Object.keys(centroids)) {
-        const c = centroids[key];
-        c.x /= c.count;
-        c.y /= c.count;
+        const ct = centroids[key];
+        ct.x /= ct.count;
+        ct.y /= ct.count;
       }
-      // Nudge each node toward its cluster centroid
       const k = alpha * 0.08;
       for (const node of nodes) {
-        const c = centroids[node.chunk.cluster];
-        if (c) {
-          node.vx = (node.vx ?? 0) + (c.x - (node.x ?? 0)) * k;
-          node.vy = (node.vy ?? 0) + (c.y - (node.y ?? 0)) * k;
+        const ct = centroids[node.chunk.cluster];
+        if (ct) {
+          node.vx = (node.vx ?? 0) + (ct.x - (node.x ?? 0)) * k;
+          node.vy = (node.vy ?? 0) + (ct.y - (node.y ?? 0)) * k;
+        }
+      }
+    });
+
+    // Bounding box force: push outliers back toward center
+    simulation.force("bounds", (alpha: number) => {
+      const k = alpha * 0.05;
+      for (const node of nodes) {
+        const dx = (node.x ?? 0) - cx;
+        const dy = (node.y ?? 0) - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 600) {
+          node.vx = (node.vx ?? 0) - dx * k;
+          node.vy = (node.vy ?? 0) - dy * k;
         }
       }
     });
@@ -148,8 +154,6 @@ export default function GraphView() {
     /* ── SVG structure ────────────────────────────────────── */
 
     const defs = svg.append("defs");
-
-    // Arrow markers for each relation type
     for (const [type, color] of Object.entries(RELATION_COLORS)) {
       defs
         .append("marker")
@@ -167,22 +171,16 @@ export default function GraphView() {
 
     const g = svg.append("g");
 
-    // Zoom
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.04, 8])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform);
-      });
+      .on("zoom", (event) => g.attr("transform", event.transform));
 
     svg.call(zoom);
     zoomRef.current = zoom;
 
-    // Click empty space to deselect
     svg.on("click", (event) => {
-      if (event.target === svgRef.current) {
-        selectChunk(null);
-      }
+      if (event.target === svgRef.current) selectChunk(null);
     });
 
     /* ── Edges ────────────────────────────────────────────── */
@@ -194,15 +192,15 @@ export default function GraphView() {
       .data(links)
       .join("line")
       .attr("stroke", (d) => RELATION_COLORS[d.relation.type] ?? "#333")
-      .attr("stroke-opacity", 0.2)
+      .attr("stroke-opacity", 0.12)
       .attr("stroke-width", (d) => 0.5 + (d.relation.weight ?? 0.5))
       .attr("stroke-dasharray", (d) =>
         d.relation.type === "EXPRESSED_THROUGH" ? "5 3" : "",
       )
       .attr("marker-end", (d) => `url(#arrow-${d.relation.type})`)
-      .style("transition", "opacity 0.15s ease");
+      .style("transition", "stroke-opacity 0.15s ease");
 
-    // Relation labels (hidden by default, shown via viewMode)
+    // Relation labels (hidden by default)
     const linkLabel = g
       .append("g")
       .attr("class", "link-labels")
@@ -270,6 +268,7 @@ export default function GraphView() {
         selectChunk(selectedChunkId === d.id ? null : d.id);
       })
       .on("mouseenter", (event, d) => {
+        setHoveredNodeId(d.id);
         if (!tooltipRef.current) return;
         const tooltip = tooltipRef.current;
         tooltip.style.display = "block";
@@ -289,6 +288,7 @@ export default function GraphView() {
         tooltipRef.current.style.top = `${event.clientY - 10}px`;
       })
       .on("mouseleave", () => {
+        setHoveredNodeId(null);
         if (tooltipRef.current) tooltipRef.current.style.display = "none";
       })
       .call(
@@ -310,7 +310,7 @@ export default function GraphView() {
           }) as any,
       );
 
-    // Node labels (hidden by default)
+    // Node labels — default ON, 7px monospace, #bfcde0
     const nodeLabel = nodeGroup
       .selectAll("text.node-label")
       .data(nodes)
@@ -318,11 +318,11 @@ export default function GraphView() {
       .attr("class", "node-label")
       .attr("font-size", "7px")
       .attr("font-family", "monospace")
-      .attr("fill", "#7a8ba3")
+      .attr("fill", "#bfcde0")
       .attr("text-anchor", "middle")
       .attr("pointer-events", "none")
-      .attr("dy", (d) => nodeRadius(d.chunk) + 10)
-      .attr("opacity", 0)
+      .attr("dy", (d) => nodeRadius(d.chunk) + 9)
+      .attr("opacity", 0.8)
       .text((d) => shortLabel(d.id));
 
     /* ── Tick ─────────────────────────────────────────────── */
@@ -336,7 +336,6 @@ export default function GraphView() {
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
 
-      // Outer rings follow nodes
       nodeGroup
         .selectAll<SVGCircleElement, SimNode>("circle.critical-ring")
         .attr("cx", (d) => d.x!)
@@ -353,7 +352,7 @@ export default function GraphView() {
         .attr("y", (d: any) => (d.source.y + d.target.y) / 2 - 4);
     });
 
-    // Auto-fit zoom after simulation settles (~68% scale)
+    // Auto-fit after settle
     simulation.on("end", () => {
       const bounds = (g.node() as SVGGElement)?.getBBox();
       if (bounds && bounds.width > 0) {
@@ -372,20 +371,19 @@ export default function GraphView() {
       }
     });
 
-    return () => {
-      simulation.stop();
-    };
+    return () => { simulation.stop(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [portrait, filteredChunks]);
+  }, [portrait]);
 
-  /* ── Highlight logic (selection + view mode + search) ──── */
+  /* ── Highlight logic ───────────────────────────────────── */
 
   useEffect(() => {
     if (!svgRef.current || !portrait) return;
     const svg = d3.select(svgRef.current);
 
-    // Build neighbor map
+    // Build neighbor map + chunk lookup
     const neighborMap = new Map<string, Set<string>>();
+    const chunkMap = new Map(portrait.chunks.map((c) => [c.chunk_id, c]));
     for (const r of portrait.relations) {
       if (!neighborMap.has(r.source)) neighborMap.set(r.source, new Set());
       if (!neighborMap.has(r.target)) neighborMap.set(r.target, new Set());
@@ -395,15 +393,18 @@ export default function GraphView() {
 
     const expand1Hop = (ids: Set<string>): Set<string> => {
       const expanded = new Set(ids);
-      for (const id of ids) {
-        const neighbors = neighborMap.get(id);
-        if (neighbors) for (const n of neighbors) expanded.add(n);
+      for (const r of portrait.relations) {
+        if (ids.has(r.source) || ids.has(r.target)) {
+          expanded.add(r.source);
+          expanded.add(r.target);
+        }
       }
       return expanded;
     };
 
-    // Compute visible set based on view mode
-    let visibleSet: Set<string> | null = null; // null = show all
+    // ── View mode sets ──
+    let visibleSet: Set<string> | null = null;
+    let isGapsMode = false;
 
     if (viewMode === "critical") {
       const seeds = new Set(
@@ -427,33 +428,28 @@ export default function GraphView() {
       );
     } else if (viewMode === "meta") {
       const seeds = new Set(
-        portrait.chunks
-          .filter((c) => c.type === "meta")
-          .map((c) => c.chunk_id),
+        portrait.chunks.filter((c) => c.type === "meta").map((c) => c.chunk_id),
       );
       visibleSet = expand1Hop(seeds);
     } else if (viewMode === "emotions") {
       const seeds = new Set(
-        portrait.chunks
-          .filter((c) => c.type === "emotion")
-          .map((c) => c.chunk_id),
+        portrait.chunks.filter((c) => c.type === "emotion").map((c) => c.chunk_id),
       );
       visibleSet = expand1Hop(seeds);
     } else if (viewMode === "gaps") {
-      // Orphans: degree ≤ 1
+      isGapsMode = true;
       const degrees = new Map<string, number>();
       for (const r of portrait.relations) {
         degrees.set(r.source, (degrees.get(r.source) ?? 0) + 1);
         degrees.set(r.target, (degrees.get(r.target) ?? 0) + 1);
       }
-      // Clusters with zero cross-cluster edges
-      const crossCluster = new Set<string>();
+      const crossClusterCounts = new Map<string, number>();
       for (const r of portrait.relations) {
-        const srcChunk = portrait.chunks.find((c) => c.chunk_id === r.source);
-        const tgtChunk = portrait.chunks.find((c) => c.chunk_id === r.target);
-        if (srcChunk && tgtChunk && srcChunk.cluster !== tgtChunk.cluster) {
-          crossCluster.add(srcChunk.cluster);
-          crossCluster.add(tgtChunk.cluster);
+        const sc = chunkMap.get(r.source)?.cluster;
+        const tc = chunkMap.get(r.target)?.cluster;
+        if (sc && tc && sc !== tc) {
+          crossClusterCounts.set(sc, (crossClusterCounts.get(sc) ?? 0) + 1);
+          crossClusterCounts.set(tc, (crossClusterCounts.get(tc) ?? 0) + 1);
         }
       }
       visibleSet = new Set(
@@ -461,13 +457,13 @@ export default function GraphView() {
           .filter(
             (c) =>
               (degrees.get(c.chunk_id) ?? 0) <= 1 ||
-              !crossCluster.has(c.cluster),
+              (crossClusterCounts.get(c.cluster) ?? 0) === 0,
           )
           .map((c) => c.chunk_id),
       );
     }
 
-    // Graph search overlay dimming
+    // ── Graph search ──
     let searchSet: Set<string> | null = null;
     if (graphSearch.trim()) {
       const q = graphSearch.trim().toLowerCase();
@@ -483,7 +479,24 @@ export default function GraphView() {
       );
     }
 
-    // Selection highlighting
+    // ── Filter set (cluster + type + uniqueness from header dropdowns) ──
+    const activeCluster = filters.cluster;
+    const hasFilter = !!(filters.cluster || filters.type || filters.uniqueness);
+    let filterSet: Set<string> | null = null;
+    if (hasFilter) {
+      filterSet = new Set(
+        portrait.chunks
+          .filter((c) => {
+            if (filters.cluster && c.cluster !== filters.cluster) return false;
+            if (filters.type && c.type !== filters.type) return false;
+            if (filters.uniqueness && c.uniqueness !== filters.uniqueness) return false;
+            return true;
+          })
+          .map((c) => c.chunk_id),
+      );
+    }
+
+    // ── Selection ──
     let selectionSet: Set<string> | null = null;
     if (selectedChunkId) {
       selectionSet = new Set([selectedChunkId]);
@@ -491,66 +504,99 @@ export default function GraphView() {
       if (neighbors) for (const n of neighbors) selectionSet.add(n);
     }
 
-    // Apply node opacity
+    // ── Hover set ──
+    let hoverSet: Set<string> | null = null;
+    if (hoveredNodeId && !selectedChunkId) {
+      hoverSet = new Set([hoveredNodeId]);
+      const neighbors = neighborMap.get(hoveredNodeId);
+      if (neighbors) for (const n of neighbors) hoverSet.add(n);
+    }
+
+    // ── Helper: get link endpoint IDs ──
+    const linkIds = (d: SimLink): [string, string] => {
+      const src = typeof d.source === "object" ? (d.source as SimNode).id : String(d.source);
+      const tgt = typeof d.target === "object" ? (d.target as SimNode).id : String(d.target);
+      return [src, tgt];
+    };
+
+    // ── Apply node opacity (priority: selection > hover > search > filter > view mode > default) ──
     svg
       .selectAll<SVGCircleElement, SimNode>("circle.node")
       .attr("opacity", (d) => {
         if (selectionSet) return selectionSet.has(d.id) ? 1 : 0.07;
+        if (hoverSet) return d.id === hoveredNodeId ? 1 : hoverSet.has(d.id) ? 0.7 : 1;
         if (searchSet) return searchSet.has(d.id) ? 1 : 0.04;
-        if (visibleSet) return visibleSet.has(d.id) ? 1 : 0.05;
+        if (filterSet) return filterSet.has(d.id) ? 1 : 0.05;
+        if (visibleSet) {
+          if (isGapsMode) return visibleSet.has(d.id) ? 0.95 : 0.1;
+          return visibleSet.has(d.id) ? 1 : 0.05;
+        }
         return 1;
       });
 
-    // Outer rings follow node opacity
-    svg
-      .selectAll<SVGCircleElement, SimNode>("circle.critical-ring")
-      .attr("opacity", (d) => {
-        if (selectionSet) return selectionSet.has(d.id) ? 0.35 : 0.02;
-        if (searchSet) return searchSet.has(d.id) ? 0.35 : 0.02;
-        if (visibleSet) return visibleSet.has(d.id) ? 0.35 : 0.02;
-        return 0.35;
-      });
+    // Outer rings
+    const ringOpacity = (d: SimNode, baseOpacity: number) => {
+      if (selectionSet) return selectionSet.has(d.id) ? baseOpacity : 0.02;
+      if (searchSet) return searchSet.has(d.id) ? baseOpacity : 0.02;
+      if (filterSet) return filterSet.has(d.id) ? baseOpacity : 0.02;
+      if (visibleSet) return visibleSet.has(d.id) ? baseOpacity : 0.02;
+      return baseOpacity;
+    };
 
-    svg
-      .selectAll<SVGCircleElement, SimNode>("circle.meta-ring")
-      .attr("opacity", (d) => {
-        if (selectionSet) return selectionSet.has(d.id) ? 0.35 : 0.02;
-        if (searchSet) return searchSet.has(d.id) ? 0.35 : 0.02;
-        if (visibleSet) return visibleSet.has(d.id) ? 0.35 : 0.02;
-        return 0.35;
-      });
+    svg.selectAll<SVGCircleElement, SimNode>("circle.critical-ring")
+      .attr("opacity", (d) => ringOpacity(d, 0.35));
+    svg.selectAll<SVGCircleElement, SimNode>("circle.meta-ring")
+      .attr("opacity", (d) => ringOpacity(d, 0.35));
 
-    // Edge opacity
+    // ── Edge opacity ──
     svg
       .selectAll<SVGLineElement, SimLink>("line")
       .attr("stroke-opacity", (d) => {
-        const src =
-          typeof d.source === "object" ? (d.source as SimNode).id : String(d.source);
-        const tgt =
-          typeof d.target === "object" ? (d.target as SimNode).id : String(d.target);
+        const [src, tgt] = linkIds(d);
 
         if (selectionSet) {
-          return src === selectedChunkId || tgt === selectedChunkId ? 0.88 : 0.02;
+          return src === selectedChunkId || tgt === selectedChunkId ? 0.85 : 0.02;
+        }
+        if (hoverSet) {
+          return src === hoveredNodeId || tgt === hoveredNodeId ? 0.5 : 0.12;
         }
         if (searchSet) {
           return searchSet.has(src) && searchSet.has(tgt) ? 0.4 : 0.02;
         }
-        if (visibleSet) {
-          return visibleSet.has(src) && visibleSet.has(tgt) ? 0.3 : 0.02;
+        if (filterSet) {
+          const srcIn = filterSet.has(src);
+          const tgtIn = filterSet.has(tgt);
+          // Both endpoints in filter → full visible
+          if (srcIn && tgtIn) return 0.6;
+          // One endpoint touching → half visible
+          if (srcIn || tgtIn) return 0.3;
+          return 0.02;
         }
-        return 0.2;
+        if (visibleSet) {
+          const srcIn = visibleSet.has(src);
+          const tgtIn = visibleSet.has(tgt);
+          return srcIn || tgtIn ? 0.85 : 0.02;
+        }
+        return 0.12;
       });
 
-    // Labels visibility
-    svg
-      .selectAll<SVGTextElement, SimNode>("text.node-label")
-      .attr("opacity", () => (viewMode === "labels" ? 0.8 : 0));
+    // ── Labels visibility ──
+    const showLabels = viewMode !== "labels"; // default ON, toggle OFF
+    svg.selectAll<SVGTextElement, SimNode>("text.node-label")
+      .attr("opacity", (d) => {
+        if (!showLabels) return 0;
+        // Dim labels with their nodes
+        if (selectionSet) return selectionSet.has(d.id) ? 0.8 : 0.05;
+        if (searchSet) return searchSet.has(d.id) ? 0.8 : 0.03;
+        if (activeCluster) return d.chunk.cluster === activeCluster ? 0.8 : 0.05;
+        if (visibleSet) return visibleSet.has(d.id) ? 0.8 : 0.05;
+        return 0.8;
+      });
 
-    // Relation labels visibility
-    svg
-      .selectAll<SVGTextElement, SimLink>("g.link-labels text")
+    // Relation labels
+    svg.selectAll<SVGTextElement, SimLink>("g.link-labels text")
       .attr("opacity", () => (viewMode === "relations" ? 0.7 : 0));
-  }, [selectedChunkId, portrait, viewMode, graphSearch]);
+  }, [selectedChunkId, portrait, viewMode, graphSearch, filters.cluster, filters.type, filters.uniqueness, hoveredNodeId]);
 
   /* ── Rebuild on data / resize ──────────────────────────── */
 
@@ -560,10 +606,7 @@ export default function GraphView() {
   }, [buildGraph]);
 
   useEffect(() => {
-    const handleResize = () => {
-      const cleanup = buildGraph();
-      return () => cleanup?.();
-    };
+    const handleResize = () => { buildGraph(); };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [buildGraph]);
@@ -620,23 +663,6 @@ export default function GraphView() {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Node count overlay (top-right) */}
-      <div
-        className="absolute top-3 right-3 px-3 py-1.5 rounded text-xs font-mono"
-        style={{
-          background: "var(--surface-1)",
-          border: "1px solid var(--border)",
-          color: "var(--text-dim)",
-        }}
-      >
-        {filteredChunks.length} nodes ·{" "}
-        {portrait.relations.filter((r) => {
-          const ids = new Set(filteredChunks.map((c) => c.chunk_id));
-          return ids.has(r.source) && ids.has(r.target);
-        }).length}{" "}
-        edges
       </div>
     </div>
   );
