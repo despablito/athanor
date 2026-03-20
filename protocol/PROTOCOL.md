@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0-draft
 **Status:** Draft
-**License:** Apache 2.0
+**License:** MIT
 
 ## Abstract
 

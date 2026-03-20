@@ -11,8 +11,9 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://athanor.dev',
-  baseUrl: '/',
+  // Override for CI (e.g. GitHub Pages project sites) via DOCUSAURUS_URL / DOCUSAURUS_BASE_URL
+  url: process.env.DOCUSAURUS_URL ?? 'https://athanor.dev',
+  baseUrl: process.env.DOCUSAURUS_BASE_URL ?? '/',
 
   organizationName: 'anthropics',
   projectName: 'athanor',
@@ -81,7 +82,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Athanor Contributors. Apache 2.0 License.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Athanor Contributors. MIT License.`,
     },
     prism: {
       theme: prismThemes.github,

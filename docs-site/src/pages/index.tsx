@@ -57,7 +57,7 @@ export default function Home(): React.JSX.Element {
                 <div className="text--center padding-horiz--md">
                   <h3>Self-Hosted &amp; Open</h3>
                   <p>
-                    Apache 2.0 licensed. Run everything locally with Ollama
+                    MIT licensed. Run everything locally with Ollama
                     and PostgreSQL. Your identity data stays yours.
                   </p>
                 </div>

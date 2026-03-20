@@ -3,16 +3,29 @@ import { loadConfig, type CloneApiConfig } from "./config.js";
 import { PortraitStore } from "./portrait-store.js";
 import { CloneEngine } from "./clone.js";
 import { createApp } from "./server.js";
+import { loadPortraitIntoStore } from "./load-portrait-source.js";
 
 export async function startServer(overrides: Partial<CloneApiConfig> = {}): Promise<void> {
   const config = loadConfig(overrides);
   const store = new PortraitStore();
 
-  // Load portrait from file if specified
   if (config.portraitPath) {
     console.log(`Loading portrait from ${config.portraitPath}…`);
     const portrait = await store.loadFromFile(config.portraitPath);
     console.log(`  Loaded: ${portrait.subject.name} (${portrait.chunks.length} chunks, ${portrait.relations.length} relations)`);
+  } else if (config.portraitId) {
+    console.log(
+      `Loading portrait "${config.portraitId}" from ${config.databaseUrl}…`,
+    );
+    await loadPortraitIntoStore(store, config);
+    const loaded = store.get(config.portraitId);
+    if (loaded) {
+      console.log(
+        `  Loaded: ${loaded.subject.name} (${loaded.chunks.length} chunks, ${loaded.relations.length} relations)`,
+      );
+    } else {
+      console.log(`  Warning: no portrait found for id ${config.portraitId}`);
+    }
   }
 
   const engine = new CloneEngine(store, {
@@ -32,7 +45,7 @@ export async function startServer(overrides: Partial<CloneApiConfig> = {}): Prom
   const app = createApp({ store, engine, config });
 
   console.log(`\nAthanor Clone API listening on port ${config.port}`);
-  console.log(`  Mode: ${config.databaseUrl ? "database" : "JSON-only (in-memory)"}`);
+  console.log(`  Database URL: ${config.databaseUrl}`);
   console.log(`  LLM: ${config.llmProvider}${config.llmModel ? ` (${config.llmModel})` : ""}`);
   console.log(`  Portraits loaded: ${store.list().length}`);
   console.log("");
@@ -63,7 +76,7 @@ export {
   ragPipeline,
   vectorSearch,
   graphExpand,
-  rerank,
+  scoreChunk,
   assembleContext,
 } from "./rag.js";
 export type { ScoredChunk, RetrievalResult, RAGConfig } from "./rag.js";

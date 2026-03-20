@@ -7,3 +7,8 @@ dist/
 *.tsbuildinfo
 coverage/
 .DS_Store
+
+# Local QA / scratch (do not commit)
+/qa-portrait/
+/transcript.txt
+/TEST_REPORT.md

@@ -1,6 +1,9 @@
 services:
   postgres:
-    image: apache/age:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.postgres-age-vector
+    image: athanor-postgres-age-vector:latest
     ports:
       - "5432:5432"
     environment:
@@ -8,7 +11,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-athanor}
       POSTGRES_DB: ${POSTGRES_DB:-athanor}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # Postgres 18+ images expect a single mount at /var/lib/postgresql and create
+      # major-version-specific subdirectories internally.
+      - pgdata:/var/lib/postgresql
 
   ollama:
     image: ollama/ollama:latest

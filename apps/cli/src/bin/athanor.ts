@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "../lib/load-env.js";
 import { Command } from "commander";
 import { initCommand } from "../commands/init.js";
 import { importCommand } from "../commands/import.js";
@@ -14,6 +15,10 @@ import { exploreCommand } from "../commands/explore.js";
 import { serveCommand } from "../commands/serve.js";
 import { mcpCommand } from "../commands/mcp.js";
 import { interviewCommand } from "../commands/interview.js";
+import { secondOrderCommand } from "../commands/second-order.js";
+import { chatCommand } from "../commands/chat.js";
+import { redTeamCommand } from "../commands/red-team.js";
+import { stripDoubleDashBeforeSubcommand } from "../lib/cli-argv.js";
 
 const program = new Command();
 
@@ -36,5 +41,14 @@ program.addCommand(exploreCommand);
 program.addCommand(serveCommand);
 program.addCommand(mcpCommand);
 program.addCommand(interviewCommand);
+program.addCommand(secondOrderCommand);
+program.addCommand(chatCommand);
+program.addCommand(redTeamCommand);
 
-program.parse();
+const argv = stripDoubleDashBeforeSubcommand(process.argv);
+// Commander’s default for “no subcommand” is help on stderr + exit 1 — treat bare `athanor` as success.
+if (argv.slice(2).length === 0) {
+  program.outputHelp();
+  process.exit(0);
+}
+program.parse(argv);

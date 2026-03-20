@@ -79,11 +79,12 @@ beforeAll(() => {
     engine,
     config: {
       port: 3000,
-      databaseUrl: null,
+      databaseUrl: "file:./portrait.db",
       llmProvider: "ollama",
       ollamaBaseUrl: "http://localhost:11434",
       portraitPath: null,
       portraitId: null,
+      portraitSubjectName: null,
       vectorTopK: 5,
       rerankTopN: 10,
       contextBudgetTokens: 4000,

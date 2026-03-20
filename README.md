@@ -19,11 +19,11 @@
 
 ## Why Athanor?
 
-Most AI "personality" tools treat identity as a flat bag of traits or a single embedding over writing style. They *sound* like you until someone asks *why* you believe something, what exceptions you'd carve out, or how two contradictory preferences coexist — then the illusion breaks.
+Most AI “personality” tools treat identity as a flat bag of traits or a single embedding over writing style. They *sound* like you until someone asks *why* you believe something, what exceptions you’d carve out, or how two contradictory preferences coexist — then the illusion breaks.
 
 Athanor models identity as a **typed, directed knowledge graph** of atomic units called *Chunks* — heuristics, beliefs, emotions, contradictions, anti-patterns, rituals, and more — connected by meaningful *Relations* (e.g. `INSTANTIATES`, `CONTRASTS_WITH`, `HARDCODED_EXCEPTION`). Each chunk carries provenance, confidence, and uniqueness. The result is a **Portrait**: a traversable map of how someone actually thinks.
 
-When you talk to an Athanor **Clone**, retrieval isn't "top-5 similar paragraphs." It's **graph-aware RAG** — semantic search, graph expansion, uniqueness-aware scoring, and layer assembly — so the clone can articulate *why* it holds a position and surface tensions in its own worldview.
+When you talk to an Athanor **Clone**, retrieval isn’t “top-5 similar paragraphs.” It’s **graph-aware RAG** — semantic search, graph expansion, uniqueness-aware scoring, and layer assembly — so the clone can articulate *why* it holds a position and surface tensions in its own worldview.
 
 ---
 

@@ -1,0 +1,21 @@
+FROM apache/age:latest
+
+# Install pgvector in the same Postgres image that already ships with Apache AGE.
+# This ensures `CREATE EXTENSION vector` works for schema/sql/init.sql.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    ca-certificates \
+    postgresql-server-dev-all \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --depth 1 https://github.com/pgvector/pgvector.git /tmp/pgvector \
+  && cd /tmp/pgvector \
+  # pgvector can segfault on ARM when built with `-march=native`.
+  # Strip it from the Makefile to keep the build portable in Docker/CI.
+  && sed -i 's/-march=native//g' Makefile \
+  && make \
+  && make install \
+  && rm -rf /tmp/pgvector
+

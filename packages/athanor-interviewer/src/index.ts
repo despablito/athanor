@@ -1,3 +1,18 @@
+export {
+  IdentityInquisitor,
+  scanAttackVectors,
+  pickAttackVectors,
+  scanContradictionVectors,
+  scanOrphanHardRuleVectors,
+  describeAttackVector,
+} from "./inquisitor.js";
+export type {
+  AttackVector,
+  InquisitorJudgeResult,
+  RedTeamScenarioResult,
+  InquisitorPhase,
+} from "./inquisitor.js";
+
 export { Interviewer, InterviewSessionImpl } from "./agent.js";
 export { PHASES, PHASE_ORDER, getPhase, getNextPhase, getPhaseSystemPrompt } from "./phases.js";
 export { analyzeDepth, getAdaptiveFollowUp } from "./adaptive.js";

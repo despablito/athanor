@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "bin": {
-    "athanor": "./dist/bin/athanor.js"
+    "athanor": "./bin/athanor.mjs"
   },
   "scripts": {
+    "athanor": "node bin/athanor.mjs",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
     "lint": "eslint src/",
@@ -19,8 +20,11 @@
     "@athanor/extractor": "workspace:*",
     "@athanor/interviewer": "workspace:*",
     "@athanor/mcp-server": "workspace:*",
+    "@inquirer/prompts": "^8.3.2",
     "chalk": "^5.4.0",
     "commander": "^13.0.0",
+    "dotenv": "^17.3.1",
+    "inquirer": "^13.3.2",
     "ora": "^8.0.0"
   },
   "devDependencies": {

@@ -15,6 +15,8 @@ export const CHUNK_TYPES = [
   "rant",
   "meta",
   "ritual",
+  /** Non-negotiable rule / principle (often paired with INSTANTIATES examples) */
+  "hard_rule",
 ] as const;
 
 export type ChunkType = (typeof CHUNK_TYPES)[number];
@@ -34,6 +36,7 @@ export const CHUNK_TYPE_CODES: Record<ChunkType, string> = {
   rant: "RANT",
   meta: "META",
   ritual: "RITL",
+  hard_rule: "HRUL",
 };
 
 export const RELATION_TYPES = [
@@ -61,6 +64,7 @@ export const SOURCE_TYPES = [
   "social",
   "observation",
   "inferred",
+  "second_order_analysis",
 ] as const;
 
 export type SourceType = (typeof SOURCE_TYPES)[number];

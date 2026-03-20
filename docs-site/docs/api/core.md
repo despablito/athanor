@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # @athanor/core API
 
-The core library provides types, the Portrait class, GraphStore, validation, and export functions.
+The core library provides types, the Portrait class, graph storage (`createGraphStore`), validation, and export functions.
 
 ## Portrait
 
@@ -96,21 +96,22 @@ Validate the portrait against the Athanor Protocol.
 
 Serialize the portrait to JSON.
 
-## GraphStore
+## Graph storage (`GraphStore`)
 
-PostgreSQL + Apache AGE integration for persistent graph storage.
+Use `createGraphStore(connectionString)` to pick the backend:
+
+- **`postgres://` / `postgresql://`** — `PostgresGraphStore` (Apache AGE + pgvector; Cypher via `query()`).
+- **`file:` / `sqlite:` / `libsql:`** — `SqliteGraphStore` (local libSQL; no Cypher).
 
 ```typescript
-import { GraphStore } from '@athanor/core';
+import { createGraphStore } from '@athanor/core';
 
-const store = new GraphStore({
-  connectionString: 'postgresql://user:pass@localhost:5432/athanor',
-});
+const store = createGraphStore('postgresql://user:pass@localhost:5432/athanor');
 
 await store.connect();
 await store.importPortrait(portrait);
 
-// Cypher queries
+// Cypher (Postgres + AGE only)
 const result = await store.query(
   "MATCH (c:Chunk {type: 'heuristic'}) RETURN c"
 );
@@ -119,6 +120,13 @@ const result = await store.query(
 const neighbors = await store.getNeighbors('TDM-HEUR-001', 2, ['INSTANTIATES']);
 
 const exported = await store.exportPortrait('alex-chen');
+```
+
+Local zero-install example:
+
+```typescript
+const local = createGraphStore('file:./portrait.db');
+await local.connect();
 ```
 
 ## Validation
