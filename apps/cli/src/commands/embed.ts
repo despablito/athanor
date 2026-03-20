@@ -23,9 +23,7 @@ export const embedCommand = new Command("embed")
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .option("--output <path>", "Output JSON file for embeddings")
   .action(async (opts: EmbedOpts) => {
-    const portraitPath = resolvePortraitPath(opts.portrait, {
-      fallbackToExample: false,
-    });
+    const portraitPath = resolvePortraitPath(opts.portrait);
     const spinner = ora("Loading portrait…").start();
 
     try {

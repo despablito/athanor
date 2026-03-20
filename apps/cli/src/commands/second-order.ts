@@ -25,9 +25,7 @@ export const secondOrderCommand = new Command("second-order")
   .option("--dry-run", "Print results without modifying portrait", true)
   .option("--apply", "Actually add approved chunks to portrait (requires confirmation)", false)
   .action(async (opts: SecondOrderOpts) => {
-    const portraitPath = resolvePortraitPath(opts.portrait, {
-      fallbackToExample: false,
-    });
+    const portraitPath = resolvePortraitPath(opts.portrait);
     const portraitJSON = await loadPortraitJSON(portraitPath);
     const portrait = jsonToPortrait(portraitJSON);
 

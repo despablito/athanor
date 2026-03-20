@@ -18,6 +18,7 @@ import { interviewCommand } from "../commands/interview.js";
 import { secondOrderCommand } from "../commands/second-order.js";
 import { chatCommand } from "../commands/chat.js";
 import { redTeamCommand } from "../commands/red-team.js";
+import { stripDoubleDashBeforeSubcommand } from "../lib/cli-argv.js";
 
 const program = new Command();
 
@@ -44,16 +45,8 @@ program.addCommand(secondOrderCommand);
 program.addCommand(chatCommand);
 program.addCommand(redTeamCommand);
 
-// Commander’s default for “no subcommand” is help on stderr + exit 1 — terminals paint stderr red.
-// Treat bare `athanor` as a normal help request on stdout + exit 0.
-const argv = process.argv.slice(2);
-if (argv.length === 0) {
-  program.outputHelp();
-  process.exit(0);
-}
-
 const argv = stripDoubleDashBeforeSubcommand(process.argv);
-/** Commander’s default is exit 1 when no subcommand is given — treat as “show help”. */
+// Commander’s default for “no subcommand” is help on stderr + exit 1 — treat bare `athanor` as success.
 if (argv.slice(2).length === 0) {
   program.outputHelp();
   process.exit(0);

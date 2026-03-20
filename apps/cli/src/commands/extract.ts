@@ -36,9 +36,7 @@ export const extractCommand = new Command("extract")
       process.exit(1);
     }
 
-    const portraitPath = resolvePortraitPath(opts.portrait, {
-      fallbackToExample: false,
-    });
+    const portraitPath = resolvePortraitPath(opts.portrait);
     let portrait: PortraitJSON;
 
     if (existsSync(portraitPath)) {

@@ -27,9 +27,7 @@ dbCommand
   )
   .option("--portrait <path>", "Portrait file path", "./portrait.json")
   .action(async (opts: { connection: string; portrait: string }) => {
-    const portraitPath = resolvePortraitPath(opts.portrait, {
-      fallbackToExample: false,
-    });
+    const portraitPath = resolvePortraitPath(opts.portrait);
 
     const spinner = ora("Loading portrait…").start();
 
