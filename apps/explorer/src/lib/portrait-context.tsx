@@ -8,7 +8,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import type { PortraitJSON, Chunk, FilterState } from "./types";
+import type { PortraitJSON, Chunk, FilterState, ViewMode } from "./types";
 
 interface PortraitContextValue {
   portrait: PortraitJSON | null;
@@ -21,6 +21,8 @@ interface PortraitContextValue {
   filteredChunks: Chunk[];
   clusters: string[];
   types: string[];
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
   reload: () => void;
 }
 
@@ -43,6 +45,7 @@ export function PortraitProvider({
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [selectedChunkId, setSelectedChunkId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>(null);
   const [filters, setFilters] = useState<FilterState>({
     cluster: null,
     type: null,
@@ -115,6 +118,8 @@ export function PortraitProvider({
         filteredChunks,
         clusters,
         types,
+        viewMode,
+        setViewMode,
         reload: fetchPortrait,
       }}
     >

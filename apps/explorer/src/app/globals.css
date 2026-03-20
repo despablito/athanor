@@ -4,15 +4,15 @@
 
 @layer base {
   :root {
-    --surface-0: #0a0a0f;
-    --surface-1: #12121a;
-    --surface-2: #1a1a25;
-    --surface-3: #242430;
-    --surface-4: #2e2e3c;
-    --text-primary: #e4e4ed;
-    --text-secondary: #9494a8;
-    --text-dim: #5a5a70;
-    --border: #2a2a38;
+    --surface-0: #07090f;
+    --surface-1: #0f1420;
+    --surface-2: #151b2a;
+    --surface-3: #1c2436;
+    --surface-4: #243044;
+    --text-primary: #bfcde0;
+    --text-secondary: #7a8ba3;
+    --text-dim: #4a5a75;
+    --border: #18202e;
   }
 
   body {
@@ -51,5 +51,11 @@
 
   .panel-header {
     @apply px-4 py-3 border-b border-[--border] text-sm font-medium text-[--text-secondary] uppercase tracking-wider;
+  }
+}
+
+@layer utilities {
+  .opacity-transition {
+    transition: opacity 0.15s ease;
   }
 }
