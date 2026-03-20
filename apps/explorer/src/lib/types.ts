@@ -18,6 +18,7 @@ export interface Relation {
   target: string;
   type: string;
   description?: string;
+  weight?: number;
 }
 
 export interface PortraitJSON {
@@ -52,3 +53,14 @@ export type FilterState = {
   uniqueness: string | null;
   search: string;
 };
+
+export type ViewMode =
+  | "labels"
+  | "relations"
+  | "gaps"
+  | "critical"
+  | "identity"
+  | "knowledge"
+  | "meta"
+  | "emotions"
+  | null;
