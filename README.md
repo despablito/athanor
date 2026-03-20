@@ -30,9 +30,11 @@ When you talk to an Athanor **Clone**, retrieval isn’t “top-5 similar paragr
 ## Highlights
 
 - **Zero-config local mode** — Embedded graph + vector database (libSQL/SQLite). **No Docker required** to get started.
-- **Structured identity model** — 14 chunk types, 6 relation types, 3-level uniqueness scoring, per-chunk confidence
+- **Structured identity model** — 15 chunk types, 6 relation types, 3-level uniqueness scoring, per-chunk confidence
 - **AI Interviewer** — 5-phase adaptive interview agent for deep identity extraction
 - **Graph-aware RAG** — Vector search → graph expansion → reranking → layer assembly
+- **Second-order thinking** — LLM-driven consequence analysis of meta-chunks ("And then what?")
+- **Red-team probes** — Adversarial identity interrogation via contradiction vectors and orphan hard rules
 - **Interactive chat** — `athanor chat` for a terminal clone session (no HTTP server)
 - **Interactive Explorer** — D3.js force-directed graph, cluster maps, stats dashboards
 - **MCP integration** — Model Context Protocol server for Claude, Cursor, and friends
@@ -56,7 +58,7 @@ athanor extract ./my_notes.txt --provider anthropic
 athanor chat
 ```
 
-That’s it: a portrait on disk, chunks extracted from your text, then a **live interactive clone** in your terminal — ask questions, probe beliefs, and watch graph-aware retrieval keep the model grounded.
+That's it: a portrait on disk, chunks extracted from your text, then a **live interactive clone** in your terminal — ask questions, probe beliefs, and watch graph-aware retrieval keep the model grounded.
 
 > **Contributors / monorepo:** clone the repo, run `pnpm install && pnpm build`, then **`pnpm athanor <command>`** (runs the CLI via `tsx`; no global install). Alternatively: `pnpm --filter @athanor/cli run athanor -- <command>` after building the CLI, or `pnpm --filter @athanor/cli dev -- <command>`.
 
@@ -87,14 +89,21 @@ That’s it: a portrait on disk, chunks extracted from your text, then a **live 
               │           Portrait               │
               │  Typed knowledge graph of        │
               │  chunks + relations + metadata   │
-              └───────┬────────────────┬────────┘
-                      │                │
-         ┌────────────▼──┐    ┌───────▼──────────┐
-         │  Clone API    │    │    Explorer       │
-         │  + CLI chat   │    │  D3.js force      │
-         │  Graph-aware  │    │  graph + stats    │
-         │  RAG pipeline │    │                   │
-         └───────────────┘    └──────────────────┘
+              └──┬────────────┬────────────┬────┘
+                 │            │            │
+    ┌────────────▼──┐ ┌──────▼────────┐ ┌─▼────────────────┐
+    │  Clone API    │ │  Explorer     │ │  Second-Order     │
+    │  + CLI chat   │ │  D3.js force  │ │  Consequence      │
+    │  Graph-aware  │ │  graph + stats│ │  analysis feeds   │
+    │  RAG pipeline │ │               │ │  back → Portrait  │
+    └───────┬───────┘ └───────────────┘ └──────────────────┘
+            │
+    ┌───────▼───────┐
+    │  Red-Team     │
+    │  Adversarial  │
+    │  identity     │
+    │  probes       │
+    └───────────────┘
 ```
 
 ---
@@ -114,13 +123,14 @@ That’s it: a portrait on disk, chunks extracted from your text, then a **live 
 │  │  Portrait     │──│  Classifier       │──│  Adaptive Depth Detect   │   │
 │  │  GraphStore   │  │  Linker           │  │  Session Scheduling      │   │
 │  │  Validator    │  │  Meta-Generator   │  │  Transcript → Chunks     │   │
-│  │  Export       │  │  Embedder         │  │                          │   │
+│  │  Export       │  │  Embedder         │  │  Identity Inquisitor     │   │
 │  └──────┬────────┘  └────────┬──────────┘  └─────────┬────────────────┘  │
 │         │                    │                        │                   │
 │  ┌──────┴────────────────────┴────────────────────────┴──────────────┐   │
 │  │                         @athanor/cli                               │   │
 │  │  init · import · validate · stats · export · extract · chat        │   │
-│  │  interview · meta-generate · clone-prompt · embed · serve · mcp    │   │
+│  │  interview · meta-generate · second-order · clone-prompt · embed   │   │
+│  │  serve · mcp · red-team                                            │   │
 │  └────────────────────────────────────────────────────────────────────┘   │
 │                                                                          │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌────────────────────┐     │
@@ -150,11 +160,11 @@ That’s it: a portrait on disk, chunks extracted from your text, then a **live 
 | Feature | Athanor | Delphi | Uare.ai | Character.ai |
 |---|---|---|---|---|
 | Identity model | Typed knowledge graph | Profile summary | Trait vectors | Conversation fine-tune |
-| Chunk types | 14 (heuristic, belief, emotion, contradiction…) | N/A | ~5 traits | N/A |
+| Chunk types | 15 (heuristic, belief, emotion, contradiction, hard_rule…) | N/A | ~5 traits | N/A |
 | Relations | 6 typed (INSTANTIATES, CONTRASTS_WITH…) | None | None | None |
 | Uniqueness scoring | 3-level (CRITICAL/HIGH/MEDIUM) | None | None | None |
 | Confidence tracking | Per-chunk 0.0–1.0 | None | None | None |
-| Provenance | 9 source types | Limited | None | None |
+| Provenance | 10 source types | Limited | None | None |
 | Retrieval | Graph-aware RAG (4-stage) | Simple retrieval | Vector only | Full context |
 | Contradictions | First-class (HARDCODED_EXCEPTION) | Ignored | Ignored | Averaged out |
 | Export formats | JSON, Cypher, Markdown, Obsidian | Proprietary | Proprietary | None |
@@ -170,7 +180,7 @@ athanor/
 ├── packages/
 │   ├── athanor-core/          # Types, Portrait, graph stores (Postgres / libSQL), validation, export
 │   ├── athanor-extractor/     # LLM extraction: chunker, classifier, linker, embedder
-│   └── athanor-interviewer/   # AI interview agent: 5-phase adaptive identity extraction
+│   └── athanor-interviewer/   # AI interview agent: 5-phase adaptive extraction + red-team inquisitor
 ├── apps/
 │   ├── cli/                   # CLI: init, interview, extract, validate, chat, serve, …
 │   ├── clone-api/             # REST API: chat, portraits, chunks, stats
@@ -192,7 +202,8 @@ athanor/
 |---|---|---|
 | Core Library | TypeScript, AJV | Types, validation, dual graph backends, export |
 | Extractor | Anthropic / OpenAI / Ollama | LLM-powered chunk extraction pipeline |
-| Interviewer | LLM + adaptive prompts | 5-phase identity interview with depth detection |
+| Interviewer | LLM + adaptive prompts | 5-phase identity interview + red-team inquisitor |
+| Second-Order | LLM + graph analysis | Meta-chunk consequence reasoning ("And then what?") |
 | Clone API | Hono | REST API with graph-aware RAG |
 | Explorer | Next.js, React, D3.js, Tailwind | Interactive portrait visualization |
 | CLI | Commander.js | Full portrait lifecycle + `chat` |
@@ -207,7 +218,7 @@ athanor/
 
 The [Athanor Protocol](protocol/PROTOCOL.md) defines the data model for identity capture:
 
-- **Chunks** — Atomic units of identity (14 types: heuristic, belief, emotion, contradiction, anti-pattern, ritual…)
+- **Chunks** — Atomic units of identity (15 types: heuristic, belief, emotion, contradiction, anti-pattern, ritual, hard_rule…)
 - **Relations** — Directed edges (6 types: INSTANTIATES, ENABLES, LEARNED_FROM, CONTRASTS_WITH, HARDCODED_EXCEPTION, EXPRESSED_THROUGH)
 - **Portraits** — Complete identity capsules with metadata, provenance, and confidence scoring
 - **Clones** — AI agents loaded with a Portrait, respecting uniqueness and confidence levels
@@ -246,6 +257,7 @@ athanor extract <file>         LLM-extract chunks from text
 athanor validate               Validate portrait against schemas
 athanor stats                  Portrait statistics and coverage
 athanor meta-generate          Generate meta-chunks (patterns, principles)
+athanor second-order           Generate second-order consequences from meta-chunks
 athanor clone-prompt           Generate system prompt for clone
 athanor embed                  Generate embeddings for chunks
 athanor export                 Export to Cypher, Markdown, Obsidian
@@ -265,7 +277,7 @@ Most commands default to `./portrait.json`. If that file is missing, the CLI **f
 ## Roadmap
 
 - [ ] **v0.2** — Zero-friction local engine (embedded SQLite graph + vector store; first-class `athanor chat` + libSQL path)
-- [ ] **v0.3** — Adversarial self-play (red-team the clone’s identity to surface cognitive dissonance and blind spots)
+- [ ] **v0.3** — Adversarial self-play (red-team the clone's identity to surface cognitive dissonance and blind spots)
 - [ ] **v0.4** — Continuous latent persona (graph-augmented LoRA fine-tuning tied to the portrait)
 - [ ] **v1.0** — Stable protocol, published JSON-LD context, npm packages on the public registry
 
@@ -273,7 +285,7 @@ Most commands default to `./portrait.json`. If that file is missing, the CLI **f
 
 ## Contributing
 
-**You belong here.** Whether you’re fixing a typo, tightening a prompt, improving a diagram, or adding a storage backend — we’re glad you showed up.
+**You belong here.** Whether you're fixing a typo, tightening a prompt, improving a diagram, or adding a storage backend — we're glad you showed up.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, code style, and how to extend chunk types, relations, and extraction prompts. Open an issue to propose bigger ideas; open a PR for focused changes. Be kind, be clear, and ship small.
 
@@ -283,4 +295,4 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, code style, and how to extend
 
 Athanor is released under the **[MIT License](LICENSE)** — permissive, commercial-friendly, and simple. Use it in your product, your research, or your weekend hack. Attribution appreciated; legal headaches not required.
 
-If you build something cool, tell us — we’d love to see it.
+If you build something cool, tell us — we'd love to see it.
