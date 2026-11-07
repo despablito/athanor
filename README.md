@@ -15,6 +15,18 @@
 
 </div>
 
+> [!IMPORTANT]
+> **Status: archived (November 2026). Research prototype, no longer maintained.**
+>
+> Athanor was built in early 2026 to test one idea: that a typed knowledge graph of a person's beliefs, rules and contradictions makes a better "clone" than a profile summary or plain vector retrieval. What I learned:
+>
+> - **The data model held up.** Typed chunks with provenance, confidence, uniqueness and privacy layers, joined by typed relations, are a useful way to store what someone thinks and why. That protocol lives on in my later work on agent memory.
+> - **The retrieval did not.** In this codebase "graph-aware RAG" is keyword overlap plus neighbour expansion with hand-set weights. Embeddings are computed but not used in the chat path, and the tokenizer drops non-ASCII letters. With 2026 context windows a portrait of a few hundred chunks fits in a single prompt, so retrieval stopped being the hard problem.
+> - **What was missing is evaluation.** Nothing here measures whether the clone actually predicts the person — only schema validity and whether the clone stays in character. The right next step would be to score predictions of the person's real, held-out decisions against a no-portrait baseline.
+> - **Known issues:** the interview merge can write chunks that fail the schema; the MCP server does not filter `private` chunks; model IDs are outdated; `@athanor/cli` was never published to npm and the docs site is offline.
+>
+> The code stays here under MIT for anyone who wants to reuse the schema or the protocol. The sections below describe the original design intent, not measured performance.
+
 ---
 
 ## Why Athanor?
@@ -49,6 +61,7 @@ When you talk to an Athanor **Clone**, retrieval isn’t “top-5 similar paragr
 **Prerequisites:** Node ≥ 22 (see `.nvmrc`). No containers required for the path below.
 
 ```bash
+# not published to npm — run from the monorepo (see note below)
 npm install -g @athanor/cli
 
 athanor init "My Clone"
